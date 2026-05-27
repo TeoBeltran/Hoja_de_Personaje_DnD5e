@@ -1,0 +1,91 @@
+{
+  "personaje": {
+    "clase": "Brujo",
+    "raza": "Tiefling Mephistopheles"
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "42/42" },
+    { "nombre": "CA", "valor": "14" },
+    { "nombre": "Iniciativa", "valor": "+2" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "9" },
+    { "nombre": "Proficiencia", "valor": "+3" }
+  ],
+  "modificadores": [
+    { "nombre": "Fuerza (STR)",       "valor": "-1", "proficiente": false },
+    { "nombre": "Destreza (DEX)",     "valor": "+2", "proficiente": false },
+    { "nombre": "Constitución (CON)", "valor": "+2", "proficiente": false },
+    { "nombre": "Inteligencia (INT)", "valor": "+0", "proficiente": false },
+    { "nombre": "Sabiduría (WIS)",    "valor": "-1", "proficiente": false },
+    { "nombre": "Carisma (CHA)",      "valor": "+3", "proficiente": true }
+  ],
+  "salvaciones": [
+    { "nombre": "Fuerza (STR)",       "valor": "-1", "proficiente": false },
+    { "nombre": "Destreza (DEX)",     "valor": "+2", "proficiente": false },
+    { "nombre": "Constitución (CON)", "valor": "+2", "proficiente": false },
+    { "nombre": "Inteligencia (INT)", "valor": "+0", "proficiente": false },
+    { "nombre": "Sabiduría (WIS)",    "valor": "+2", "proficiente": false },
+    { "nombre": "Carisma (CHA)",      "valor": "+6", "proficiente": true }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "valor": "+2", "proficiente": false, "desc": "Controla tu capacidad para mantenerte en pie." },
+    { "nombre": "Perspicacia", "valor": "-1", "proficiente": false, "desc": "Mide tu capacidad de leer intenciones." },
+    { "nombre": "Interpretación", "valor": "+3", "proficiente": false, "desc": "Tu capacidad para actuar o entretener." },
+    { "nombre": "Trato con animales", "valor": "-1", "proficiente": false, "desc": "Tu habilidad para calmar animales." },
+    { "nombre": "Intimidación", "valor": "+3", "proficiente": false, "desc": "Capacidad de infundir miedo." },
+    { "nombre": "Persuasión", "valor": "+3", "proficiente": false, "desc": "Influir en otros con tacto." },
+    { "nombre": "Conoc. Arcano", "valor": "+3", "proficiente": true, "desc": "Saber sobre magia y planos." },
+    { "nombre": "Investigación", "valor": "+3", "proficiente": true, "desc": "Deducir hechos mediante pistas." },
+    { "nombre": "Religión", "valor": "+0", "proficiente": false, "desc": "Conocimiento sobre deidades." },
+    { "nombre": "Atletismo", "valor": "-1", "proficiente": false, "desc": "Escalar, saltar o nadar." },
+    { "nombre": "Medicina", "valor": "-1", "proficiente": false, "desc": "Estabilizar heridos." },
+    { "nombre": "Juego de manos", "valor": "+5", "proficiente": true, "desc": "Habilidad manual y prestidigitación." },
+    { "nombre": "Engaño", "valor": "+6", "proficiente": true, "desc": "Convencer a otros de una falsedad." },
+    { "nombre": "Naturaleza", "valor": "+0", "proficiente": false, "desc": "Conocimiento sobre flora y fauna." },
+    { "nombre": "Sigilo", "valor": "+2", "proficiente": false, "desc": "Escabullirse sin ser visto." },
+    { "nombre": "Historia", "valor": "+0", "proficiente": false, "desc": "Recordar eventos antiguos." },
+    { "nombre": "Percepción", "valor": "-1", "proficiente": false, "desc": "Notar detalles del entorno." },
+    { "nombre": "Supervivencia", "valor": "-1", "proficiente": false, "desc": "Seguir rastros y sobrevivir." }
+  ],
+  "rasgos": [
+    { "nombre": "Pact Magic", "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos." },
+    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño." },
+    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta." },
+    { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
+    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel)." },
+    { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
+    { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
+    { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
+    { "nombre": "Resistencia al fuego", "desc": "Tienes resistencia al daño de fuego." }
+  ],
+  "habilidadesUso": [
+    { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
+    { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "desc": "Acción, 15ft. Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
+    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "desc": "Acción Bonus, propio, concentración o 1 minuto. En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
+  ],
+  "equipo": [
+    { "nombre": "Cuero Tachonado", "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb." },
+    { "nombre": "Ballesta Ligera", "desc": "Arma a distancia. Propiedades: 2 manos, Recarga, Rango (80/320), Munición.\nDaño: 1d8 + 2 perforante.\nAtaque: +5 al 1d20 para acertar." }
+  ],
+  "hechizos": {
+        "ranuras": [
+            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "largo" },
+            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "largo" },
+            { "nivel": "Nivel 3", "cantidad": "2", "recupera": "largo" },
+            { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
+        ],
+        "lista": [
+            { "nivel": "CANTRIPS", "nombre": "Eldritch Blast: <span style=\"color: #6a1b9a;\">Acción, 120ft.</span>", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10 (+Agonizing Blast) de daño de fuerza." },
+            { "nivel": "CANTRIPS", "nombre": "Mage Hand", "desc": "Acción, 30ft. Crea una mano espectral..." },
+            { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "desc": "Acción, 60ft, 1 ronda. Dispara un pico..." },
+            { "nivel": "NIVEL 1", "nombre": "Find Familiar", "desc": "Acción, 1 hora, 10ft. Invoca un familiar..." },
+            { "nivel": "NIVEL 1", "nombre": "Hex", "desc": "Acción Bonus, 90ft, concentración..." },
+            { "nivel": "NIVEL 2", "nombre": "Misty Step", "desc": "Acción Bonus, propio. Teletransporte..." },
+            { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "desc": "Acción, 120ft. 3 rayos de fuego..." },
+            { "nivel": "NIVEL 3", "nombre": "Counterspell", "desc": "Reacción, 60ft. Interrumpe..." },
+            { "nivel": "NIVEL 3", "nombre": "Fear", "desc": "Acción, 30ft. Imagen fantasmal..." },
+            { "nivel": "NIVEL 3", "nombre": "Fireball", "desc": "Acción, 150ft. 8d6 daño fuego..." },
+            { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "desc": "Acción, 120ft. Charm..." }
+        ]
+    }
+}

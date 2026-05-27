@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Hoja de Personaje - DnD 5e</title>
+
+    <link rel="stylesheet" href="Estilos.css">
+
+    <!-- Librería para generar PDF -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+</head>
+
+<body>
+
+
+
+    <div class="container">
+
+        <header>
+
+            <h1>Hoja de Personaje</h1>
+
+            <p style="color: var(--text-muted); margin: 5px 0 0 0;">Haz clic en cualquier habilidad para ver su descripción</p>
+
+           
+
+            <!-- Botón de descarga -->
+
+            <div style="margin-top: 15px;">
+
+                <button id="download-pdf" class="skill-btn" style="background-color: var(--accent-color); color: white; padding: 10px 20px; border: none; cursor: pointer;">
+
+                    Descargar Hoja en PDF
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <main>
+
+            <section class="skills-container">
+
+                <h2>Habilidades (Skills)</h2>
+
+               
+
+                <div class="skills-grid">
+
+                    <button class="skill-btn" data-skill="Acrobacias" data-desc="Acrobacias (Destreza): Controla tu capacidad para mantenerte en pie en situaciones difíciles, como correr por una cuerda floja o hacer piruetas.">
+
+                        <span>Acrobacias</span>
+
+                        <span class="skill-mod">+2</span>
+
+                    </button>
+
+
+
+                    <button class="skill-btn" data-skill="Atletismo" data-desc="Atletismo (Fuerza): Cubre las situaciones difíciles en las que te encuentres al escalar, saltar o nadar.">
+
+                        <span>Atletismo</span>
+
+                        <span class="skill-mod">+4</span>
+
+                    </button>
+
+
+
+                    <button class="skill-btn" data-skill="Historia" data-desc="Historia (Inteligencia): Mide tu capacidad para recordar eventos históricos, reinos antiguos, leyendas o guerras pasadas.">
+
+                        <span>Historia</span>
+
+                        <span class="skill-mod">+0</span>
+
+                    </button>
+
+
+
+                    <button class="skill-btn" data-skill="Percepción" data-desc="Percepción (Sabiduría): Te permite ver, oír o detectar de otro modo la presencia de algo. Mide tu conocimiento general de tu entorno.">
+
+                        <span>Percepción</span>
+
+                        <span class="skill-mod">+3</span>
+
+                    </button>
+
+
+
+                    <button class="skill-btn" data-skill="Persuasión" data-desc="Persuasión (Carisma): Se utiliza cuando intentas influir en alguien con tacto, gracia social o buena naturaleza.">
+
+                        <span>Persuasión</span>
+
+                        <span class="skill-mod">+5</span>
+
+                    </button>
+
+
+
+                    <button class="skill-btn" data-skill="Sigilo" data-desc="Sigilo (Destreza): Se usa cuando intentas ocultarte de los enemigos, escabullirte sin hacer ruido o emboscar a alguien.">
+
+                        <span>Sigilo</span>
+
+                        <span class="skill-mod">+2</span>
+
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+
+    <div id="skill-modal" class="modal">
+
+        <div class="modal-content">
+
+            <span class="close-btn">&times;</span>
+
+            <h3 id="modal-title">Título de la Habilidad</h3>
+
+            <p id="modal-desc">Descripción detallada aquí...</p>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
