@@ -5,12 +5,14 @@
   },
   "estadisticas": [
     { "nombre": "Vida", "valor": "42/42" },
+    { "nombre": "Nivel", "valor": "6" },
     { "nombre": "CA", "valor": "14" },
-    { "nombre": "Iniciativa", "valor": "+2" },
+    { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "9" },
-    { "nombre": "Proficiencia", "valor": "+3" }
-  ],
+    { "nombre": "Percepción P.", "valor": "11" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+],
   "modificadores": [
     { "nombre": "Fuerza (STR)",       "valor": "-1", "proficiente": false },
     { "nombre": "Destreza (DEX)",     "valor": "+2", "proficiente": false },

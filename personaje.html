@@ -51,7 +51,7 @@
                 <div id="habilidades-uso-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
             </section>
             <section class="skills-container" style="margin-top: 20px;">
-                <h2>Armas y Armaduras</h2>
+                <h2 class="titulo-recordar">Armas y Armaduras</h2>
                 <div id="equipo-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
             </section>
             <section class="skills-container" style="margin-top: 20px;">
@@ -78,11 +78,11 @@
             <h3 style="color: var(--accent-color); margin-top: 0;">Tomar un Descanso</h3>
             <p style="line-height: 1.5;">Elegí qué tipo de descanso querés tomar:</p>
             <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px;">
-                <button id="rest-corto" class="hp-btn" style="background-color: #f9a825; color: #2e1a10;">
+                <button id="rest-corto" class="hp-btn" style="background-color: #a1887f; color: #2e1a10;">
                     ☕ Descanso Corto<br>
                     <span style="font-size: 0.85rem; font-weight: normal;">Recupera ranuras y habilidades marcadas como "corto"</span>
                 </button>
-                <button id="rest-largo" class="hp-btn" style="background-color: #2e7d32;">
+                <button id="rest-largo" class="hp-btn" style="background-color: #5d4037;">
                     🛏️ Descanso Largo<br>
                     <span style="font-size: 0.85rem; font-weight: normal;">Recupera TODO: vida, ranuras y habilidades</span>
                 </button>
@@ -106,6 +106,40 @@
                 <button class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
                 <button class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
             </div>            
+        </div>
+    </div>
+
+    <div id="hd-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-hd">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Hit Dice - Descanso Corto</h3>
+            <div id="hd-display" style="text-align: center; font-size: 1.3rem; font-weight: bold; margin: 10px 0; color: var(--accent-color);"></div>
+
+            <!-- PASO 1: Elegir cantidad de dados -->
+            <div id="hd-paso-1">
+                <p style="text-align: center; margin-bottom: 5px;">¿Cuántos dados querés usar?</p>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 15px;">
+                    <button id="hd-menos" class="hp-btn hp-damage" style="width: 50px;">-</button>
+                    <span id="hd-cantidad" style="font-size: 2.5rem; font-weight: bold; color: var(--accent-color); min-width: 60px; text-align: center;">0</span>
+                    <button id="hd-mas" class="hp-btn hp-heal" style="width: 50px;">+</button>
+                </div>
+                <p id="hd-lanzar-texto" style="text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--accent-color); margin-bottom: 15px;"></p>
+                <button id="hd-siguiente" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white;">Siguiente</button>
+            </div>
+
+            <!-- PASO 2: Ingresar cuánto se cura -->
+            <div id="hd-paso-2" style="display: none;">
+                <p style="text-align: center; margin-bottom: 10px;">Tirá los dados y sumá el total.</p>
+                <p style="text-align: center; margin-bottom: 5px;">Te curás:</p>
+                <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+                    <input id="hd-curacion-input" type="number" min="0" value="0" style="font-size: 2rem; font-weight: bold; text-align: center; width: 120px; padding: 8px; border: 2px solid var(--accent-color); border-radius: var(--border-radius); color: var(--accent-color); background-color: #fbf9f4;">
+                </div>
+                <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">puntos de vida</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button id="hd-volver" class="hp-btn" style="background-color: var(--text-muted); color: white;">← Volver</button>
+                    <button id="hd-aceptar" class="hp-btn hp-heal">Aceptar</button>
+                </div>
+            </div>
         </div>
     </div>
 

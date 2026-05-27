@@ -378,3 +378,25 @@ h2 {
     color: var(--text-color) !important;
 }
 
+/* En tablets y celulares: Modificadores y Salvaciones en grid 2x3 */
+@media (max-width: 768px) {
+    #mods-grid,
+    #saves-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Stats siempre en grid de 3 columnas */
+#stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* Slot vacío para mantener el grid 3x3 */
+.stat-vacio {
+    visibility: hidden;
+}
+
+/* Títulos en bordó (recordatorio de actualizar) */
+.titulo-recordar {
+    color: #8b0000 !important;
+}
