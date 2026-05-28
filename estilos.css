@@ -400,3 +400,27 @@ h2 {
 .titulo-recordar {
     color: #8b0000 !important;
 }
+
+/* Badges en hover: fondo violeta claro + borde y texto violeta oscuro (igual que las skills proficientes) */
+
+/* Atk Bonus (borde violeta, sin fondo) */
+.skill-btn:hover span[style*="border: 1px solid #6a1b9a"][style*="color: #6a1b9a"] {
+    background-color: #e1bee7 !important;
+    color: #4a148c !important;
+    border-color: #4a148c !important;
+}
+
+/* Daño (fondo violeta lleno) */
+.skill-btn:hover span.skill-mod[style*="background-color: #6a1b9a"] {
+    background-color: #e1bee7 !important;
+    color: #4a148c !important;
+    border: 1px solid #4a148c !important;
+}
+
+/* Tipo de daño y otros badges con borde marrón (manos, tipo de daño, etc.) */
+.skill-btn:hover span[style*="border: 1px solid var(--accent-color)"] {
+    background-color: #e1bee7 !important;
+    color: #4a148c !important;
+    border-color: #4a148c !important;
+}
+
