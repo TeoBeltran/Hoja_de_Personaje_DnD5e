@@ -1,12 +1,12 @@
 {
   "personaje": {
-    "clase": "Brujo",
+    "clase": "Clérigo",
     "raza": "Tiefling Mephistopheles"
   },
   "estadisticas": [
     { "nombre": "Vida", "valor": "42/42" },
     { "nombre": "Nivel", "valor": "6" },
-    { "nombre": "CA", "valor": "14" },
+    { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
     { "nombre": "Percepción P.", "valor": "11" },
@@ -66,8 +66,9 @@
     { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "desc": "Acción Bonus, propio, concentración o 1 minuto. En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
   ],
   "equipo": [
-    { "nombre": "Cuero Tachonado", "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb." },
-    { "nombre": "Ballesta Ligera: <span style=\"color: #6a1b9a;\">Daño: 1d8 + 2 perforante.</span>", "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Rango (80/320), Munición.</strong>\nAtaque: +5 al 1d20 para acertar." }
+    { "nombre": "Cuero Tachonado", "esArmadura": true, "tipoArmadura": "ligera", "armaduraBase": 12, "manos": 0, "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb." },
+    { "nombre": "Ballesta Ligera", "dano": "1d8", "tipoDano": "perforante", "tipo": "finesse", "manos": 2, "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Rango (80/320), Munición.</strong>" },
+    { "nombre": "EscudoTest", "esArmadura": true, "tipoArmadura": "escudo", "armaduraBase": 2, "manos": 1, "desc": "No usar, es para test." }
   ],
   "hechizos": {
         "ranuras": [
@@ -77,17 +78,17 @@
             { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
         ],
         "lista": [
-            { "nivel": "CANTRIPS", "nombre": "Eldritch Blast: <span style=\"color: #6a1b9a;\">Acción, 120ft.</span>", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10 (+Agonizing Blast) de daño de fuerza." },
-            { "nivel": "CANTRIPS", "nombre": "Mage Hand", "desc": "Acción, 30ft. Crea una mano espectral..." },
-            { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "desc": "Acción, 60ft, 1 ronda. Dispara un pico..." },
-            { "nivel": "NIVEL 1", "nombre": "Find Familiar", "desc": "Acción, 1 hora, 10ft. Invoca un familiar..." },
-            { "nivel": "NIVEL 1", "nombre": "Hex", "desc": "Acción Bonus, 90ft, concentración..." },
-            { "nivel": "NIVEL 2", "nombre": "Misty Step", "desc": "Acción Bonus, propio. Teletransporte..." },
-            { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "desc": "Acción, 120ft. 3 rayos de fuego..." },
-            { "nivel": "NIVEL 3", "nombre": "Counterspell", "desc": "Reacción, 60ft. Interrumpe..." },
-            { "nivel": "NIVEL 3", "nombre": "Fear", "desc": "Acción, 30ft. Imagen fantasmal..." },
-            { "nivel": "NIVEL 3", "nombre": "Fireball", "desc": "Acción, 150ft. 8d6 daño fuego..." },
-            { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "desc": "Acción, 120ft. Charm..." }
-        ]
+          { "nivel": "CANTRIPS", "nombre": "Eldritch Blast: <span style=\"color: #6a1b9a;\">Acción, 120ft.</span>", "dano": "1d10+3", "ataques": 2, "tipoDano": "fuerza", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10+3 (incluye Agonizing Blast) de daño de fuerza." },
+          { "nivel": "CANTRIPS", "nombre": "Mage Hand", "desc": "Acción, 30ft. Crea una mano espectral..." },
+          { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "tipoDano": "psíquico", "desc": "Acción, 60ft, 1 ronda. Dispara un pico..." },
+          { "nivel": "NIVEL 1", "nombre": "Find Familiar", "desc": "Acción, 1 hora, 10ft. Invoca un familiar..." },
+          { "nivel": "NIVEL 1", "nombre": "Hex", "dano": "1d6", "tipoDano": "necrótico", "desc": "Acción Bonus, 90ft, concentración..." },
+          { "nivel": "NIVEL 2", "nombre": "Misty Step", "desc": "Acción Bonus, propio. Teletransporte..." },
+          { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "dano": "2d6", "ataques": 3, "tipoDano": "fuego", "desc": "Acción, 120ft. 3 rayos de fuego, cada uno hace 2d6 de fuego." },
+          { "nivel": "NIVEL 3", "nombre": "Counterspell", "desc": "Reacción, 60ft. Interrumpe..." },
+          { "nivel": "NIVEL 3", "nombre": "Fear", "desc": "Acción, 30ft. Imagen fantasmal..." },
+          { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "desc": "..." },
+          { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "desc": "Acción, 120ft. Charm..." }
+      ]
     }
 }
