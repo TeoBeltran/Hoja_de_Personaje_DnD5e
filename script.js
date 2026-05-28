@@ -15,6 +15,18 @@ let hitDiceActual = 0;
 let hitDiceMaximo = 0;
 let hitDiceDado = 'd8';
 let hdCantidadAUsar = 0;
+let proficienciaActual = 2;         // El personaje a nivel 1 tiene 2
+let modPrincipal = 0;
+let nombreModPrincipal = '';
+let claseActual = '';
+let armaduraEquipadaId = null;
+let armaduraEquipadaBase = 0;
+let armaduraEquipadaTipo = '';
+let escudoEquipadoId = null;
+let escudoEquipadoBase = 0;
+let armasEquipadas = [];   // array de nombres de armas equipadas
+let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
+let modDexGlobal = 0;
 
 // Mapea nivel de hechizo a ranura. Si es Brujo, TODO va a Nivel 3.
 function mapNivelHechizoARanura(nivelHechizo) {
@@ -119,6 +131,77 @@ function guardarCA() {
     localStorage.setItem(STORAGE_PREFIX + 'caActual', String(caActual));
 }
 
+function guardarArmaduraEquipada() {
+    if (armaduraEquipadaId) {
+        localStorage.setItem(STORAGE_PREFIX + 'armaduraEquipada', armaduraEquipadaId);
+    } else {
+        localStorage.removeItem(STORAGE_PREFIX + 'armaduraEquipada');
+    }
+}
+
+function guardarEscudoEquipado() {
+    if (escudoEquipadoId) {
+        localStorage.setItem(STORAGE_PREFIX + 'escudoEquipado', escudoEquipadoId);
+    } else {
+        localStorage.removeItem(STORAGE_PREFIX + 'escudoEquipado');
+    }
+}
+
+function calcularCA() {
+    let ca = 0;
+    if (armaduraEquipadaId) {
+        if (armaduraEquipadaTipo === 'ligera') {
+            ca = armaduraEquipadaBase + modDexGlobal;
+        } else if (armaduraEquipadaTipo === 'mediana') {
+            // Mediana: máx +2 de DEX. Si DEX es negativo, sí se resta.
+            const dexAplicado = Math.min(modDexGlobal, 2);
+            ca = armaduraEquipadaBase + dexAplicado;
+        } else if (armaduraEquipadaTipo === 'pesada') {
+            // Pesada: no aplica DEX en absoluto.
+            ca = armaduraEquipadaBase;
+        } else {
+            ca = armaduraEquipadaBase + modDexGlobal;
+        }
+    } else {
+        // Sin armadura: 10 + DEX
+        ca = 10 + modDexGlobal;
+    }
+    if (escudoEquipadoId) {
+        ca += escudoEquipadoBase;
+    }
+    return ca;
+}
+
+function recalcularYActualizarCA() {
+    caActual = calcularCA();
+    caOriginal = caActual;
+    guardarCA();
+    actualizarCaDOM();
+}
+
+function guardarArmasEquipadas() {
+    localStorage.setItem(STORAGE_PREFIX + 'armasEquipadas', JSON.stringify(armasEquipadas));
+}
+
+function recalcularManosUsadas(equipoData) {
+    let manos = 0;
+    if (escudoEquipadoId) {
+        const esc = equipoData.find(e => e.nombre === escudoEquipadoId);
+        if (esc) manos += (esc.manos || 1);
+    }
+    armasEquipadas.forEach(nombre => {
+        const arma = equipoData.find(e => e.nombre === nombre);
+        if (arma) manos += (arma.manos || 1);
+    });
+    manosUsadas = manos;
+    return manos;
+}
+
+function actualizarManosDOM() {
+    const span = document.getElementById('manos-display');
+    if (span) span.textContent = `${manosUsadas} / 2`;
+}
+
 function actualizarCaDOM() {
     const btnCa = document.getElementById('ca-btn');
     if (btnCa) {
@@ -171,6 +254,22 @@ function calcularProficiencia(nivel) {
     return '+2';
 }
 
+// Convierte "+3" o "-1" a número 3 o -1
+function parseMod(modStr) {
+    return parseInt(modStr.replace('+', '')) || 0;
+}
+
+// Formatea un número como "+3", "-1", "+0"
+function formatMod(num) {
+    return (num >= 0 ? '+' : '') + num;
+}
+
+// Obtiene el modificador de un atributo desde data.modificadores
+function obtenerMod(modificadores, nombreParcial) {
+    const stat = modificadores.find(m => m.nombre.includes(nombreParcial));
+    return stat ? parseMod(stat.valor) : 0;
+}
+
 function obtenerHitDiceSegunClase(clase) {
     const mapa = {
         'Mago': 'd6',
@@ -187,7 +286,60 @@ function obtenerHitDiceSegunClase(clase) {
         'Ranger': 'd10',
         'Bárbaro': 'd12'
     };
-    return mapa[clase] || 'd8'; // Default d8 si no coincide
+    return mapa[clase] || 'd8';
+}
+
+// Devuelve el nivel máximo de armadura permitido: 'ninguna' | 'ligera' | 'mediana' | 'pesada'
+function armaduraMaximaSegunClase(clase) {
+    const mapa = {
+        'Mago': 'ninguna',
+        'Hechicero': 'ninguna',
+        'Monje': 'ninguna',
+        'Bárbaro': 'ninguna',
+        'Bardo': 'ligera',
+        'Pícaro': 'ligera',
+        'Brujo': 'ligera',
+        'Artífice': 'ligera',
+        'Druida': 'mediana',
+        'Explorador': 'mediana',
+        'Ranger': 'mediana',
+        'Paladín': 'pesada',
+        'Guerrero': 'pesada',
+        'Clérigo': 'pesada'
+    };
+    return mapa[clase] || 'pesada'; // Default: permite todo si la clase no está mapeada
+}
+
+function puedeUsarEscudoSegunClase(clase) {
+    const conEscudo = ['Paladín', 'Guerrero', 'Clérigo', 'Druida', 'Explorador', 'Ranger', 'Bárbaro', 'Artífice'];
+    return conEscudo.includes(clase);
+}
+
+// Verifica si la clase puede equipar la armadura. Devuelve {permitido: bool, razon: string}
+function validarArmaduraPorClase(item, clase) {
+    if (!item.esArmadura) return { permitido: true, razon: '' };
+
+    // Escudo
+    if (item.tipoArmadura === 'escudo') {
+        if (!puedeUsarEscudoSegunClase(clase)) {
+            return { permitido: false, razon: `${clase} no puede usar escudos` };
+        }
+        return { permitido: true, razon: '' };
+    }
+
+    // Armadura corporal
+    const max = armaduraMaximaSegunClase(clase);
+    const orden = { 'ninguna': 0, 'ligera': 1, 'mediana': 2, 'pesada': 3 };
+    const nivelItem = orden[item.tipoArmadura] ?? 0;
+    const nivelMax = orden[max] ?? 0;
+
+    if (nivelItem > nivelMax) {
+        if (max === 'ninguna') {
+            return { permitido: false, razon: `${clase} no puede usar armaduras` };
+        }
+        return { permitido: false, razon: `${clase} solo puede usar armadura ${max} o menor` };
+    }
+    return { permitido: true, razon: '' };
 }
 
 function actualizarHdCantidadDOM() {
@@ -327,8 +479,20 @@ async function init() {
         if (claseEl) claseEl.textContent = data.personaje.clase || '';
         if (razaEl) razaEl.textContent = data.personaje.raza || '';
         claseEsBrujo = (data.personaje.clase === "Brujo");
-        // Asignar tipo de Hit Die según la clase
+        claseActual = data.personaje.clase || '';
         hitDiceDado = obtenerHitDiceSegunClase(data.personaje.clase);
+
+        // Determinar la stat principal según la clase
+        const statPorClase = {
+            'Bardo': 'CHA', 'Brujo': 'CHA', 'Hechicero': 'CHA', 'Paladín': 'CHA',
+            'Clérigo': 'WIS', 'Druida': 'WIS', 'Ranger': 'WIS', 'Explorador': 'WIS',
+            'Mago': 'INT', 'Artífice': 'INT',
+            'Bárbaro': 'STR', 'Guerrero': 'STR',
+            'Pícaro': 'DEX',
+            'Monje': 'WIS'
+        };
+        nombreModPrincipal = statPorClase[data.personaje.clase] || 'STR';
+        modPrincipal = obtenerMod(data.modificadores, nombreModPrincipal);
     }
 
     // Inicializar ranuras
@@ -371,8 +535,39 @@ async function init() {
     // Calcular valores automáticos antes de renderizar
     const nivelStat = data.estadisticas.find(s => s.nombre === "Nivel");
     const nivelPersonaje = nivelStat ? parseInt(nivelStat.valor) : 1;
-    const dexStat = data.modificadores.find(m => m.nombre.includes("DEX") || m.nombre.includes("Destreza"));
-    const modDex = dexStat ? dexStat.valor : '+0';
+    const modDex = formatMod(obtenerMod(data.modificadores, "DEX"));
+    proficienciaActual = parseMod(calcularProficiencia(nivelPersonaje));
+
+    // Pre-cargar armadura, escudo y armas equipadas desde localStorage
+    modDexGlobal = obtenerMod(data.modificadores, "DEX");
+    const armaduraGuardada = localStorage.getItem(STORAGE_PREFIX + 'armaduraEquipada');
+    const escudoGuardado = localStorage.getItem(STORAGE_PREFIX + 'escudoEquipado');
+    const armasGuardadas = localStorage.getItem(STORAGE_PREFIX + 'armasEquipadas');
+    if (data.equipo) {
+        if (armaduraGuardada) {
+            const arm = data.equipo.find(e => e.esArmadura && e.tipoArmadura !== 'escudo' && e.nombre === armaduraGuardada);
+            if (arm) {
+                armaduraEquipadaId = arm.nombre;
+                armaduraEquipadaBase = arm.armaduraBase || 0;
+                armaduraEquipadaTipo = arm.tipoArmadura || 'ligera';
+            }
+        }
+        if (escudoGuardado) {
+            const esc = data.equipo.find(e => e.esArmadura && e.tipoArmadura === 'escudo' && e.nombre === escudoGuardado);
+            if (esc) {
+                escudoEquipadoId = esc.nombre;
+                escudoEquipadoBase = esc.armaduraBase || 0;
+            }
+        }
+        if (armasGuardadas) {
+            try {
+                armasEquipadas = JSON.parse(armasGuardadas);
+                // Filtrar las que aún existen en el JSON
+                armasEquipadas = armasEquipadas.filter(n => data.equipo.some(e => e.nombre === n && !e.esArmadura));
+            } catch(e) { armasEquipadas = []; }
+        }
+        recalcularManosUsadas(data.equipo);
+    }
 
     data.estadisticas.forEach(i => {
         // Resolver valores "auto"
@@ -383,6 +578,8 @@ async function init() {
                 i.valor = calcularProficiencia(nivelPersonaje);
             } else if (i.nombre === "Hit Dice") {
                 i.valor = `${nivelPersonaje}/${nivelPersonaje}`;
+            } else if (i.nombre === "CA") {
+                i.valor = String(calcularCA());
             }
         }
 
@@ -466,23 +663,244 @@ async function init() {
     });
 
     // Equipo
+    const modStr = obtenerMod(data.modificadores, "STR");
+    const modDexNum = obtenerMod(data.modificadores, "DEX");
+
+    // Función auxiliar: ¿el ítem está equipado?
+    const estaEquipado = (item) => {
+        if (item.esArmadura) {
+            return item.tipoArmadura === 'escudo'
+                ? (escudoEquipadoId === item.nombre)
+                : (armaduraEquipadaId === item.nombre);
+        }
+        return armasEquipadas.includes(item.nombre);
+    };
+
+    // Refresca solo el badge "Equipado" de una card sin re-renderizar todo
+    const refrescarCardEquipado = (item) => {
+        const card = document.querySelector(`.skill-btn[data-item-nombre="${item.nombre}"]`);
+        if (!card) return;
+        const eq = estaEquipado(item);
+        let badge = card.querySelector('.badge-equipado');
+        if (eq && !badge) {
+            const span = document.createElement('span');
+            span.className = 'badge-equipado';
+            span.textContent = '✓ Equipado';
+            span.style.cssText = 'display: inline-block; margin-top: 8px; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; border-radius: var(--border-radius); background-color: #2e7d32; color: white;';
+            card.appendChild(span);
+        } else if (!eq && badge) {
+            badge.remove();
+        }
+    };
+
     data.equipo.forEach(i => {
         const btn = document.createElement('button');
         btn.className = 'skill-btn';
+        btn.dataset.itemNombre = i.nombre;
         btn.style.flexDirection = 'column';
         btn.style.alignItems = 'flex-start';
         btn.style.height = 'auto';
+
+        let attackBonusHTML = '';
+        let danoFinal = i.dano || '';
+        if (i.tipo) {
+            const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
+            const bonus = proficienciaActual + modUsado;
+            attackBonusHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-right: 6px;">Atk: ${formatMod(bonus)}</span>`;
+            if (i.dano && modUsado !== 0) {
+                danoFinal = `${i.dano}${formatMod(modUsado)}`;
+            }
+        }
+        // Agregar multiplicador de ataques si existe
+        if (i.ataques && i.ataques > 1 && danoFinal) {
+            danoFinal = `${danoFinal} ×${i.ataques}`;
+        }
+
+        const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
+        const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${i.tipoDano}</span>` : '';
+
+        let armaduraHTML = '';
+        if (i.esArmadura) {
+            const esEscudo = (i.tipoArmadura === 'escudo');
+            const labelBadge = esEscudo ? `+${i.armaduraBase} CA` : `CA: ${i.armaduraBase}`;
+            const tipoLabel = i.tipoArmadura ? ` (${i.tipoArmadura})` : '';
+            armaduraHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-right: 6px;">${labelBadge}${tipoLabel}</span>`;
+        }
+
+        let manosHTML = '';
+        if (i.manos && i.manos > 0) {
+            manosHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-right: 6px;">${i.manos === 2 ? '2 manos' : '1 mano'}</span>`;
+        }
+
+        const eq = estaEquipado(i);
+        const equipadoBadgeHTML = eq
+            ? `<span class="badge-equipado" style="display: inline-block; margin-top: 8px; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; border-radius: var(--border-radius); background-color: #2e7d32; color: white;">✓ Equipado</span>`
+            : '';
+
         btn.innerHTML = `
-            <span style="font-weight: bold; margin-bottom: 5px;">${i.nombre}</span>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px; gap: 10px; flex-wrap: wrap;">
+                <span style="font-weight: bold;">${i.nombre}</span>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
+                    ${attackBonusHTML}
+                    ${armaduraHTML}
+                    ${manosHTML}
+                    ${danoHTML}
+                    ${tipoDanoHTML}
+                </div>
+            </div>
             <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${i.desc.replace(/\n/g, '<br>')}</span>
+            ${equipadoBadgeHTML}
         `;
-        btn.onclick = () => {
-            modalTitle.innerHTML = i.nombre;
-            modalDesc.innerHTML = i.desc.replace(/\n/g, '<br>');
-            if (modalActions) modalActions.style.display = 'none';
-            modal.style.display = 'flex';
-        };
+        btn.onclick = () => abrirModalEquipo(i, data.equipo);
         document.getElementById('equipo-grid').appendChild(btn);
+    });
+
+    // === Lógica de equipar/desequipar desde el modal ===
+    let itemModalActual = null;
+
+    function abrirModalEquipo(item, equipoData) {
+        itemModalActual = item;
+        modalTitle.innerHTML = item.nombre;
+        modalDesc.innerHTML = item.desc.replace(/\n/g, '<br>');
+        if (modalActions) modalActions.style.display = 'none';
+
+        const modalEquipar = document.getElementById('modal-equipar');
+        const btnEqModal = document.getElementById('btn-equipar-modal');
+
+        // Solo mostrar botón si el ítem es equipable (armadura, escudo o arma con manos)
+        const esEquipable = item.esArmadura || (item.manos && item.manos > 0);
+
+        if (esEquipable && modalEquipar && btnEqModal) {
+            modalEquipar.style.display = 'block';
+            const eq = estaEquipado(item);
+
+            if (eq) {
+                btnEqModal.textContent = '✓ Desequipar';
+                btnEqModal.style.backgroundColor = '#2e7d32';
+                btnEqModal.style.color = 'white';
+                btnEqModal.disabled = false;
+            } else {
+                // 1° Validar restricción por clase
+                const validacion = validarArmaduraPorClase(item, claseActual);
+                if (!validacion.permitido) {
+                    btnEqModal.textContent = `🚫 ${validacion.razon}`;
+                    btnEqModal.style.backgroundColor = '#c62828';
+                    btnEqModal.style.color = 'white';
+                    btnEqModal.disabled = true;
+                } else {
+                    // 2° Validar manos disponibles
+                    const manosNecesarias = item.manos || 0;
+                    const manosLibres = 2 - manosUsadas;
+                    const tieneEspacio = manosNecesarias <= manosLibres;
+
+                    if (tieneEspacio) {
+                        btnEqModal.textContent = 'Equipar';
+                        btnEqModal.style.backgroundColor = 'var(--accent-color)';
+                        btnEqModal.style.color = 'white';
+                        btnEqModal.disabled = false;
+                    } else {
+                        btnEqModal.textContent = `No hay manos libres (${manosLibres}/2)`;
+                        btnEqModal.style.backgroundColor = 'var(--text-muted)';
+                        btnEqModal.style.color = 'white';
+                        btnEqModal.disabled = true;
+                    }
+                }
+            }
+        } else if (modalEquipar) {
+            modalEquipar.style.display = 'none';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    // Listener único del botón Equipar dentro del modal
+    const btnEquiparModal = document.getElementById('btn-equipar-modal');
+    if (btnEquiparModal) {
+        btnEquiparModal.addEventListener('click', () => {
+            if (!itemModalActual) return;
+            const item = itemModalActual;
+            const yaEquipado = estaEquipado(item);
+
+            if (yaEquipado) {
+                // === DESEQUIPAR ===
+                if (item.esArmadura && item.tipoArmadura === 'escudo') {
+                    escudoEquipadoId = null;
+                    escudoEquipadoBase = 0;
+                    guardarEscudoEquipado();
+                } else if (item.esArmadura) {
+                    armaduraEquipadaId = null;
+                    armaduraEquipadaBase = 0;
+                    armaduraEquipadaTipo = '';
+                    guardarArmaduraEquipada();
+                } else {
+                    // Arma
+                    armasEquipadas = armasEquipadas.filter(n => n !== item.nombre);
+                    guardarArmasEquipadas();
+                }
+                mostrarToast(`${item.nombre} desequipado`);
+            } else {
+                // === EQUIPAR ===
+                // Validar restricción por clase
+                const validacion = validarArmaduraPorClase(item, claseActual);
+                if (!validacion.permitido) {
+                    mostrarToast(validacion.razon, 'warning');
+                    return;
+                }
+
+                const manosNecesarias = item.manos || 0;
+                const manosLibres = 2 - manosUsadas;
+                if (manosNecesarias > manosLibres) {
+                    mostrarToast(`No tenés manos libres para equipar ${item.nombre}`, 'warning');
+                    return;
+                }
+
+                if (item.esArmadura && item.tipoArmadura === 'escudo') {
+                    escudoEquipadoId = item.nombre;
+                    escudoEquipadoBase = item.armaduraBase || 0;
+                    guardarEscudoEquipado();
+                } else if (item.esArmadura) {
+                    armaduraEquipadaId = item.nombre;
+                    armaduraEquipadaBase = item.armaduraBase || 0;
+                    armaduraEquipadaTipo = item.tipoArmadura || 'ligera';
+                    guardarArmaduraEquipada();
+                } else {
+                    // Arma
+                    if (!armasEquipadas.includes(item.nombre)) {
+                        armasEquipadas.push(item.nombre);
+                    }
+                    guardarArmasEquipadas();
+                }
+                mostrarToast(`${item.nombre} equipado ✓`);
+            }
+
+            // Recalcular manos, CA y refrescar UI
+            recalcularManosUsadas(data.equipo);
+            actualizarManosDOM();
+            recalcularYActualizarCA();
+
+            // Refrescar todas las cards de equipo (para badge "Equipado")
+            data.equipo.forEach(eqItem => refrescarCardEquipado(eqItem));
+
+            // Cerrar modal
+            modal.style.display = 'none';
+        });
+    }
+
+    // Inicializar el contador de manos en el header
+    actualizarManosDOM();
+
+    // Calcular y mostrar Save DC y Spell Attack Bonus en headers
+    const saveDC = 8 + proficienciaActual + modPrincipal;
+    const spellAttackBonus = formatMod(proficienciaActual + modPrincipal);
+    document.querySelectorAll('.proficient').forEach(span => {
+        const txt = span.textContent;
+        if (txt.includes('Spell Attack Bonus')) {
+            span.textContent = `Spell Attack Bonus: ${spellAttackBonus}`;
+        } else if (txt.includes('Spell Save DC')) {
+            span.textContent = `Spell Save DC: ${saveDC}`;
+        } else if (txt.includes('Save DC')) {
+            span.textContent = `Save DC: ${saveDC}`;
+        }
     });
 
     // Habilidades con usos
@@ -578,8 +996,17 @@ async function init() {
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'flex-start';
             btn.style.height = 'auto';
+            const danoTexto = h.ataques && h.ataques > 1 ? `${h.dano} ×${h.ataques}` : h.dano;
+            const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTexto}</span>` : '';
+            const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${h.tipoDano}</span>` : '';
             btn.innerHTML = `
-                <span style="font-weight: bold; margin-bottom: 5px;">${h.nombre}</span>
+                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px; gap: 10px; flex-wrap: wrap;">
+                    <span style="font-weight: bold;">${h.nombre}</span>
+                    <div style="display: flex; align-items: center;">
+                        ${danoHTML}
+                        ${tipoDanoHTML}
+                    </div>
+                </div>
                 <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${h.desc.replace(/\n/g, '<br>')}</span>
             `;
             btn.onclick = () => {
@@ -646,7 +1073,37 @@ async function init() {
     const restCorto = document.getElementById('rest-corto');
     const restLargo = document.getElementById('rest-largo');
     if (restCorto) restCorto.addEventListener('click', () => tomarDescanso('corto'));
-    if (restLargo) restLargo.addEventListener('click', () => tomarDescanso('largo'));
+    if (restLargo) {
+        restLargo.addEventListener('click', () => {
+            // Cerrar modal de descanso y abrir el de confirmación del DM
+            document.getElementById('rest-modal').style.display = 'none';
+            document.getElementById('confirm-largo-modal').style.display = 'flex';
+        });
+    }
+
+    // Modal de confirmación del DM para descanso largo
+    const confirmSi = document.getElementById('confirm-largo-si');
+    const confirmNo = document.getElementById('confirm-largo-no');
+    if (confirmSi) {
+        confirmSi.addEventListener('click', () => {
+            document.getElementById('confirm-largo-modal').style.display = 'none';
+            tomarDescanso('largo');
+        });
+    }
+    if (confirmNo) {
+        confirmNo.addEventListener('click', () => {
+            document.getElementById('confirm-largo-modal').style.display = 'none';
+            mostrarToast('Descanso largo no aprobado por el DM', 'warning');
+        });
+    }
+
+    // Modal de confirmación: cerrar con la X
+    const confirmModal = document.getElementById('confirm-largo-modal');
+    const confirmCloseBtn = document.querySelector('.close-btn-confirm');
+    if (confirmCloseBtn) {
+        confirmCloseBtn.addEventListener('click', () => confirmModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === confirmModal) confirmModal.style.display = 'none'; });
 
     // Cerrar modal de descanso
     const restModal = document.getElementById('rest-modal');
@@ -744,6 +1201,15 @@ async function init() {
             document.getElementById('hd-paso-1').style.display = 'none';
             document.getElementById('hd-paso-2').style.display = 'block';
             document.getElementById('hd-curacion-input').value = 0;
+        });
+    }
+
+    // Modal de Hit Dice: botón Sin curarse (cierra el modal sin gastar dados)
+    const hdSaltar = document.getElementById('hd-saltar');
+    if (hdSaltar) {
+        hdSaltar.addEventListener('click', () => {
+            document.getElementById('hd-modal').style.display = 'none';
+            mostrarToast('Descanso corto finalizado sin curarse');
         });
     }
 
