@@ -657,6 +657,8 @@ async function init() {
             modalTitle.innerHTML = i.nombre;
             modalDesc.innerHTML = i.desc.replace(/\n/g, '<br>');
             if (modalActions) modalActions.style.display = 'none';
+            const modalEquipar = document.getElementById('modal-equipar');
+            if (modalEquipar) modalEquipar.style.display = 'none';
             modal.style.display = 'flex';
         };
         document.getElementById('rasgos-grid').appendChild(btn);
@@ -943,9 +945,10 @@ async function init() {
             btn.onclick = () => {
                 modalTitle.innerHTML = h.nombre;
                 modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
+                const modalEquipar = document.getElementById('modal-equipar');
+                if (modalEquipar) modalEquipar.style.display = 'none';
                 if (modalActions && useSpellBtn) {
                     modalActions.style.display = 'block';
-                    // Reutilizamos useSpellBtn pero con un marcador especial
                     useSpellBtn.dataset.nivel = '';
                     useSpellBtn.dataset.habilidad = h.nombre;
                     const dispActuales = parseInt(habilidadesUsoState[h.nombre].split('/')[0]);
@@ -1013,17 +1016,33 @@ async function init() {
                 modalTitle.innerHTML = h.nombre;
                 modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
 
-                const nivelRanura = mapNivelHechizoARanura(h.nivel);
-                if (nivelRanura && modalActions && useSpellBtn) {
-                    modalActions.style.display = 'block';
-                    useSpellBtn.dataset.nivel = nivelRanura;
-                    const disponibles = parseInt(ranurasState[nivelRanura]);
-                    useSpellBtn.disabled = disponibles <= 0;
-                    useSpellBtn.textContent = disponibles > 0
-                        ? `Usar Hechizo (${disponibles} disponibles en ${nivelRanura})`
-                        : 'Sin ranuras disponibles';
-                } else if (modalActions) {
-                    modalActions.style.display = 'none';
+                // Ocultar el botón Equipar (este NO es un ítem de equipo)
+                const modalEquipar = document.getElementById('modal-equipar');
+                if (modalEquipar) modalEquipar.style.display = 'none';
+
+                if (modalActions && useSpellBtn) {
+                    if (h.nivel === "CANTRIPS") {
+                        // Cantrips: se pueden usar libremente, no consumen ranura
+                        modalActions.style.display = 'block';
+                        useSpellBtn.dataset.nivel = '';
+                        useSpellBtn.dataset.cantrip = 'true';
+                        useSpellBtn.disabled = false;
+                        useSpellBtn.textContent = 'Usar Cantrip';
+                    } else {
+                        const nivelRanura = mapNivelHechizoARanura(h.nivel);
+                        if (nivelRanura) {
+                            modalActions.style.display = 'block';
+                            useSpellBtn.dataset.nivel = nivelRanura;
+                            useSpellBtn.dataset.cantrip = '';
+                            const disponibles = parseInt(ranurasState[nivelRanura]);
+                            useSpellBtn.disabled = disponibles <= 0;
+                            useSpellBtn.textContent = disponibles > 0
+                                ? `Usar Hechizo (${disponibles} disponibles en ${nivelRanura})`
+                                : 'Sin ranuras disponibles';
+                        } else {
+                            modalActions.style.display = 'none';
+                        }
+                    }
                 }
                 modal.style.display = 'flex';
             };
@@ -1041,7 +1060,14 @@ async function init() {
                 useSpellBtn.dataset.habilidad = '';
                 return;
             }
-            // Caso 2: es un hechizo (ranura)
+            // Caso 2: es un cantrip (no consume ranura)
+            if (useSpellBtn.dataset.cantrip === 'true') {
+                modal.style.display = 'none';
+                mostrarToast('¡Cantrip usado! ✨');
+                useSpellBtn.dataset.cantrip = '';
+                return;
+            }
+            // Caso 3: es un hechizo (ranura)
             const nivel = useSpellBtn.dataset.nivel;
             if (!nivel) return;
             let actual = parseInt(ranurasState[nivel]);
