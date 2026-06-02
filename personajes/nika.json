@@ -1,7 +1,8 @@
 {
   "personaje": {
+    "nombre": "Nika",
     "clase": "Paladín",
-    "raza": "Tiefling Mephistopheles"
+    "raza": "Aasimar"
   },
   "estadisticas": [
     { "nombre": "Vida", "valor": "42/42" },
@@ -50,45 +51,227 @@
     { "nombre": "Supervivencia", "valor": "-1", "proficiente": false, "desc": "Seguir rastros y sobrevivir." }
   ],
   "rasgos": [
-    { "nombre": "Pact Magic", "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos." },
-    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño." },
-    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta." },
-    { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
-    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel)." },
-    { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
-    { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
+    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma." },
+    { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
+    { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia al fuego", "desc": "Tienes resistencia al daño de fuego." }
+    { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." }
   ],
   "habilidadesUso": [
-    { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
-    { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "desc": "Acción, 15ft. Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
-    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "desc": "Acción Bonus, propio, concentración o 1 minuto. En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
+    {
+        "nombre": "Divine Sense",
+        "usos": "4/4",
+        "recupera": "largo",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Detectás la posición de cualquier celestial, demonio o no-muerto a 60 ft."
+    },
+    {
+        "nombre": "Lay on Hands",
+        "usos": "25/25",
+        "recupera": "largo",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Cura HP o enfermedades. Pool de 25 puntos curativos que se reparten como quieras."
+    },
+    {
+        "nombre": "Divine Smite",
+        "tipo": "smite",
+        "tipoDano": "radiante",
+        "danoPorNivel": {
+            "1": "2d8",
+            "2": "3d8",
+            "3": "4d8",
+            "4": "5d8"
+        },
+        "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
+    },
+    {
+        "nombre": "Channel Divinity: Nature's Wrath",
+        "usos": "1/1",
+        "recupera": "corto",
+        "accion": "Acción",
+        "distancia": "10 ft",
+        "desc": "Crea enredaderas espectrales a un enemigo a 10 ft. El objetivo hace tirada de STR o DEX o queda agarrado. Solo se libera al final de cada turno con la tirada."
+    },
+    {
+        "nombre": "Channel Divinity: Turn the Faithless",
+        "usos": "1/1",
+        "recupera": "corto",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "desc": "Cada hada o demonio que pueda oírte hace tirada de salvación de WIS. Si falla, durante 1 minuto o hasta que reciba daño queda con miedo hacia vos."
+    },
+    {
+        "nombre": "Healing Hands",
+        "usos": "1/1",
+        "recupera": "largo",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y la curás una cantidad de HP igual a tu nivel."
+    },
+    {
+        "nombre": "Radiant Soul",
+        "usos": "1/1",
+        "recupera": "largo",
+        "accion": "Acción",
+        "duracion": "1 minuto",
+        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Una vez por turno hacés daño radiante extra igual a tu nivel al usar un ataque o spell. Se apaga con Acción Bonus."
+    }
   ],
   "equipo": [
-    { "nombre": "Cuero Tachonado", "esArmadura": true, "tipoArmadura": "ligera", "armaduraBase": 12, "manos": 0, "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb." },
-    { "nombre": "Ballesta Ligera", "dano": "1d8", "tipoDano": "perforante", "tipo": "finesse", "manos": 2, "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Rango (80/320), Munición.</strong>" },
-    { "nombre": "EscudoTest", "esArmadura": true, "tipoArmadura": "escudo", "armaduraBase": 2, "manos": 1, "desc": "No usar, es para test." }
+    {
+        "nombre": "Lanza (1 mano)",
+        "dano": "1d6+2",
+        "tipoDano": "perforante",
+        "tipo": "melee",
+        "manos": 1,
+        "accion": "Acción",
+        "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+        "desc": "Versátil y arrojadiza. Empuñada a una mano: 1d6+2+STR perforante. El +2 viene de Dueling (solo si tenés la otra mano libre). Como arma arrojadiza, podés lanzarla hasta 20 ft (60 ft con desventaja)."
+    },
+    {
+        "nombre": "Lanza (2 manos)",
+        "dano": "1d8+2",
+        "tipoDano": "perforante",
+        "tipo": "melee",
+        "manos": 2,
+        "accion": "Acción",
+        "distancia": "Melee 5 ft",
+        "desc": "Versátil empuñada a dos manos: 1d8+2+STR perforante. Nota: a dos manos NO aplica el +2 de Dueling."
+    }
   ],
   "hechizos": {
         "ranuras": [
-            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 3", "cantidad": "2", "recupera": "largo" },
+            { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+            { "nivel": "Nivel 2", "cantidad": "2", "recupera": "largo" },
+            { "nivel": "Nivel 3", "cantidad": "0", "recupera": "largo" },
             { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
         ],
         "lista": [
-          { "nivel": "CANTRIPS", "nombre": "Eldritch Blast: <span style=\"color: #6a1b9a;\">Acción, 120ft.</span>", "dano": "1d10+3", "ataques": 2, "tipoDano": "fuerza", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10+3 (incluye Agonizing Blast) de daño de fuerza." },
-          { "nivel": "CANTRIPS", "nombre": "Mage Hand", "desc": "Acción, 30ft. Crea una mano espectral..." },
-          { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "tipoDano": "psíquico", "desc": "Acción, 60ft, 1 ronda. Dispara un pico..." },
-          { "nivel": "NIVEL 1", "nombre": "Find Familiar", "desc": "Acción, 1 hora, 10ft. Invoca un familiar..." },
-          { "nivel": "NIVEL 1", "nombre": "Hex", "dano": "1d6", "tipoDano": "necrótico", "desc": "Acción Bonus, 90ft, concentración..." },
-          { "nivel": "NIVEL 2", "nombre": "Misty Step", "desc": "Acción Bonus, propio. Teletransporte..." },
-          { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "dano": "2d6", "ataques": 3, "tipoDano": "fuego", "desc": "Acción, 120ft. 3 rayos de fuego, cada uno hace 2d6 de fuego." },
-          { "nivel": "NIVEL 3", "nombre": "Counterspell", "desc": "Reacción, 60ft. Interrumpe..." },
-          { "nivel": "NIVEL 3", "nombre": "Fear", "desc": "Acción, 30ft. Imagen fantasmal..." },
-          { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "desc": "..." },
-          { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "desc": "Acción, 120ft. Charm..." }
-      ]
+        {
+            "nivel": "CANTRIPS",
+            "nombre": "Light",
+            "accion": "Acción",
+            "distancia": "Toque",
+            "duracion": "1 hora",
+            "desc": "Tocás un objeto de hasta 10 ft. El objeto brilla intensamente en un radio de 20 ft y tenuemente otros 20 ft."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Bless",
+            "accion": "Acción",
+            "distancia": "30 ft",
+            "duracion": "Concentración, 1 minuto",
+            "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Command",
+            "accion": "Acción",
+            "distancia": "60 ft",
+            "duracion": "1 ronda",
+            "desc": "⚠️ En esta campaña no afecta a los enemigos."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Cure Wounds",
+            "dano": "1d8+3",
+            "tipoDano": "curación",
+            "accion": "Acción",
+            "distancia": "Toque",
+            "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Ensnaring Strike",
+            "dano": "1d6",
+            "tipoDano": "perforante",
+            "accion": "Acción Bonus",
+            "distancia": "Propio",
+            "duracion": "Concentración, 1 minuto",
+            "desc": "La próxima vez que golpees a una criatura con un arma, salen enredaderas espinosas: el objetivo hace tirada de STR o queda atrapado hasta que el hechizo termine. Las criaturas grandes tiran con ventaja. Mientras esté atrapado recibe 1d6 perforante al inicio de cada turno. Puede salirse con una tirada de STR contra tu DC."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Protection from Evil and Good",
+            "accion": "Acción",
+            "distancia": "Toque",
+            "duracion": "Concentración, 10 minutos",
+            "desc": "Una criatura que toques queda protegida de no-muertos (en esta campaña). Le tiran con desventaja en ataques, no puede ser charmed/frightened/possessed, y tiene ventaja para curarse."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Shield of Faith",
+            "accion": "Acción Bonus",
+            "distancia": "60 ft",
+            "duracion": "Concentración, 10 minutos",
+            "desc": "Un campo reluciente rodea a una criatura a elección dentro del rango, dándole +2 de CA mientras dure el hechizo."
+        },
+        {
+            "nivel": "NIVEL 1",
+            "nombre": "Speak with Animals",
+            "accion": "Acción",
+            "distancia": "Propio",
+            "duracion": "10 minutos",
+            "desc": "⚠️ En esta campaña no sirve."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Aid",
+            "accion": "Acción",
+            "distancia": "30 ft",
+            "duracion": "8 horas",
+            "desc": "Elegís 3 criaturas en rango. Cada una gana 5 HP máximos y actuales mientras dure el hechizo. Si se lanza con slot Nivel 3, son 10 HP."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Find Steed",
+            "accion": "Acción",
+            "distancia": "30 ft",
+            "duracion": "Hasta que muera",
+            "desc": "Invocás un espíritu en forma física: Colapinto. Si baja a 0 HP desaparece sin dejar rastro. Mientras estén a menos de 1 milla, se comunican telepáticamente. Cast time: 10 minutos."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Lesser Restoration",
+            "accion": "Acción",
+            "distancia": "Toque",
+            "desc": "Cura ceguera, sordera, parálisis o veneno. ⚠️ En esta campaña no sirve."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Magic Weapon",
+            "accion": "Acción Bonus",
+            "distancia": "Toque",
+            "duracion": "Concentración, 1 hora",
+            "desc": "Tocás un arma no-mágica. Mientras dure, esa arma es mágica con +1 a tiradas de ataque y daño."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Misty Step",
+            "accion": "Acción Bonus",
+            "distancia": "Propio",
+            "desc": "Te cubrís de niebla plateada y te teletransportás a un lugar vacío que puedas ver dentro de 30 ft."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Moonbeam",
+            "dano": "2d10",
+            "tipoDano": "radiante",
+            "accion": "Acción",
+            "distancia": "120 ft",
+            "duracion": "Concentración, 1 minuto",
+            "desc": "Crea un cilindro de luz pálida de 5 ft de radio y 40 ft de alto. Cuando una criatura entra al área por primera vez o inicia su turno ahí, hace tirada de CON: 2d10 radiante (mitad si pasa). En tu turno podés gastar Acción para mover el rayo 60 ft. +1d10 por cada slot superior al 2."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Zone of Truth",
+            "accion": "Acción",
+            "distancia": "60 ft",
+            "duracion": "10 minutos",
+            "desc": "Creás una zona mágica de 15 ft de radio. Cuando una criatura entra por primera vez o inicia su turno ahí, hace tirada de CHA. Si falla, no puede mentir conscientemente dentro del radio. Sabe que está afectada y puede evitar preguntas comprometedoras."
+        }
+    ]
     }
 }
