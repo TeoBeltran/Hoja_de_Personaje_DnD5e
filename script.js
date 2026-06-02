@@ -601,11 +601,11 @@ function actualizarPesoInventarioDOM() {
 
 // === Background ===
 
-// Aplica el background al personaje (suma rasgos y oro solo la primera vez)
+// Aplica el background al personaje (solo mergea rasgos)
 function aplicarBackground(background, equipoData) {
     if (!background) return;
 
-    // 1. Mergear habilidades del background a rasgos globales
+    // Mergear habilidades del background a rasgos globales
     if (background.habilidades && Array.isArray(background.habilidades)) {
         background.habilidades.forEach(hab => {
             // Evitar duplicados si ya existe un rasgo con el mismo nombre
@@ -614,26 +614,6 @@ function aplicarBackground(background, equipoData) {
                 rasgosGlobal.push(hab);
             }
         });
-    }
-
-    // 2. Sumar oro inicial UNA SOLA VEZ (flag en localStorage)
-    const flagKey = STORAGE_PREFIX + 'backgroundAplicado';
-    const yaAplicado = localStorage.getItem(flagKey);
-    if (!yaAplicado && background.oroInicial && background.oroInicial > 0) {
-        // Buscar el item "Oro" en el inventario; si no existe, crearlo
-        let oroItem = inventarioState.find(i => i.nombre === 'Oro');
-        if (oroItem) {
-            oroItem.cantidad += background.oroInicial;
-        } else {
-            inventarioState.push({
-                nombre: 'Oro',
-                peso: 0.02,
-                cantidad: background.oroInicial,
-                desc: 'Piezas de Oro.'
-            });
-        }
-        guardarInventario();
-        localStorage.setItem(flagKey, 'true');
     }
 }
 
