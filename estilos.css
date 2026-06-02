@@ -373,6 +373,18 @@ h2 {
     color: white !important;
 }
 
+/* Items del menú de turno: solo clickeables cuando están agotados (para restaurar) */
+.turno-item {
+    cursor: default !important;
+}
+.turno-item:has(.turno-valor[style*="c62828"]) {
+    cursor: pointer !important;
+}
+.turno-item:has(.turno-valor[style*="c62828"]):hover {
+    background-color: #f5f0e1 !important;
+    border-color: var(--accent-color) !important;
+}
+
 .skill-btn.proficient:hover span,
 .skill-btn.modificado:hover span {
     color: var(--text-color) !important;
