@@ -10,6 +10,10 @@
     --border-radius: 8px;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--bg-color);
@@ -197,12 +201,35 @@ h2 {
 
 /* Opcional: Para mejorar el espaciado en pantallas pequeñas */
 @media (max-width: 600px) {
+    body {
+        padding: 10px !important;
+    }
+
+    .skills-container {
+        padding: 12px !important;
+    }
+
     .skills-container > div {
         flex-direction: column;
         align-items: flex-start !important;
     }
     .skills-container > div > div {
         margin-top: 10px;
+    }
+
+    #stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .stat-vacio {
+        display: none !important;
+    }
+
+    .modal-content {
+        width: 90% !important;
+        max-width: 90% !important;
+        margin: 10% auto !important;
+        padding: 15px !important;
+        box-sizing: border-box !important;
     }
 }
 
@@ -393,14 +420,17 @@ h2 {
 /* En tablets y celulares: Modificadores y Salvaciones en grid 2x3 */
 @media (max-width: 768px) {
     #mods-grid,
-    #saves-grid {
+    #saves-grid,
+    #skills-grid {
         grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
-/* Stats siempre en grid de 3 columnas */
-#stats-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+/* Stats: 3 columnas en desktop */
+@media (min-width: 601px) {
+    #stats-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
 }
 
 /* Slot vacío para mantener el grid 3x3 */
@@ -434,5 +464,35 @@ h2 {
     background-color: #e1bee7 !important;
     color: #4a148c !important;
     border-color: #4a148c !important;
+}
+
+/* Modal de confirmación de inventario: por encima del modal de item */
+#inv-confirm-modal {
+    z-index: 150 !important;
+}
+
+/* Velocidad reducida por peso: badge en rojo */
+.skill-btn.velocidad-reducida {
+    border: 2px solid #c62828 !important;
+}
+
+.skill-btn.velocidad-reducida .skill-mod {
+    background-color: #c62828 !important;
+    color: white !important;
+}
+
+.skill-btn.velocidad-reducida:hover {
+    background-color: #ffcdd2 !important;
+    border-color: #c62828 !important;
+    color: var(--text-color) !important;
+}
+
+.skill-btn.velocidad-reducida:hover .skill-mod {
+    background-color: #c62828 !important;
+    color: white !important;
+}
+
+.skill-btn.velocidad-reducida:hover span {
+    color: var(--text-color) !important;
 }
 

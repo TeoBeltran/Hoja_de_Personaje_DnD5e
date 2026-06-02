@@ -10,7 +10,12 @@
 <body>
     <div class="container">
         <header>
-            <h1 id="nombre-personaje">Hoja de Personaje</h1>
+            <h1 id="nombre-personaje" style="display: inline-flex; align-items: center; gap: 12px; justify-content: center;">
+                <span class="icono-personaje" style="cursor: pointer; font-size: 1em; transition: transform 0.2s ease;" title="Ver imagen"></span>
+                <span id="nombre-texto">Hoja de Personaje</span>
+                <span class="icono-personaje" style="cursor: pointer; font-size: 1em; transition: transform 0.2s ease;" title="Ver imagen"></span>
+            </h1>
+            <br>
             <a href="index.html" style="display: inline-block; margin-top: 10px; color: var(--accent-color); text-decoration: none; font-size: 0.9rem;">← Volver al menú</a>
             <div style="display: flex; justify-content: center; gap: 20px; margin-top: 15px; flex-wrap: wrap; align-items: center;">
                 <div class="info-personaje">
@@ -212,6 +217,64 @@
 
     <div id="toast"></div>
 
+    <!-- Modal de Inventario -->
+    <div id="inventario-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-inventario">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0; margin-bottom: 4px;">🎒 Inventario</h3>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">
+                Peso: <span id="inventario-peso" style="font-weight: bold;">0 / 0 lb</span>
+            </div>
+            <div id="inventario-lista" style="display: grid; grid-template-columns: 1fr; gap: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación de cambio de inventario -->
+    <div id="inv-confirm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-inv-confirm">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Confirmar cambio</h3>
+            <p id="inv-confirm-texto" style="line-height: 1.5; text-align: center; font-size: 1.05rem; margin: 20px 0;"></p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button id="inv-confirm-no" class="hp-btn hp-damage">Cancelar</button>
+                <button id="inv-confirm-si" class="hp-btn hp-heal">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de detalle de item del inventario -->
+    <div id="inv-item-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-inv-item">&times;</span>
+            <h3 id="inv-item-title" style="color: var(--accent-color); margin-top: 0;"></h3>
+            <div id="inv-item-info" style="margin: 10px 0; font-size: 0.9rem; color: var(--text-muted);"></div>
+            <p id="inv-item-desc" style="line-height: 1.5;"></p>
+
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <p style="text-align: center; margin: 0 0 10px 0; font-weight: bold;">Modificar cantidad</p>
+                <div style="text-align: center; font-size: 1.3rem; font-weight: bold; color: var(--accent-color); margin-bottom: 10px;">
+                    Actual: <span id="inv-item-cantidad-actual">0</span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <button class="hp-btn hp-damage inv-modif" data-cant="-5">-5</button>
+                    <button class="hp-btn hp-heal inv-modif" data-cant="5">+5</button>
+                    <button class="hp-btn hp-damage inv-modif" data-cant="-1">-1</button>
+                    <button class="hp-btn hp-heal inv-modif" data-cant="1">+1</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+                    <label style="font-size: 0.9rem;">Manual:</label>
+                    <input id="inv-item-input" type="number" min="-99" value="0" style="flex: 1; padding: 6px; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 1rem;">
+                    <button id="inv-item-aplicar" class="hp-btn" style="background-color: var(--accent-color); color: white; padding: 8px 14px;">Aplicar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante de inventario -->
+    <div id="inventario-fab" style="position: fixed; bottom: 30px; right: 100px; z-index: 90;">
+        <button id="inventario-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Inventario">🎒</button>
+    </div>
+
     <!-- Menú flotante de turno -->
     <div id="turno-fab" style="position: fixed; bottom: 30px; right: 30px; z-index: 90;">
         <button id="turno-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Mi turno">⚔️</button>
@@ -246,6 +309,15 @@
             </div>
 
             <button id="turno-reset" class="hp-btn hp-heal" style="width: 100%; padding: 10px; font-weight: bold;">🔄 Terminé mi turno</button>
+        </div>
+    </div>
+
+    <!-- Modal de imagen del personaje -->
+    <div id="imagen-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px; text-align: center;">
+            <span class="close-btn-imagen">&times;</span>
+            <h1 id="imagen-modal-titulo" style="color: var(--accent-color); margin-top: 0;"></h1>
+            <img id="imagen-modal-img" src="" alt="" style="display: block; width: 100%; max-width: 400px; height: auto; aspect-ratio: 1 / 1; object-fit: contain; border-radius: var(--border-radius); border: 2px solid var(--accent-color); margin: 10px auto 0;">
         </div>
     </div>
 

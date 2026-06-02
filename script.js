@@ -28,6 +28,20 @@ let armasEquipadas = [];   // array de nombres de armas equipadas
 let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
 let modDexGlobal = 0;
 let modStrGlobal = 0;
+let statsGlobal = {};
+let rasgosGlobal = [];
+
+// === Inventario ===
+let inventarioState = []; // array con {nombre, peso, cantidad, desc}
+let itemInventarioActual = null;
+let cantidadInventarioPendiente = 0;
+
+// === Sistema de peso y velocidad ===
+let velocidadBase = 30; // Velocidad original del personaje (en ft)
+let velocidadActual = 30;
+let pesoCargado = 0;
+let pesoMaximo = 0;
+let tamanoPersonaje = 'estandar';
 
 // === Sistema de turno ===
 let turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
@@ -280,6 +294,457 @@ function obtenerMod(modificadores, nombreParcial) {
 
 // === Funciones del sistema de turno ===
 
+// Íconos por personaje (los mismos que en el menú principal)
+const ICONOS_PERSONAJE = {
+    'gangstur': '🔮',
+    'nika': '🛡️',
+    'lothar': '🗡️',
+    'lunareth': '📖',
+    'leonidas': '✨',
+    'orfe': '🌿'
+};
+
+// === Sistema de stats y proficiencias ===
+
+// Stats con proficiencia de Saving Throw por clase
+// El primero es la stat principal (también proficiente en modificadores)
+// El segundo es solo proficiente en saving throws
+const PROFICIENCIAS_POR_CLASE = {
+    'Bárbaro':   { principal: 'STR', savingExtra: 'CON' },
+    'Bardo':     { principal: 'CHA', savingExtra: 'DEX' },
+    'Brujo':     { principal: 'CHA', savingExtra: 'WIS' },
+    'Clérigo':   { principal: 'WIS', savingExtra: 'CHA' },
+    'Druida':    { principal: 'WIS', savingExtra: 'INT' },
+    'Explorador':{ principal: 'WIS', savingExtra: 'STR' },
+    'Ranger':    { principal: 'WIS', savingExtra: 'STR' },
+    'Guerrero':  { principal: 'STR', savingExtra: 'CON' },
+    'Hechicero': { principal: 'CHA', savingExtra: 'CON' },
+    'Mago':      { principal: 'INT', savingExtra: 'WIS' },
+    'Monje':     { principal: 'DEX', savingExtra: 'STR' },
+    'Paladín':   { principal: 'CHA', savingExtra: 'WIS' },
+    'Pícaro':    { principal: 'DEX', savingExtra: 'INT' },
+    'Artífice':  { principal: 'INT', savingExtra: 'CON' }
+};
+
+// Nombres completos para mostrar en el grid
+const NOMBRES_STATS = {
+    'STR': 'Fuerza (STR)',
+    'DEX': 'Destreza (DEX)',
+    'CON': 'Constitución (CON)',
+    'INT': 'Inteligencia (INT)',
+    'WIS': 'Sabiduría (WIS)',
+    'CHA': 'Carisma (CHA)'
+};
+
+// Mapa de skill → stat asociada
+const SKILL_STAT = {
+    'Atletismo': 'STR',
+    'Acrobacias': 'DEX',
+    'Juego de manos': 'DEX',
+    'Sigilo': 'DEX',
+    'Conoc. Arcano': 'INT',
+    'Historia': 'INT',
+    'Investigación': 'INT',
+    'Naturaleza': 'INT',
+    'Religión': 'INT',
+    'Trato animal': 'WIS',
+    'Perspicacia': 'WIS',
+    'Medicina': 'WIS',
+    'Percepción': 'WIS',
+    'Supervivencia': 'WIS',
+    'Engaño': 'CHA',
+    'Intimidación': 'CHA',
+    'Interpretación': 'CHA',
+    'Persuasión': 'CHA'
+};
+
+// Descripciones genéricas de cada skill
+const SKILL_DESC = {
+    'Atletismo': 'Escalar, saltar, nadar o cualquier acción atlética.',
+    'Acrobacias': 'Controla tu capacidad para mantenerte en pie y movimientos ágiles.',
+    'Juego de manos': 'Habilidad manual, robar de forma sigilosa y prestidigitación.',
+    'Sigilo': 'Escabullirse sin ser visto ni oído.',
+    'Conoc. Arcano': 'Saber sobre magia, hechizos, planos y criaturas mágicas.',
+    'Historia': 'Recordar eventos antiguos, reinos perdidos, guerras y dinastías.',
+    'Investigación': 'Deducir hechos mediante pistas y razonamiento.',
+    'Naturaleza': 'Conocimiento sobre flora, fauna, clima y ciclos naturales.',
+    'Religión': 'Conocimiento sobre deidades, ritos sagrados y jerarquías religiosas.',
+    'Trato animal': 'Tu habilidad para calmar, entender o controlar animales.',
+    'Perspicacia': 'Mide tu capacidad de leer intenciones y mentiras.',
+    'Medicina': 'Estabilizar heridos y diagnosticar enfermedades.',
+    'Percepción': 'Notar detalles del entorno con todos tus sentidos.',
+    'Supervivencia': 'Seguir rastros, cazar, sobrevivir en la naturaleza.',
+    'Engaño': 'Convencer a otros de una falsedad con palabras o gestos.',
+    'Intimidación': 'Capacidad de infundir miedo mediante amenazas o presencia.',
+    'Interpretación': 'Tu capacidad para actuar, cantar, contar historias o entretener.',
+    'Persuasión': 'Influir en otros con tacto, diplomacia y razón.'
+};
+
+// Calcula el modificador a partir del score (8→-1, 10→0, 14→+2, etc.)
+function statAMod(score) {
+    return Math.floor((score - 10) / 2);
+}
+
+// Calcula el valor de una skill: mod de la stat + (proficiencia si aplica)
+function calcularValorSkill(skill, stats, profBonus) {
+    const statKey = SKILL_STAT[skill.nombre];
+    if (!statKey || !stats || stats[statKey] === undefined) return 0;
+    let valor = statAMod(stats[statKey]);
+    if (skill.proficiente) valor += profBonus;
+    return valor;
+}
+
+// Genera el array de habilidades enriquecido (con valor y desc dinámicos)
+function generarHabilidades(habilidadesBase, stats, profBonus) {
+    if (!habilidadesBase) return [];
+    return habilidadesBase.map(skill => {
+        const valor = calcularValorSkill(skill, stats, profBonus);
+        const statKey = SKILL_STAT[skill.nombre] || '';
+        return {
+            nombre: skill.nombre,
+            valor: formatMod(valor),
+            proficiente: skill.proficiente || false,
+            stat: statKey,
+            desc: SKILL_DESC[skill.nombre] || ''
+        };
+    });
+}
+
+// Genera el array de modificadores a partir de stats y clase
+function generarModificadores(stats, clase) {
+    const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
+    return Object.keys(stats).map(key => ({
+        nombre: NOMBRES_STATS[key],
+        valor: formatMod(statAMod(stats[key])),
+        proficiente: key === prof.principal
+    }));
+}
+
+// Genera el array de salvaciones a partir de stats, clase y proficiencia bonus
+function generarSalvaciones(stats, clase, profBonus) {
+    const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
+    return Object.keys(stats).map(key => {
+        const esProficiente = (key === prof.principal || key === prof.savingExtra);
+        const mod = statAMod(stats[key]);
+        const valor = esProficiente ? mod + profBonus : mod;
+        return {
+            nombre: NOMBRES_STATS[key],
+            valor: formatMod(valor),
+            proficiente: esProficiente
+        };
+    });
+}
+
+// === Sistema de peso y velocidad ===
+
+// Multiplicador según tamaño del personaje
+function multiplicadorTamano(tamano) {
+    if (tamano === 'diminuto') return 0.5;
+    if (tamano === 'grande') return 2;
+    return 1; // estandar
+}
+
+// Calcula el peso total cargado: equipo (siempre) + inventario (cantidad × peso)
+function calcularPesoCargado(equipoData) {
+    let total = 0;
+    if (equipoData) {
+        equipoData.forEach(item => {
+            if (item.peso) total += item.peso;
+        });
+    }
+    inventarioState.forEach(item => {
+        if (item.peso && item.cantidad) {
+            total += item.peso * item.cantidad;
+        }
+    });
+    return Math.round(total * 100) / 100; // 2 decimales
+}
+
+// Calcula el peso máximo que puede llevar (STR × 15 × multiplicador tamaño)
+function calcularPesoMaximo(stats, tamano) {
+    const str = stats?.STR || 10;
+    const mult = multiplicadorTamano(tamano);
+    return str * 15 * mult;
+}
+
+// Calcula la velocidad actual según peso cargado
+function calcularVelocidad(pesoCargado, stats, tamano, velocidadBase) {
+    const str = stats?.STR || 10;
+    const mult = multiplicadorTamano(tamano);
+    const limite1 = str * 5 * mult;
+    const limite2 = str * 10 * mult;
+    const limite3 = str * 15 * mult;
+
+    if (pesoCargado <= limite1) return velocidadBase;
+    if (pesoCargado <= limite2) return Math.max(0, velocidadBase - 10);
+    if (pesoCargado <= limite3) return Math.max(0, velocidadBase - 20);
+    return 0; // Sobre el peso máximo
+}
+
+// Recalcula peso/velocidad y actualiza el DOM
+function recalcularPesoYVelocidad(equipoData) {
+    pesoCargado = calcularPesoCargado(equipoData);
+    pesoMaximo = calcularPesoMaximo(statsGlobal, tamanoPersonaje);
+    velocidadActual = calcularVelocidad(pesoCargado, statsGlobal, tamanoPersonaje, velocidadBase);
+    actualizarVelocidadDOM();
+    actualizarPesoInventarioDOM();
+}
+
+// Actualiza la velocidad mostrada en la stat
+function actualizarVelocidadDOM() {
+    // Buscamos el botón de Velocidad en el grid (no tiene id, lo identificamos por texto)
+    const stats = document.querySelectorAll('#stats-grid .skill-btn');
+    stats.forEach(btn => {
+        const span = btn.querySelector('span');
+        if (span && span.textContent === 'Velocidad') {
+            const mod = btn.querySelector('.skill-mod');
+            if (mod) mod.textContent = `${velocidadActual}ft`;
+            // Marcar en rojo si la velocidad bajó
+            if (velocidadActual < velocidadBase) {
+                btn.classList.add('velocidad-reducida');
+            } else {
+                btn.classList.remove('velocidad-reducida');
+            }
+        }
+    });
+}
+
+// Actualiza el peso mostrado en el header del modal de inventario
+function actualizarPesoInventarioDOM() {
+    const span = document.getElementById('inventario-peso');
+    if (span) {
+        span.textContent = `${pesoCargado} / ${pesoMaximo} lb`;
+        if (pesoCargado > pesoMaximo) {
+            span.style.color = '#c62828';
+        } else if (pesoCargado > pesoMaximo * (5/15)) {
+            // Más de STR×5 → ya tiene penalidad
+            span.style.color = '#f9a825';
+        } else {
+            span.style.color = 'var(--text-muted)';
+        }
+    }
+}
+
+// === Background ===
+
+// Aplica el background al personaje (suma rasgos y oro solo la primera vez)
+function aplicarBackground(background, equipoData) {
+    if (!background) return;
+
+    // 1. Mergear habilidades del background a rasgos globales
+    if (background.habilidades && Array.isArray(background.habilidades)) {
+        background.habilidades.forEach(hab => {
+            // Evitar duplicados si ya existe un rasgo con el mismo nombre
+            const yaExiste = rasgosGlobal.some(r => r.nombre === hab.nombre);
+            if (!yaExiste) {
+                rasgosGlobal.push(hab);
+            }
+        });
+    }
+
+    // 2. Sumar oro inicial UNA SOLA VEZ (flag en localStorage)
+    const flagKey = STORAGE_PREFIX + 'backgroundAplicado';
+    const yaAplicado = localStorage.getItem(flagKey);
+    if (!yaAplicado && background.oroInicial && background.oroInicial > 0) {
+        // Buscar el item "Oro" en el inventario; si no existe, crearlo
+        let oroItem = inventarioState.find(i => i.nombre === 'Oro');
+        if (oroItem) {
+            oroItem.cantidad += background.oroInicial;
+        } else {
+            inventarioState.push({
+                nombre: 'Oro',
+                peso: 0.02,
+                cantidad: background.oroInicial,
+                desc: 'Piezas de Oro.'
+            });
+        }
+        guardarInventario();
+        localStorage.setItem(flagKey, 'true');
+    }
+}
+
+// === Inventario ===
+
+function guardarInventario() {
+    localStorage.setItem(STORAGE_PREFIX + 'inventario', JSON.stringify(inventarioState));
+}
+
+function cargarInventario(inventarioJSON) {
+    const guardado = localStorage.getItem(STORAGE_PREFIX + 'inventario');
+    if (guardado) {
+        try {
+            inventarioState = JSON.parse(guardado);
+            // Sincronizar con JSON: agregar items nuevos del JSON que no estén en localStorage
+            inventarioJSON.forEach(itemJSON => {
+                const existe = inventarioState.find(i => i.nombre === itemJSON.nombre);
+                if (!existe) {
+                    inventarioState.push({ ...itemJSON });
+                } else {
+                    // Actualizar peso/desc del JSON pero mantener cantidad del localStorage
+                    existe.peso = itemJSON.peso;
+                    existe.desc = itemJSON.desc;
+                }
+            });
+        } catch(e) {
+            inventarioState = inventarioJSON.map(i => ({ ...i }));
+        }
+    } else {
+        inventarioState = inventarioJSON.map(i => ({ ...i }));
+    }
+}
+
+function renderInventarioLista() {
+    const cont = document.getElementById('inventario-lista');
+    if (!cont) return;
+    cont.innerHTML = '';
+
+    if (inventarioState.length === 0) {
+        cont.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Inventario vacío</p>';
+        return;
+    }
+
+    inventarioState.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-btn';
+        btn.style.cssText = 'display: flex; justify-content: space-between; align-items: center; width: 100%;';
+        btn.innerHTML = `
+            <span style="font-weight: bold;">${item.nombre}</span>
+            <span class="skill-mod" style="background-color: #6a1b9a; color: white;">x${item.cantidad}</span>
+        `;
+        btn.onclick = () => abrirModalItemInventario(item);
+        cont.appendChild(btn);
+    });
+}
+
+function abrirModalItemInventario(item) {
+    itemInventarioActual = item;
+    document.getElementById('inv-item-title').textContent = item.nombre;
+    document.getElementById('inv-item-info').textContent = `Peso: ${item.peso} lb por unidad`;
+    document.getElementById('inv-item-desc').innerHTML = (item.desc || '').replace(/\n/g, '<br>');
+    document.getElementById('inv-item-cantidad-actual').textContent = item.cantidad;
+    document.getElementById('inv-item-input').value = 0;
+    document.getElementById('inv-item-modal').style.display = 'flex';
+}
+
+function modificarCantidadInventario(cantidad) {
+    if (!itemInventarioActual || cantidad === 0) return;
+    cantidadInventarioPendiente = cantidad;
+    const actual = itemInventarioActual.cantidad;
+    const nueva = Math.max(0, actual + cantidad);
+    const signo = cantidad > 0 ? '+' : '';
+    document.getElementById('inv-confirm-texto').innerHTML =
+        `¿Querés <strong>${signo}${cantidad}</strong> de <strong>${itemInventarioActual.nombre}</strong>?<br>` +
+        `<span style="color: var(--text-muted); font-size: 0.9rem;">Cantidad actual: ${actual} → Nueva: ${nueva}</span>`;
+    document.getElementById('inv-confirm-modal').style.display = 'flex';
+}
+
+function aplicarCambioInventario() {
+    if (!itemInventarioActual) return;
+    const nuevaCantidad = Math.max(0, itemInventarioActual.cantidad + cantidadInventarioPendiente);
+    const cantidad = cantidadInventarioPendiente;
+    itemInventarioActual.cantidad = nuevaCantidad;
+    guardarInventario();
+    document.getElementById('inv-item-cantidad-actual').textContent = nuevaCantidad;
+    renderInventarioLista();
+    if (cantidad < 0) {
+        mostrarToast(`-${Math.abs(cantidad)} ${itemInventarioActual.nombre}`, 'warning');
+    } else if (cantidad > 0) {
+        mostrarToast(`+${cantidad} ${itemInventarioActual.nombre}`);
+    }
+    cantidadInventarioPendiente = 0;
+
+    // Recalcular peso y velocidad después del cambio
+    recalcularPesoYVelocidad(window._equipoData);
+}
+
+// === Sistema de bonos de daño dinámicos ===
+
+// Calcula el valor numérico de un bonoDano (puede ser número o nombre de stat)
+function resolverBono(bonoDano, stats) {
+    if (typeof bonoDano === 'number') return bonoDano;
+    if (typeof bonoDano === 'string' && stats && stats[bonoDano] !== undefined) {
+        return statAMod(stats[bonoDano]);
+    }
+    return 0;
+}
+
+// Determina si un bono se aplica a un item dado (arma o hechizo)
+function bonoAplicaA(rasgo, item, esHechizo, equipoData) {
+    if (!rasgo.aplicaA) return false;
+    const aplicaA = rasgo.aplicaA;
+
+    // Match por nombre específico
+    if (aplicaA.startsWith('hechizo:')) {
+        return esHechizo && aplicaA.substring(8).toLowerCase() === item.nombre.toLowerCase();
+    }
+    if (aplicaA.startsWith('arma:')) {
+        return !esHechizo && aplicaA.substring(5).toLowerCase() === item.nombre.toLowerCase();
+    }
+
+    // Match por categoría (solo armas)
+    if (esHechizo) return false;
+
+    if (aplicaA === 'armasUnaMano') return item.manos === 1;
+    if (aplicaA === 'armasDosManos') return item.manos === 2;
+    if (aplicaA === 'armasMelee') return item.tipo === 'melee';
+    if (aplicaA === 'armasRanged') return item.tipo === 'ranged';
+
+    // Caso especial: Dueling
+    if (aplicaA === 'duelingMelee') {
+        if (item.tipo !== 'melee' || item.manos !== 1) return false;
+        // Verificar que no haya OTRA arma equipada (escudo permitido)
+        const otrasArmas = armasEquipadas.filter(n => n !== item.nombre);
+        if (otrasArmas.length === 0) return true; // Solo este arma
+        // Si hay otras armas equipadas → no aplica
+        return false;
+    }
+
+    return false;
+}
+
+// Calcula los bonos aplicables a un item
+// Devuelve { totalBono: number, detalles: [{nombre, valor, fuente}] }
+function calcularBonosDano(item, esHechizo, rasgos, stats, equipoData) {
+    const detalles = [];
+    let total = 0;
+
+    if (!rasgos) return { totalBono: 0, detalles: [] };
+
+    rasgos.forEach(rasgo => {
+        if (rasgo.bonoDano !== undefined && bonoAplicaA(rasgo, item, esHechizo, equipoData)) {
+            const valor = resolverBono(rasgo.bonoDano, stats);
+            if (valor !== 0) {
+                detalles.push({ nombre: rasgo.nombre, valor: valor });
+                total += valor;
+            }
+        }
+    });
+
+    return { totalBono: total, detalles };
+}
+
+// Genera el string de daño con bonos: "1d10+3+2"
+function formatearDanoConBonos(danoBase, modBase, bonos) {
+    let resultado = danoBase;
+    if (modBase !== 0) {
+        resultado += formatMod(modBase);
+    }
+    bonos.forEach(b => {
+        if (b.valor !== 0) resultado += formatMod(b.valor);
+    });
+    return resultado;
+}
+
+// Genera el HTML de tooltip con detalles: "(+3 CHA, +2 Dueling)"
+function formatearDetalleBonos(modBase, nombreModBase, bonos) {
+    const partes = [];
+    if (modBase !== 0) partes.push(`${formatMod(modBase)} ${nombreModBase}`);
+    bonos.forEach(b => {
+        if (b.valor !== 0) partes.push(`${formatMod(b.valor)} ${b.nombre}`);
+    });
+    return partes.length > 0 ? `(${partes.join(', ')})` : '';
+}
+
 function calcularExtraAttacks(rasgos, clase, nivel) {
     // Caso especial: Guerrero tiene escalado automático según nivel
     if (clase === 'Guerrero') {
@@ -465,6 +930,25 @@ function puedeUsarEscudoSegunClase(clase) {
 }
 
 // Verifica si la clase puede equipar la armadura. Devuelve {permitido: bool, razon: string}
+// Verifica si el personaje cumple los requerimientos de stats del item
+// Devuelve { permitido: bool, razon: string }
+function validarRequerimientosStats(item, stats) {
+    if (!item.requiere || !stats) return { permitido: true, razon: '' };
+
+    for (const statKey of Object.keys(item.requiere)) {
+        const requerido = item.requiere[statKey];
+        const actual = stats[statKey] || 0;
+        if (actual < requerido) {
+            const nombreStat = NOMBRES_STATS[statKey] || statKey;
+            return {
+                permitido: false,
+                razon: `Requiere ${statKey} ${requerido} (Tenés ${actual})`
+            };
+        }
+    }
+    return { permitido: true, razon: '' };
+}
+
 function validarArmaduraPorClase(item, clase) {
     if (!item.esArmadura) return { permitido: true, razon: '' };
 
@@ -623,31 +1107,62 @@ async function init() {
 
     // Cargar Nombre, Clase y Raza desde el JSON
     if (data.personaje) {
-        const nombreEl = document.getElementById('nombre-personaje');
+        const nombreTextoEl = document.getElementById('nombre-texto');
+        const iconoEl = document.getElementById('icono-personaje');
         const claseEl = document.getElementById('clase-valor');
         const razaEl = document.getElementById('raza-valor');
-        if (nombreEl && data.personaje.nombre) {
-            nombreEl.textContent = data.personaje.nombre;
+        if (nombreTextoEl && data.personaje.nombre) {
+            nombreTextoEl.textContent = data.personaje.nombre;
             document.title = `${data.personaje.nombre} - Hoja de Personaje`;
         }
+        const iconosEl = document.querySelectorAll('.icono-personaje');
+        iconosEl.forEach(iconoEl => {
+            iconoEl.textContent = ICONOS_PERSONAJE[personajeId] || '🎭';
+            iconoEl.addEventListener('click', () => {
+                document.getElementById('imagen-modal-titulo').textContent = data.personaje.nombre || '';
+                const img = document.getElementById('imagen-modal-img');
+                img.src = `img/${personajeId}.png`;
+                img.alt = data.personaje.nombre || '';
+                document.getElementById('imagen-modal').style.display = 'flex';
+            });
+        });
         if (claseEl) claseEl.textContent = data.personaje.clase || '';
         if (razaEl) razaEl.textContent = data.personaje.raza || '';
         claseEsBrujo = (data.personaje.clase === "Brujo");
         claseActual = data.personaje.clase || '';
         hitDiceDado = obtenerHitDiceSegunClase(data.personaje.clase);
-
-        // Determinar la stat principal según la clase
-        const statPorClase = {
-            'Bardo': 'CHA', 'Brujo': 'CHA', 'Hechicero': 'CHA', 'Paladín': 'CHA',
-            'Clérigo': 'WIS', 'Druida': 'WIS', 'Ranger': 'WIS', 'Explorador': 'WIS',
-            'Mago': 'INT', 'Artífice': 'INT',
-            'Bárbaro': 'STR', 'Guerrero': 'STR',
-            'Pícaro': 'DEX',
-            'Monje': 'WIS'
-        };
-        nombreModPrincipal = statPorClase[data.personaje.clase] || 'STR';
-        modPrincipal = obtenerMod(data.modificadores, nombreModPrincipal);
     }
+
+    // Guardar rasgos globalmente para cálculo de bonos
+    rasgosGlobal = data.rasgos || [];
+
+    // Inicializar tamaño del personaje (estandar por defecto)
+    tamanoPersonaje = (data.personaje && data.personaje.tamano) || 'estandar';
+
+    // Guardar velocidad base del personaje (parseando el string del JSON)
+    const velStat = data.estadisticas.find(s => s.nombre === "Velocidad");
+    if (velStat) {
+        velocidadBase = parseInt(velStat.valor) || 30;
+        velocidadActual = velocidadBase;
+    }
+
+    // Generar modificadores y salvaciones desde stats
+    // Primero necesitamos el nivel para calcular la proficiencia
+    const nivelStatTmp = data.estadisticas.find(s => s.nombre === "Nivel");
+    const nivelTmp = nivelStatTmp ? parseInt(nivelStatTmp.valor) : 1;
+    const profBonusTmp = parseMod(calcularProficiencia(nivelTmp));
+
+    if (data.personaje && data.personaje.stats) {
+        statsGlobal = data.personaje.stats;
+        data.modificadores = generarModificadores(data.personaje.stats, data.personaje.clase);
+        data.salvaciones = generarSalvaciones(data.personaje.stats, data.personaje.clase, profBonusTmp);
+        data.habilidades = generarHabilidades(data.habilidades, data.personaje.stats, profBonusTmp);
+    }
+
+    // Stat principal según clase (para Spell Save DC, Spell Attack Bonus, etc)
+    const profDatos = PROFICIENCIAS_POR_CLASE[claseActual] || { principal: 'STR' };
+    nombreModPrincipal = profDatos.principal;
+    modPrincipal = obtenerMod(data.modificadores, nombreModPrincipal);
 
     // Inicializar ranuras
     data.hechizos.ranuras.forEach(r => {
@@ -687,10 +1202,9 @@ async function init() {
     const skG = document.getElementById('skills-grid');
 
     // Calcular valores automáticos antes de renderizar
-    const nivelStat = data.estadisticas.find(s => s.nombre === "Nivel");
-    const nivelPersonaje = nivelStat ? parseInt(nivelStat.valor) : 1;
+    const nivelPersonaje = nivelTmp;
     const modDex = formatMod(obtenerMod(data.modificadores, "DEX"));
-    proficienciaActual = parseMod(calcularProficiencia(nivelPersonaje));
+    proficienciaActual = profBonusTmp;
 
     // Pre-cargar armadura, escudo y armas equipadas desde localStorage
     modDexGlobal = obtenerMod(data.modificadores, "DEX");
@@ -796,8 +1310,10 @@ async function init() {
     data.salvaciones.forEach(i => vG.appendChild(createBtn(i)));
     data.habilidades.forEach(i => skG.appendChild(createBtn(i)));
 
-    // Rasgos
-    data.rasgos.forEach(i => {
+    // Rasgos (mergeamos los del background primero para que aparezcan en la lista)
+    aplicarBackground(data.background, data.equipo);
+
+    rasgosGlobal.forEach(i => {
         const btn = document.createElement('button');
         btn.className = 'skill-btn';
         btn.style.flexDirection = 'column';
@@ -805,11 +1321,11 @@ async function init() {
         btn.style.height = 'auto';
         btn.innerHTML = `
             <span style="font-weight: bold; margin-bottom: 5px;">${i.nombre}</span>
-            <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${i.desc.replace(/\n/g, '<br>')}</span>
+            <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${(i.desc || '').replace(/\n/g, '<br>')}</span>
         `;
         btn.onclick = () => {
             modalTitle.innerHTML = i.nombre;
-            modalDesc.innerHTML = i.desc.replace(/\n/g, '<br>');
+            modalDesc.innerHTML = (i.desc || '').replace(/\n/g, '<br>');
             if (modalActions) modalActions.style.display = 'none';
             const modalEquipar = document.getElementById('modal-equipar');
             if (modalEquipar) modalEquipar.style.display = 'none';
@@ -862,11 +1378,11 @@ async function init() {
         btn.style.height = 'auto';
 
         let danoFinal = i.dano || '';
-        if (i.tipo) {
+        if (i.dano && i.tipo) {
             const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
-            if (i.dano && modUsado !== 0) {
-                danoFinal = `${i.dano}${formatMod(modUsado)}`;
-            }
+            const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
+            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, data.equipo);
+            danoFinal = formatearDanoConBonos(i.dano, modUsado, bonosInfo.detalles);
         }
         if (i.ataques && i.ataques > 1 && danoFinal) {
             danoFinal = `${danoFinal} ×${i.ataques}`;
@@ -932,15 +1448,26 @@ async function init() {
 
         const partes = [];
 
-        // Daño + multiplicador
+        // Daño + multiplicador + bonos
         if (item.dano) {
             let danoTexto = item.dano;
+            const esHechizoItem = !item.manos && !item.esArmadura;
+            let modUsado = 0;
+            let nombreModUsado = '';
             if (item.tipo) {
-                const modUsado = (item.tipo === 'finesse') ? modDexGlobal : modStrGlobal;
-                if (modUsado !== 0) danoTexto = `${item.dano}${formatMod(modUsado)}`;
+                modUsado = (item.tipo === 'finesse') ? modDexGlobal : modStrGlobal;
+                nombreModUsado = (item.tipo === 'finesse') ? 'DEX' : 'STR';
             }
+            const bonosModalInfo = calcularBonosDano(item, esHechizoItem, rasgosGlobal, statsGlobal, data.equipo);
+            danoTexto = formatearDanoConBonos(item.dano, modUsado, bonosModalInfo.detalles);
             if (item.ataques && item.ataques > 1) danoTexto = `${danoTexto} ×${item.ataques}`;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
+
+            // Tooltip con detalle de bonos
+            const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, bonosModalInfo.detalles);
+            if (detalleStr) {
+                partes.push(`<span style="font-size: 0.8rem; color: var(--text-muted); padding: 2px 6px;">${detalleStr}</span>`);
+            }
         }
 
         // Tipo de daño
@@ -1084,8 +1611,14 @@ async function init() {
                 btnEqModal.disabled = false;
             } else {
                 const validacion = validarArmaduraPorClase(item, claseActual);
+                const validacionStats = validarRequerimientosStats(item, statsGlobal);
                 if (!validacion.permitido) {
                     btnEqModal.textContent = `🚫 ${validacion.razon}`;
+                    btnEqModal.style.backgroundColor = '#c62828';
+                    btnEqModal.style.color = 'white';
+                    btnEqModal.disabled = true;
+                } else if (!validacionStats.permitido) {
+                    btnEqModal.textContent = `🚫 ${validacionStats.razon}`;
                     btnEqModal.style.backgroundColor = '#c62828';
                     btnEqModal.style.color = 'white';
                     btnEqModal.disabled = true;
@@ -1146,6 +1679,13 @@ async function init() {
                     return;
                 }
 
+                // Validar requerimientos de stats
+                const validacionStats = validarRequerimientosStats(item, statsGlobal);
+                if (!validacionStats.permitido) {
+                    mostrarToast(validacionStats.razon, 'warning');
+                    return;
+                }
+
                 const manosNecesarias = item.manos || 0;
                 const manosLibres = 2 - manosUsadas;
                 if (manosNecesarias > manosLibres) {
@@ -1188,6 +1728,20 @@ async function init() {
     // Inicializar el contador de manos en el header
     actualizarManosDOM();
 
+    // Guardar equipo globalmente para recálculos posteriores
+    window._equipoData = data.equipo;
+
+    // Inicializar inventario
+    cargarInventario(data.inventario || []);
+
+    // Aplicar background (mergea rasgos y suma oro inicial una sola vez)
+    aplicarBackground(data.background, data.equipo);
+
+    renderInventarioLista();
+
+    // Calcular peso y velocidad inicial
+    recalcularPesoYVelocidad(data.equipo);
+
     // Inicializar sistema de turno (acá ya está STORAGE_PREFIX definido)
     extraAttacks = calcularExtraAttacks(data.rasgos, claseActual, nivelPersonaje);
     cargarTurnoEstado();
@@ -1196,6 +1750,81 @@ async function init() {
     // Detectar Divine Smite (si la clase tiene una habilidad con tipo "smite")
     if (data.habilidadesUso) {
         smiteData = data.habilidadesUso.find(h => h.tipo === 'smite') || null;
+    }
+
+    // === Listeners del inventario ===
+    const inventarioToggle = document.getElementById('inventario-toggle');
+    const inventarioModal = document.getElementById('inventario-modal');
+    const invItemModal = document.getElementById('inv-item-modal');
+    const invCloseBtn = document.querySelector('.close-btn-inventario');
+    const invItemCloseBtn = document.querySelector('.close-btn-inv-item');
+
+    if (inventarioToggle && inventarioModal) {
+        inventarioToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            renderInventarioLista();
+            inventarioModal.style.display = 'flex';
+        });
+    }
+
+    if (invCloseBtn) {
+        invCloseBtn.addEventListener('click', () => inventarioModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === inventarioModal) inventarioModal.style.display = 'none'; });
+
+    if (invItemCloseBtn) {
+        invItemCloseBtn.addEventListener('click', () => invItemModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === invItemModal) invItemModal.style.display = 'none'; });
+
+    // Listeners del modal de confirmación
+    const invConfirmModal = document.getElementById('inv-confirm-modal');
+    const invConfirmSi = document.getElementById('inv-confirm-si');
+    const invConfirmNo = document.getElementById('inv-confirm-no');
+    const invConfirmClose = document.querySelector('.close-btn-inv-confirm');
+
+    if (invConfirmSi) {
+        invConfirmSi.addEventListener('click', () => {
+            aplicarCambioInventario();
+            invConfirmModal.style.display = 'none';
+        });
+    }
+    if (invConfirmNo) {
+        invConfirmNo.addEventListener('click', () => {
+            cantidadInventarioPendiente = 0;
+            invConfirmModal.style.display = 'none';
+        });
+    }
+    if (invConfirmClose) {
+        invConfirmClose.addEventListener('click', () => {
+            cantidadInventarioPendiente = 0;
+            invConfirmModal.style.display = 'none';
+        });
+    }
+    window.addEventListener('click', (e) => {
+        if (e.target === invConfirmModal) {
+            cantidadInventarioPendiente = 0;
+            invConfirmModal.style.display = 'none';
+        }
+    });
+
+    // Botones +/- predefinidos
+    document.querySelectorAll('.inv-modif').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cantidad = parseInt(btn.dataset.cant);
+            modificarCantidadInventario(cantidad);
+        });
+    });
+
+    // Botón Aplicar (input manual)
+    const invItemAplicar = document.getElementById('inv-item-aplicar');
+    if (invItemAplicar) {
+        invItemAplicar.addEventListener('click', () => {
+            const input = document.getElementById('inv-item-input');
+            const cantidad = parseInt(input.value) || 0;
+            modificarCantidadInventario(cantidad);
+            input.value = 0;
+        });
     }
 
     // === Listeners del menú flotante de turno ===
@@ -1366,7 +1995,7 @@ async function init() {
         btn.id = `ranura-${i.nivel.replace(' ', '-')}`;
         btn.style.textAlign = 'center';
         const valorActual = ranurasState[i.nivel];
-        btn.innerHTML = `<span style="font-size: 0.8rem; display:block;">${i.nivel}</span><span class="valor-ranura" style="font-weight:bold;">${valorActual}</span>`;
+        btn.innerHTML = `<span style="font-weight:bold;">${i.nivel} (<span class="valor-ranura">${valorActual}</span>)</span>`;
         if (parseInt(valorActual) <= 0) btn.classList.add('ranura-vacia');
         ranurasG.appendChild(btn);
     });
@@ -1394,8 +2023,13 @@ async function init() {
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'flex-start';
             btn.style.height = 'auto';
-            const danoTexto = h.ataques && h.ataques > 1 ? `${h.dano} ×${h.ataques}` : h.dano;
-            const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTexto}</span>` : '';
+            let danoTextoSpell = h.dano || '';
+            if (h.dano) {
+                const bonosSpellInfo = calcularBonosDano(h, true, rasgosGlobal, statsGlobal, data.equipo);
+                danoTextoSpell = formatearDanoConBonos(h.dano, 0, bonosSpellInfo.detalles);
+                if (h.ataques && h.ataques > 1) danoTextoSpell = `${danoTextoSpell} ×${h.ataques}`;
+            }
+            const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTextoSpell}</span>` : '';
             const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${h.tipoDano}</span>` : '';
 
             // Línea celeste de info
@@ -1736,6 +2370,14 @@ async function init() {
         hdCloseBtn.addEventListener('click', () => hdModal.style.display = 'none');
     }
     window.addEventListener('click', (e) => { if (e.target === hdModal) hdModal.style.display = 'none'; });
+
+    // Modal de imagen del personaje: cerrar
+    const imagenModal = document.getElementById('imagen-modal');
+    const imagenCloseBtn = document.querySelector('.close-btn-imagen');
+    if (imagenCloseBtn) {
+        imagenCloseBtn.addEventListener('click', () => imagenModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === imagenModal) imagenModal.style.display = 'none'; });
 }
 
 document.addEventListener('DOMContentLoaded', init);
