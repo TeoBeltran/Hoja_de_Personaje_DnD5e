@@ -45,7 +45,6 @@
   ],
   "background": {
     "nombre": "False Identity",
-    "oroInicial": 15,
     "habilidades": [
       {
         "nombre": "False Identity",
@@ -124,7 +123,7 @@
         {
             "nombre": "Oro",
             "peso": 0.02,
-            "cantidad": 50,
+            "cantidad": 150,
             "desc": "Piezas de Oro."
         }
     ]
