@@ -2,10 +2,19 @@
   "personaje": {
     "nombre": "Nika",
     "clase": "Paladín",
-    "raza": "Aasimar"
+    "raza": "Aasimar",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 15,
+        "DEX": 10,
+        "CON": 14,
+        "INT": 8,
+        "WIS": 11,
+        "CHA": 16
+    }
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "42/42" },
+    { "nombre": "Vida", "valor": "48/48" },
     { "nombre": "Nivel", "valor": "6" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
@@ -13,45 +22,39 @@
     { "nombre": "Percepción P.", "valor": "11" },
     { "nombre": "Proficiencia", "valor": "auto" },
     { "nombre": "Hit Dice", "valor": "auto" }
-],
-  "modificadores": [
-    { "nombre": "Fuerza (STR)",       "valor": "-1", "proficiente": false },
-    { "nombre": "Destreza (DEX)",     "valor": "+2", "proficiente": false },
-    { "nombre": "Constitución (CON)", "valor": "+2", "proficiente": false },
-    { "nombre": "Inteligencia (INT)", "valor": "+0", "proficiente": false },
-    { "nombre": "Sabiduría (WIS)",    "valor": "-1", "proficiente": false },
-    { "nombre": "Carisma (CHA)",      "valor": "+3", "proficiente": true }
-  ],
-  "salvaciones": [
-    { "nombre": "Fuerza (STR)",       "valor": "-1", "proficiente": false },
-    { "nombre": "Destreza (DEX)",     "valor": "+2", "proficiente": false },
-    { "nombre": "Constitución (CON)", "valor": "+2", "proficiente": false },
-    { "nombre": "Inteligencia (INT)", "valor": "+0", "proficiente": false },
-    { "nombre": "Sabiduría (WIS)",    "valor": "+2", "proficiente": false },
-    { "nombre": "Carisma (CHA)",      "valor": "+6", "proficiente": true }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "valor": "+2", "proficiente": false, "desc": "Controla tu capacidad para mantenerte en pie." },
-    { "nombre": "Perspicacia", "valor": "-1", "proficiente": false, "desc": "Mide tu capacidad de leer intenciones." },
-    { "nombre": "Interpretación", "valor": "+3", "proficiente": false, "desc": "Tu capacidad para actuar o entretener." },
-    { "nombre": "Trato con animales", "valor": "-1", "proficiente": false, "desc": "Tu habilidad para calmar animales." },
-    { "nombre": "Intimidación", "valor": "+3", "proficiente": false, "desc": "Capacidad de infundir miedo." },
-    { "nombre": "Persuasión", "valor": "+3", "proficiente": false, "desc": "Influir en otros con tacto." },
-    { "nombre": "Conoc. Arcano", "valor": "+3", "proficiente": true, "desc": "Saber sobre magia y planos." },
-    { "nombre": "Investigación", "valor": "+3", "proficiente": true, "desc": "Deducir hechos mediante pistas." },
-    { "nombre": "Religión", "valor": "+0", "proficiente": false, "desc": "Conocimiento sobre deidades." },
-    { "nombre": "Atletismo", "valor": "-1", "proficiente": false, "desc": "Escalar, saltar o nadar." },
-    { "nombre": "Medicina", "valor": "-1", "proficiente": false, "desc": "Estabilizar heridos." },
-    { "nombre": "Juego de manos", "valor": "+5", "proficiente": true, "desc": "Habilidad manual y prestidigitación." },
-    { "nombre": "Engaño", "valor": "+6", "proficiente": true, "desc": "Convencer a otros de una falsedad." },
-    { "nombre": "Naturaleza", "valor": "+0", "proficiente": false, "desc": "Conocimiento sobre flora y fauna." },
-    { "nombre": "Sigilo", "valor": "+2", "proficiente": false, "desc": "Escabullirse sin ser visto." },
-    { "nombre": "Historia", "valor": "+0", "proficiente": false, "desc": "Recordar eventos antiguos." },
-    { "nombre": "Percepción", "valor": "-1", "proficiente": false, "desc": "Notar detalles del entorno." },
-    { "nombre": "Supervivencia", "valor": "-1", "proficiente": false, "desc": "Seguir rastros y sobrevivir." }
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": true },
+    { "nombre": "Conoc. Arcano", "proficiente": false },
+    { "nombre": "Engaño", "proficiente": false },
+    { "nombre": "Historia", "proficiente": false },
+    { "nombre": "Interpretación", "proficiente": false },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": false },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": false },
+    { "nombre": "Persuasión", "proficiente": true },
+    { "nombre": "Perspicacia", "proficiente": true },
+    { "nombre": "Religión", "proficiente": true },
+    { "nombre": "Sigilo", "proficiente": false },
+    { "nombre": "Supervivencia", "proficiente": false },
+    { "nombre": "Trato animal", "proficiente": false }
   ],
+  "background": {
+    "nombre": "Shelter of the Faithful",
+    "oroInicial": 15,
+    "habilidades": [
+      {
+        "nombre": "Shelter of the Faithful",
+        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
+      }
+    ]
+  },
   "rasgos": [
-    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma." },
+    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.", "bonoDano": 2, "aplicaA": "duelingMelee" },
     { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
     { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
@@ -121,24 +124,49 @@
   ],
   "equipo": [
     {
-        "nombre": "Lanza (1 mano)",
-        "dano": "1d6+2",
-        "tipoDano": "perforante",
-        "tipo": "melee",
-        "manos": 1,
-        "accion": "Acción",
-        "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
-        "desc": "Versátil y arrojadiza. Empuñada a una mano: 1d6+2+STR perforante. El +2 viene de Dueling (solo si tenés la otra mano libre). Como arma arrojadiza, podés lanzarla hasta 20 ft (60 ft con desventaja)."
+      "nombre": "Lanza (1 mano)",
+      "dano": "1d6",
+      "tipoDano": "perforante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 3,
+      "valor": 1,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Versátil y arrojadiza. Empuñada a una mano: 1d6+2+STR perforante. El +2 viene de Dueling (solo si tenés la otra mano libre). Como arma arrojadiza, podés lanzarla hasta 20 ft (60 ft con desventaja).\n Sumar Fighting Style: Dueling"
     },
     {
-        "nombre": "Lanza (2 manos)",
-        "dano": "1d8+2",
-        "tipoDano": "perforante",
-        "tipo": "melee",
-        "manos": 2,
-        "accion": "Acción",
-        "distancia": "Melee 5 ft",
-        "desc": "Versátil empuñada a dos manos: 1d8+2+STR perforante. Nota: a dos manos NO aplica el +2 de Dueling."
+      "nombre": "Lanza (2 manos)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "melee",
+      "manos": 2,
+      "peso": 0,
+      "valor": 0,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Versátil empuñada a dos manos: 1d8+2+STR perforante. Nota: a dos manos NO aplica el +2 de Dueling."
+    },
+    { 
+      "nombre": "Cota de Malla", 
+      "esArmadura": true, 
+      "tipoArmadura": "pesada", 
+      "armaduraBase": 16, 
+      "manos": 0, 
+      "peso": 55,
+      "valor": 75,
+      "requiere": { "STR": 13 },
+      "desc": "Armadura pesada"
+    },
+    { 
+      "nombre": "Escudo", 
+      "esArmadura": true, 
+      "tipoArmadura": "escudo", 
+      "armaduraBase": 2, 
+      "manos": 1, 
+      "peso": 6,
+      "valor": 10,
+      "desc": "Escudo."
     }
   ],
   "hechizos": {
@@ -272,6 +300,20 @@
             "duracion": "10 minutos",
             "desc": "Creás una zona mágica de 15 ft de radio. Cuando una criatura entra por primera vez o inicia su turno ahí, hace tirada de CHA. Si falla, no puede mentir conscientemente dentro del radio. Sabe que está afectada y puede evitar preguntas comprometedoras."
         }
+      ]
+    },
+    "inventario": [
+        {
+            "nombre": "Leña",
+            "peso": 1,
+            "cantidad": 2,
+            "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+        },
+        {
+            "nombre": "Oro",
+            "peso": 0.02,
+            "cantidad": 50,
+            "desc": "Piezas de Oro."
+        }
     ]
-    }
 }
