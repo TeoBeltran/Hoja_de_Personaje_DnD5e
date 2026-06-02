@@ -44,76 +44,245 @@
     { "nombre": "Trato animal", "proficiente": false }
   ],
   "background": {
-    "nombre": "False Identity",
+    "nombre": "Shelter of the Faithful",
     "oroInicial": 15,
     "habilidades": [
       {
-        "nombre": "False Identity",
-        "desc": "Creaste una segunda identidad creíble que incluye documentación, contactos y disfraces. Podés asumir esa identidad como una persona real."
+        "nombre": "Shelter of the Faithful",
+        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
       }
     ]
   },
   "rasgos": [
-    { "nombre": "Pact Magic", "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos." },
-    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.", "bonoDano": "CHA", "aplicaA": "hechizo:Eldritch Blast" },
-    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta." },
-    { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
-    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel)." },
-    { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
-    { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
-    { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia al fuego", "desc": "Tienes resistencia al daño de fuego." }
+    { "nombre": "Disciple of Life", "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo." },
+    { "nombre": "Blessed Healer", "desc": "Cuando lanzás un hechizo de curación de nivel 1 o mayor sobre otra criatura, vos también recuperás HP igual a 2 + el nivel del hechizo." },
+    { "nombre": "Volar", "desc": "Podés moverte 30 ft de distancia mientras volás." },
+    { "nombre": "Healing Word: bono WIS", "desc": "Healing Word suma WIS a la curación.", "bonoDano": "WIS", "aplicaA": "hechizo:Healing Word" },
+    { "nombre": "Mass Healing Word: bono WIS", "desc": "Mass Healing Word suma WIS a la curación.", "bonoDano": "WIS", "aplicaA": "hechizo:Mass Healing Word" },
+    { "nombre": "Spiritual Weapon: bono WIS", "desc": "Spiritual Weapon suma WIS al daño.", "bonoDano": "WIS", "aplicaA": "hechizo:Spiritual Weapon" }
   ],
   "habilidadesUso": [
-    { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
-    { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
-    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
-  ],
-  "equipo": [
-    { 
-      "nombre": "Cuero Tachonado", 
-      "esArmadura": true, 
-      "tipoArmadura": "ligera", 
-      "armaduraBase": 12, 
-      "manos": 0, 
-      "peso": 13,
-      "valor": 45,
-      "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb."
+    {
+      "nombre": "Channel Divinity",
+      "usos": "2/2",
+      "recupera": "corto",
+      "desc": "Tenés 2 usos por descanso corto. Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Turn Undead, Harness Divine Power o Preserve Life)."
     },
     {
-      "nombre": "Ballesta Ligera", 
-      "dano": "1d8", 
-      "tipoDano": "perforante", 
-      "tipo": "finesse", 
-      "manos": 2, 
-      "peso": 5,
-      "valor": 25,
-      "accion": "Acción", 
-      "distancia": "80/320 ft", 
-      "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Munición.</strong>"
+      "nombre": "Channel Divinity: Turn Undead",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "duracion": "1 minuto",
+      "desc": "Cuando veas o escuches un No-Muerto a 30 ft, hace tirada de salvación de WIS. Si falla, queda asustado durante 1 minuto o hasta recibir daño. Consume 1 uso de Channel Divinity."
+    },
+    {
+      "nombre": "Channel Divinity: Harness Divine Power",
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "desc": "Tocá tu símbolo sagrado (cruz) y recuperás un spell slot. El nivel del slot recuperado no puede ser mayor a la mitad de tu proficiency bonus (redondeado hacia arriba). Consume 1 uso de Channel Divinity."
+    },
+    {
+      "nombre": "Channel Divinity: Preserve Life",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Presentá tu símbolo sagrado y curá un total de HP igual a tu nivel de Clérigo × 5. Podés repartir esos puntos entre cualquier cantidad de criaturas a 30 ft (incluído vos). No funciona con criaturas a 0 HP. Consume 1 uso de Channel Divinity."
+    },
+    {
+      "nombre": "Fairy Magic: Faerie Fire",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "60 ft",
+      "duracion": "Concentración, 1 minuto",
+      "desc": "Cada objeto y criatura en un cubo de 20 ft dentro del rango queda iluminado. Las criaturas afectadas no se benefician de invisibilidad. Las tiradas de ataque contra ellas tienen ventaja."
+    },
+    {
+      "nombre": "Fairy Magic: Enlarge/Reduce",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "duracion": "Concentración, 1 minuto",
+      "desc": "Una criatura u objeto que veas dentro del rango aumenta o disminuye de tamaño. Si elige Enlarge: gana una categoría de tamaño, ventaja en tiradas de STR y +1d4 al daño con armas. Si Reduce: pierde una categoría, desventaja en STR y -1d4 al daño con armas."
     }
   ],
-  "hechizos": {
-        "ranuras": [
-            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 3", "cantidad": "2", "recupera": "largo" },
-            { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
-        ],
-        "lista": [
-          { "nivel": "CANTRIPS", "nombre": "Eldritch Blast", "dano": "1d10", "ataques": 2, "tipoDano": "fuerza", "accion": "Acción", "distancia": "120 ft", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10 (incluye Agonizing Blast) de daño de fuerza." },
-          { "nivel": "CANTRIPS", "nombre": "Mage Hand", "accion": "Acción", "distancia": "30 ft", "duracion": "1 minuto", "desc": "Crea una mano espectral que dura hasta 1 minuto y desaparece si se aleja más de 30ft del usuario. Puede manipular objetos no mágicos ni cargar más de 10 pounds." },
-          { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "tipoDano": "psíquico", "accion": "Acción", "distancia": "60 ft", "duracion": "1 ronda", "desc": "Dispara un pico de energía psíquica que pueda ver. El objetivo tiene que pasar una tirada de salvación de INT o recibir 1d6 de daño psíquico y restar 1d4 de su próxima tirada de salvación antes del f inal de tu próximo turno." },
-          { "nivel": "NIVEL 1", "nombre": "Find Familiar", "accion": "Acción", "distancia": "10 ft", "duracion": "1 hora", "desc": "Puede invocar un familiar animal o especial y se comunican telepáticamente." },
-          { "nivel": "NIVEL 1", "nombre": "Hex", "dano": "1d6", "tipoDano": "necrótico", "accion": "Acción Bonus", "distancia": "90 ft", "duracion": "Concentración, 1 hora", "desc": "Pone una maldición en una criatura que pueda ver en rango, hasta que termine el hechizo hace 1d6 de daño necrotic extra cada vez que hagas daño a esa criatura. También elegis una habilidad y el objetivo tiene desventaja en tiradas de salvación de ese tipo.  Si el objetivo muere mientras Hex sigue activo, podes gastar tu Acción Bonus para maldecir otra criatura." },
-          { "nivel": "NIVEL 2", "nombre": "Misty Step", "accion": "Acción Bonus", "distancia": "Propio", "desc": "Teletransporte hasta 30 ft a un lugar que puedas ver." },
-          { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "dano": "2d6", "ataques": 3, "tipoDano": "fuego", "accion": "Acción", "distancia": "120 ft", "desc": "Crea 3 rayos de fuego y los gira hacia enemigos en rango, pueden ser enemigos distintos. Cada rayo acierta o falla por separado. Si aciertan, hacen 2d6 de daño de fuego. Cada nivel por encima del nivel 2 que se use es 1d6 extra de daño." },
-          { "nivel": "NIVEL 3", "nombre": "Counterspell", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
-          { "nivel": "NIVEL 3", "nombre": "Fear", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal, cada criatura a 30ft del cono tienen que pasar una tirada de Sabiduría o soltar lo que tengan y pasan a estar Frightened. Mientras estén así, usan su acción para correr hacia la ruta mas segura. Si perdes visión de la criatura, puede hacer una tirada de salvación de Sabiduría." },
-          { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
-          { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 min", "desc": "Los enemigos hacen tirada de salvación de Sabiduría o quedan bajo el efecto de Charm. Bajo Charm, su velocidad es 0. Al recibir daño dejan de tener Charm." }
-        ]
+  "equipo": [
+    {
+      "nombre": "Martillo de Guerra (1 mano)",
+      "dano": "1d8",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 15,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Versátil empuñado a una mano: 1d8+STR contundente."
     },
+    {
+      "nombre": "Martillo de Guerra (2 manos)",
+      "dano": "1d10",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 2,
+      "peso": 0,
+      "valor": 0,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Versátil empuñado a dos manos: 1d10+STR contundente."
+    },
+    {
+      "nombre": "Martillo Liviano (1 mano)",
+      "dano": "1d4",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 2,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadizo 20/60 ft",
+      "desc": "Arrojadizo. Empuñado a una mano: 1d4+STR contundente. Como arma arrojadiza, podés lanzarlo hasta 20 ft (60 ft con desventaja)."
+    },
+    {
+      "nombre": "Martillo Liviano (2 manos)",
+      "dano": "1d6",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 2,
+      "peso": 0,
+      "valor": 0,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Empuñado a dos manos: 1d6+STR contundente."
+    }
+  ],"hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Druidcraft",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "desc": "Crea pequeños efectos mágicos de naturaleza dentro del rango: predecir el clima, encender/apagar una vela, o hacer aparecer efectos sensoriales pequeños (flores, brisa, sonidos)."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Guidance",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Tocá una criatura. Antes de que termine el hechizo, una vez la criatura puede sumar 1d4 a una tirada de habilidad que haga."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Sacred Flame",
+        "dano": "2d8",
+        "tipoDano": "radiante",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Una criatura dentro del rango debe hacer salvación de DEX. Si falla, recibe 2d8 de daño radiante (escala con nivel de clérigo). Ignora cobertura."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Thaumaturgy",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Hasta 1 minuto",
+        "desc": "Crea efectos mágicos menores: hacer temblar el suelo, abrir puertas, cambiar tu voz para amplificarla 3×, o generar sonidos sobrenaturales."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Bless",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cuando hagan una tirada de ataque o salvación antes que termine el hechizo, tiran 1d4 y lo suman al resultado."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Detect Magic",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Mientras dura, sentís magia a 30 ft. Podés ver un aura alrededor de objetos o criaturas mágicas y conocer la escuela de magia."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Guiding Bolt",
+        "dano": "4d6",
+        "tipoDano": "radiante",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Hacé un ataque mágico a distancia. Si golpea, hace 4d6 radiante y el próximo ataque contra el objetivo antes de tu próximo turno tiene ventaja. Cada slot superior al 1 suma 1d6."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Healing Word",
+        "dano": "1d4",
+        "tipoDano": "curación",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Una criatura elegida recupera 1d4 + WIS HP. Cada slot superior al 1 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra.",
+        "efectos": [
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" }
+        ]
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield of Faith",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Un campo reluciente rodea a una criatura a elección dentro del rango, dándole +2 de CA mientras dure el hechizo."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Hold Person",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un humanoide elegido debe hacer salvación de WIS o queda paralizado. Puede repetir la salvación al final de cada turno."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Spiritual Weapon",
+        "dano": "1d8",
+        "tipoDano": "fuerza",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "duracion": "1 minuto",
+        "desc": "Crea un arma espiritual flotante. Cuando aparece y como Acción Bonus en turnos siguientes, ataca a una criatura a 5 ft del arma haciendo 1d8 + WIS de daño de fuerza. Cada 2 slots superiores suma 1d8."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Mass Healing Word",
+        "dano": "1d4",
+        "tipoDano": "curación",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Hasta 6 criaturas elegidas recuperan 1d4 + WIS HP. Cada slot superior al 3 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra a cada una.",
+        "efectos": [
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra a cada criatura)" }
+        ]
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Spirit Guardians",
+        "dano": "3d8",
+        "tipoDano": "radiante",
+        "accion": "Acción",
+        "distancia": "Propio (radio 15 ft)",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Invocás espíritus en un radio de 15 ft alrededor tuyo. Los enemigos dentro del área tienen velocidad reducida a la mitad. Cuando una criatura entra al área o empieza su turno ahí, hace salvación de WIS o recibe 3d8 radiante (mitad si pasa). Cada slot superior al 3 suma 1d8."
+      }
+    ]
+  },
     "inventario": [
         {
             "nombre": "Leña",
