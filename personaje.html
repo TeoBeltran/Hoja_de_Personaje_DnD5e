@@ -99,6 +99,25 @@
                     🛏️ Descanso Largo<br>
                     <span style="font-size: 0.85rem; font-weight: normal;">Recupera TODO: vida, ranuras y habilidades</span>
                 </button>
+                <button id="rest-borrar" class="hp-btn hp-damage" style="margin-top: 10px;">
+                    🗑️ Borrar datos del personaje<br>
+                    <span style="font-size: 0.85rem; font-weight: normal;">Restaura todos los valores al original del JSON</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para borrar datos -->
+    <div id="confirm-borrar-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-borrar">&times;</span>
+            <h3 style="color: #c62828; margin-top: 0;">⚠️ Borrar datos del personaje</h3>
+            <p style="line-height: 1.5; text-align: center; font-size: 1.05rem; margin: 20px 0;">
+                ¿Estás seguro de borrar los datos guardados de este personaje? Se restaurará todo al estado original del JSON.
+            </p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button id="confirm-borrar-no" class="hp-btn hp-heal">No</button>
+                <button id="confirm-borrar-si" class="hp-btn hp-damage">Sí, borrar</button>
             </div>
         </div>
     </div>

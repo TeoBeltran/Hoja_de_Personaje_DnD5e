@@ -47,6 +47,80 @@ let tamanoPersonaje = 'estandar';
 let turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
 let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)", etc.
 
+// === Sistema de efectos automáticos ===
+
+// Evalúa una fórmula sustituyendo variables conocidas
+// Variables soportadas: nivelHechizo, nivelPersonaje, WIS, STR, DEX, CON, INT, CHA
+function evaluarFormula(formula, contexto) {
+    let expr = formula;
+
+    // Reemplazar variables por sus valores
+    expr = expr.replace(/nivelHechizo/g, contexto.nivelHechizo || 0);
+    expr = expr.replace(/nivelPersonaje/g, contexto.nivelPersonaje || 0);
+    expr = expr.replace(/WIS/g, statAMod(statsGlobal.WIS || 10));
+    expr = expr.replace(/STR/g, statAMod(statsGlobal.STR || 10));
+    expr = expr.replace(/DEX/g, statAMod(statsGlobal.DEX || 10));
+    expr = expr.replace(/CON/g, statAMod(statsGlobal.CON || 10));
+    expr = expr.replace(/INT/g, statAMod(statsGlobal.INT || 10));
+    expr = expr.replace(/CHA/g, statAMod(statsGlobal.CHA || 10));
+
+    // Evaluar la expresión matemática (segura: solo permite + - * / números y paréntesis)
+    if (!/^[\d+\-*/() .]+$/.test(expr)) return 0;
+    try {
+        return Function('"use strict"; return (' + expr + ')')();
+    } catch (e) {
+        return 0;
+    }
+}
+
+// Verifica si el personaje tiene un rasgo dado (por nombre)
+function tieneRasgo(nombreRasgo) {
+    if (!rasgosGlobal) return false;
+    return rasgosGlobal.some(r => r.nombre === nombreRasgo);
+}
+
+// Procesa los efectos de un item y muestra el modal si hay alguno aplicable
+function procesarEfectos(item, contexto) {
+    if (!item || !item.efectos || !Array.isArray(item.efectos)) return;
+
+    const efectosAplicables = item.efectos.filter(e => {
+        // Si requiere un rasgo, validar que el personaje lo tenga
+        if (e.rasgoRequerido && !tieneRasgo(e.rasgoRequerido)) return false;
+        return true;
+    });
+
+    if (efectosAplicables.length === 0) return;
+
+    // Construir HTML del modal
+    const lista = document.getElementById('efectos-lista');
+    if (!lista) return;
+    lista.innerHTML = '';
+
+    efectosAplicables.forEach(efecto => {
+        const div = document.createElement('div');
+        div.style.cssText = 'padding: 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-left: 4px solid var(--accent-color); border-radius: var(--border-radius);';
+
+        let mensaje = '';
+        if (efecto.tipo === 'autoCuracion') {
+            const valor = evaluarFormula(efecto.formula, contexto);
+            mensaje = `Tenés que curarte <strong style="color: #2e7d32; font-size: 1.2rem;">${valor} HP</strong>`;
+        } else if (efecto.tipo === 'autoDano') {
+            const valor = evaluarFormula(efecto.formula, contexto);
+            mensaje = `Recibís <strong style="color: #c62828; font-size: 1.2rem;">${valor} de daño</strong>`;
+        } else if (efecto.tipo === 'notificacion') {
+            mensaje = efecto.mensaje || '';
+        }
+
+        div.innerHTML = `
+            <div style="font-weight: bold; color: var(--accent-color); margin-bottom: 4px;">${efecto.descripcion}</div>
+            <div style="font-size: 0.95rem;">${mensaje}</div>
+        `;
+        lista.appendChild(div);
+    });
+
+    document.getElementById('efectos-modal').style.display = 'flex';
+}
+
 // === Divine Smite ===
 let smiteData = null; // Guarda el objeto smite del JSON si la clase lo tiene
 
@@ -2162,6 +2236,18 @@ async function init() {
                 } else {
                     mostrarToast(`¡Hechizo usado! Quedan ${actual} de ${nivel}. ${r.mensaje}`.trim());
                 }
+
+                // Disparar efectos automáticos del hechizo (Blessed Healer, Disciple of Life, etc.)
+                const hechizoUsado = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
+                if (hechizoUsado && hechizoUsado.efectos) {
+                    const nivelNumerico = parseInt(nivel.replace(/[^0-9]/g, '')) || 1;
+                    setTimeout(() => {
+                        procesarEfectos(hechizoUsado, {
+                            nivelHechizo: nivelNumerico,
+                            nivelPersonaje: nivelPersonaje
+                        });
+                    }, 400);
+                }
             }
         });
     }
@@ -2178,6 +2264,7 @@ async function init() {
     // Botones dentro del modal de descanso
     const restCorto = document.getElementById('rest-corto');
     const restLargo = document.getElementById('rest-largo');
+    const restBorrar = document.getElementById('rest-borrar');
     if (restCorto) restCorto.addEventListener('click', () => tomarDescanso('corto'));
     if (restLargo) {
         restLargo.addEventListener('click', () => {
@@ -2186,6 +2273,47 @@ async function init() {
             document.getElementById('confirm-largo-modal').style.display = 'flex';
         });
     }
+    if (restBorrar) {
+        restBorrar.addEventListener('click', () => {
+            document.getElementById('rest-modal').style.display = 'none';
+            document.getElementById('confirm-borrar-modal').style.display = 'flex';
+        });
+    }
+
+    // Modal de confirmación de borrado: listeners
+    const confirmBorrarSi = document.getElementById('confirm-borrar-si');
+    const confirmBorrarNo = document.getElementById('confirm-borrar-no');
+    const confirmBorrarClose = document.querySelector('.close-btn-borrar');
+    const confirmBorrarModal = document.getElementById('confirm-borrar-modal');
+
+    if (confirmBorrarSi) {
+        confirmBorrarSi.addEventListener('click', () => {
+            // Borrar TODAS las keys de localStorage que pertenezcan a este personaje
+            const keysABorrar = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith(STORAGE_PREFIX)) {
+                    keysABorrar.push(key);
+                }
+            }
+            keysABorrar.forEach(k => localStorage.removeItem(k));
+            // Recargar la página
+            location.reload();
+        });
+    }
+    if (confirmBorrarNo) {
+        confirmBorrarNo.addEventListener('click', () => {
+            confirmBorrarModal.style.display = 'none';
+        });
+    }
+    if (confirmBorrarClose) {
+        confirmBorrarClose.addEventListener('click', () => {
+            confirmBorrarModal.style.display = 'none';
+        });
+    }
+    window.addEventListener('click', (e) => {
+        if (e.target === confirmBorrarModal) confirmBorrarModal.style.display = 'none';
+    });
 
     // Modal de confirmación del DM para descanso largo
     const confirmSi = document.getElementById('confirm-largo-si');
@@ -2378,6 +2506,18 @@ async function init() {
         imagenCloseBtn.addEventListener('click', () => imagenModal.style.display = 'none');
     }
     window.addEventListener('click', (e) => { if (e.target === imagenModal) imagenModal.style.display = 'none'; });
+
+    // Modal genérico de efectos: cerrar
+    const efectosModal = document.getElementById('efectos-modal');
+    const efectosCloseBtn = document.querySelector('.close-btn-efectos');
+    const efectosCerrar = document.getElementById('efectos-cerrar');
+    if (efectosCloseBtn) {
+        efectosCloseBtn.addEventListener('click', () => efectosModal.style.display = 'none');
+    }
+    if (efectosCerrar) {
+        efectosCerrar.addEventListener('click', () => efectosModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === efectosModal) efectosModal.style.display = 'none'; });
 }
 
 document.addEventListener('DOMContentLoaded', init);
