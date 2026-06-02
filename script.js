@@ -27,6 +27,14 @@ let escudoEquipadoBase = 0;
 let armasEquipadas = [];   // array de nombres de armas equipadas
 let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
 let modDexGlobal = 0;
+let modStrGlobal = 0;
+
+// === Sistema de turno ===
+let turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
+let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)", etc.
+
+// === Divine Smite ===
+let smiteData = null; // Guarda el objeto smite del JSON si la clase lo tiene
 
 // Mapea nivel de hechizo a ranura. Si es Brujo, TODO va a Nivel 3.
 function mapNivelHechizoARanura(nivelHechizo) {
@@ -270,6 +278,147 @@ function obtenerMod(modificadores, nombreParcial) {
     return stat ? parseMod(stat.valor) : 0;
 }
 
+// === Funciones del sistema de turno ===
+
+function calcularExtraAttacks(rasgos, clase, nivel) {
+    // Caso especial: Guerrero tiene escalado automático según nivel
+    if (clase === 'Guerrero') {
+        if (nivel >= 20) return 4;
+        if (nivel >= 11) return 3;
+        if (nivel >= 5) return 2;
+        return 1;
+    }
+
+    // Resto de clases: usar el rasgo del JSON
+    if (!rasgos) return 1;
+    const extra = rasgos.find(r => /extra attack/i.test(r.nombre));
+    if (!extra) return 1;
+    const match = extra.nombre.match(/\((\d+)\)/);
+    if (match) return 1 + parseInt(match[1]);
+    return 2;
+}
+
+function cargarTurnoEstado() {
+    const guardado = localStorage.getItem(STORAGE_PREFIX + 'turno');
+    if (guardado) {
+        try { turnoEstado = JSON.parse(guardado); } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1 }; }
+    }
+}
+
+function guardarTurnoEstado() {
+    localStorage.setItem(STORAGE_PREFIX + 'turno', JSON.stringify(turnoEstado));
+}
+
+function actualizarTurnoDOM() {
+    document.querySelectorAll('.turno-valor').forEach(span => {
+        const tipo = span.dataset.tipo;
+        const valor = turnoEstado[tipo];
+        span.textContent = `${valor} / 1`;
+        span.style.backgroundColor = valor > 0 ? '#2e7d32' : '#c62828';
+    });
+    const badge = document.getElementById('extra-attack-badge');
+    if (badge) {
+        if (extraAttacks > 1) {
+            badge.textContent = `×${extraAttacks} si golpeás`;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+
+function consumirAccion(tipoAccion) {
+    if (!tipoAccion) return { ok: true, mensaje: '' };
+    const t = tipoAccion.toLowerCase();
+    if (t.includes('bonus') || t.includes('adicional')) {
+        if (turnoEstado.bonus > 0) {
+            turnoEstado.bonus = 0;
+            guardarTurnoEstado();
+            actualizarTurnoDOM();
+            return { ok: true, mensaje: '' };
+        } else if (turnoEstado.accion > 0) {
+            turnoEstado.accion = 0;
+            guardarTurnoEstado();
+            actualizarTurnoDOM();
+            return { ok: true, mensaje: '(consumió tu Acción principal)' };
+        } else {
+            return { ok: false, mensaje: 'No te quedan acciones disponibles' };
+        }
+    } else if (t.includes('reacción') || t.includes('reaccion')) {
+        if (turnoEstado.reaccion > 0) {
+            turnoEstado.reaccion = 0;
+            guardarTurnoEstado();
+            actualizarTurnoDOM();
+            return { ok: true, mensaje: '' };
+        } else {
+            return { ok: false, mensaje: 'Ya usaste tu Reacción este turno' };
+        }
+    } else if (t.includes('acción') || t.includes('accion')) {
+        if (turnoEstado.accion > 0) {
+            turnoEstado.accion = 0;
+            guardarTurnoEstado();
+            actualizarTurnoDOM();
+            return { ok: true, mensaje: '' };
+        } else {
+            return { ok: false, mensaje: 'Ya usaste tu Acción este turno' };
+        }
+    }
+    return { ok: true, mensaje: '' };
+}
+
+function resetearTurno() {
+    turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
+    guardarTurnoEstado();
+    actualizarTurnoDOM();
+}
+
+// === Divine Smite ===
+
+// Verifica si el arma usada califica para Smite (debe ser melee)
+function armaPuedeGatillarSmite(nombreArma, equipoData) {
+    if (!smiteData) return false;
+    const arma = equipoData.find(e => e.nombre === nombreArma);
+    if (!arma) return false;
+    // Smite solo aplica a ataques melee (no a ranged como ballestas)
+    // Consideramos melee si tipo es 'melee' o si tiene 'finesse' (las finesse pueden usarse melee)
+    return arma.tipo === 'melee' || arma.tipo === 'finesse';
+}
+
+// Abre el modal de Smite con los niveles disponibles
+function abrirModalSmite() {
+    const smiteModal = document.getElementById('smite-modal');
+    const cont = document.getElementById('smite-opciones');
+    if (!smiteModal || !cont || !smiteData) return;
+
+    cont.innerHTML = '';
+
+    // Recorrer ranuras y mostrar solo las disponibles con daño correspondiente
+    Object.keys(smiteData.danoPorNivel).forEach(nivelNum => {
+        const nivelKey = `Nivel ${nivelNum}`;
+        const disponibles = parseInt(ranurasState[nivelKey] || 0);
+        const dano = smiteData.danoPorNivel[nivelNum];
+
+        const btn = document.createElement('button');
+        btn.className = 'hp-btn';
+        btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${disponibles <= 0 ? 'background-color: #999; cursor: not-allowed;' : 'background-color: #6a1b9a; color: white;'}`;
+        btn.disabled = disponibles <= 0;
+        btn.innerHTML = `Slot Nivel ${nivelNum} → ${dano} ${smiteData.tipoDano} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${disponibles} disponibles)</span>`;
+
+        btn.onclick = () => {
+            if (disponibles <= 0) return;
+            // Consumir la ranura
+            ranurasState[nivelKey] = String(disponibles - 1);
+            guardarRanuras();
+            actualizarRanuraDOM(nivelKey);
+            smiteModal.style.display = 'none';
+            mostrarToast(`⚔️ ¡Divine Smite! +${dano} ${smiteData.tipoDano}`);
+        };
+        cont.appendChild(btn);
+    });
+
+    smiteModal.style.display = 'flex';
+}
+
 function obtenerHitDiceSegunClase(clase) {
     const mapa = {
         'Mago': 'd6',
@@ -472,10 +621,15 @@ async function init() {
     const response = await fetch(`personajes/${personajeId}.json`);
     const data = await response.json();
 
-    // Cargar Clase y Raza desde el JSON
+    // Cargar Nombre, Clase y Raza desde el JSON
     if (data.personaje) {
+        const nombreEl = document.getElementById('nombre-personaje');
         const claseEl = document.getElementById('clase-valor');
         const razaEl = document.getElementById('raza-valor');
+        if (nombreEl && data.personaje.nombre) {
+            nombreEl.textContent = data.personaje.nombre;
+            document.title = `${data.personaje.nombre} - Hoja de Personaje`;
+        }
         if (claseEl) claseEl.textContent = data.personaje.clase || '';
         if (razaEl) razaEl.textContent = data.personaje.raza || '';
         claseEsBrujo = (data.personaje.clase === "Brujo");
@@ -659,6 +813,9 @@ async function init() {
             if (modalActions) modalActions.style.display = 'none';
             const modalEquipar = document.getElementById('modal-equipar');
             if (modalEquipar) modalEquipar.style.display = 'none';
+            // Limpiar badges y línea celeste (los rasgos no los tienen)
+            renderModalBadges({});
+            renderModalInfoLinea({});
             modal.style.display = 'flex';
         };
         document.getElementById('rasgos-grid').appendChild(btn);
@@ -666,6 +823,7 @@ async function init() {
 
     // Equipo
     const modStr = obtenerMod(data.modificadores, "STR");
+    modStrGlobal = modStr;
     const modDexNum = obtenerMod(data.modificadores, "DEX");
 
     // Función auxiliar: ¿el ítem está equipado?
@@ -703,17 +861,13 @@ async function init() {
         btn.style.alignItems = 'flex-start';
         btn.style.height = 'auto';
 
-        let attackBonusHTML = '';
         let danoFinal = i.dano || '';
         if (i.tipo) {
             const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
-            const bonus = proficienciaActual + modUsado;
-            attackBonusHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-right: 6px;">Atk: ${formatMod(bonus)}</span>`;
             if (i.dano && modUsado !== 0) {
                 danoFinal = `${i.dano}${formatMod(modUsado)}`;
             }
         }
-        // Agregar multiplicador de ataques si existe
         if (i.ataques && i.ataques > 1 && danoFinal) {
             danoFinal = `${danoFinal} ×${i.ataques}`;
         }
@@ -739,17 +893,26 @@ async function init() {
             ? `<span class="badge-equipado" style="display: inline-block; margin-top: 8px; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; border-radius: var(--border-radius); background-color: #2e7d32; color: white;">✓ Equipado</span>`
             : '';
 
+        // Construir línea de info celeste (acción, distancia, duración)
+        const partesInfo = [];
+        if (i.accion) partesInfo.push(i.accion);
+        if (i.distancia) partesInfo.push(i.distancia);
+        if (i.duracion) partesInfo.push(i.duracion);
+        const infoLineaHTML = partesInfo.length > 0
+            ? `<span style="color: #0277bd; font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 4px;">${partesInfo.join(' • ')}</span>`
+            : '';
+
         btn.innerHTML = `
             <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px; gap: 10px; flex-wrap: wrap;">
                 <span style="font-weight: bold;">${i.nombre}</span>
                 <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
-                    ${attackBonusHTML}
                     ${armaduraHTML}
                     ${manosHTML}
                     ${danoHTML}
                     ${tipoDanoHTML}
                 </div>
             </div>
+            ${infoLineaHTML}
             <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${i.desc.replace(/\n/g, '<br>')}</span>
             ${equipadoBadgeHTML}
         `;
@@ -759,17 +922,155 @@ async function init() {
 
     // === Lógica de equipar/desequipar desde el modal ===
     let itemModalActual = null;
+    let itemContextoActual = null;
+
+    // Llena el contenedor #modal-badges con las mini-cards (daño, tipo, manos, armadura)
+    function renderModalBadges(item) {
+        const cont = document.getElementById('modal-badges');
+        if (!cont) return;
+        cont.innerHTML = '';
+
+        const partes = [];
+
+        // Daño + multiplicador
+        if (item.dano) {
+            let danoTexto = item.dano;
+            if (item.tipo) {
+                const modUsado = (item.tipo === 'finesse') ? modDexGlobal : modStrGlobal;
+                if (modUsado !== 0) danoTexto = `${item.dano}${formatMod(modUsado)}`;
+            }
+            if (item.ataques && item.ataques > 1) danoTexto = `${danoTexto} ×${item.ataques}`;
+            partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
+        }
+
+        // Tipo de daño
+        if (item.tipoDano) {
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${item.tipoDano}</span>`);
+        }
+
+        // Manos
+        if (item.manos && item.manos > 0) {
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${item.manos === 2 ? '2 manos' : '1 mano'}</span>`);
+        }
+
+        // Armadura/escudo
+        if (item.esArmadura) {
+            const esEscudo = (item.tipoArmadura === 'escudo');
+            const labelBadge = esEscudo ? `+${item.armaduraBase} CA` : `CA: ${item.armaduraBase}`;
+            const tipoLabel = item.tipoArmadura ? ` (${item.tipoArmadura})` : '';
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">${labelBadge}${tipoLabel}</span>`);
+        }
+
+        // Usos (habilidades)
+        if (item.usos) {
+            const valorUsos = habilidadesUsoState[item.nombre] || item.usos;
+            partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${valorUsos}</span>`);
+        }
+
+        cont.innerHTML = partes.join('');
+        cont.style.display = partes.length > 0 ? 'flex' : 'none';
+    }
+
+    // Llena la línea celeste con accion • distancia • duracion
+    function renderModalInfoLinea(item) {
+        const cont = document.getElementById('modal-info-linea');
+        if (!cont) return;
+        const partes = [];
+        if (item.accion) partes.push(item.accion);
+        if (item.distancia) partes.push(item.distancia);
+        if (item.duracion) partes.push(item.duracion);
+        cont.textContent = partes.join(' • ');
+        cont.style.display = partes.length > 0 ? 'block' : 'none';
+    }
+
+    // Muestra u oculta el botón "Usar" según el item
+    // tipo: 'arma' | 'hechizo' | 'cantrip' | 'habilidad' | null
+    function renderBotonUsar(item, tipo) {
+        if (!modalActions || !useSpellBtn) return;
+
+        useSpellBtn.dataset.nivel = '';
+        useSpellBtn.dataset.cantrip = '';
+        useSpellBtn.dataset.habilidad = '';
+        useSpellBtn.dataset.arma = '';
+        useSpellBtn.dataset.smite = '';
+        useSpellBtn.style.backgroundColor = '#6a1b9a'; // Reset color
+
+        const tieneDano = !!item.dano;
+        const esHabilidad = !!item.usos || item.tipo === 'smite';
+        const esHechizoConRanura = (tipo === 'hechizo');
+        const esCantrip = (tipo === 'cantrip');
+        const esArma = (tipo === 'arma') && tieneDano;
+
+        if (esArma) {
+            modalActions.style.display = 'block';
+            useSpellBtn.dataset.arma = item.nombre;
+            const armaEquipada = armasEquipadas.includes(item.nombre);
+            if (armaEquipada) {
+                useSpellBtn.disabled = false;
+                useSpellBtn.textContent = `Usar ${item.nombre}`;
+                useSpellBtn.style.backgroundColor = '#6a1b9a';
+            } else {
+                useSpellBtn.disabled = true;
+                useSpellBtn.textContent = `🚫 Equipá ${item.nombre} primero`;
+                useSpellBtn.style.backgroundColor = '#999';
+            }
+        } else if (esCantrip) {
+            modalActions.style.display = 'block';
+            useSpellBtn.dataset.cantrip = 'true';
+            useSpellBtn.disabled = false;
+            useSpellBtn.textContent = 'Usar Cantrip';
+        } else if (esHechizoConRanura) {
+            const nivelRanura = mapNivelHechizoARanura(item.nivel);
+            if (nivelRanura) {
+                modalActions.style.display = 'block';
+                useSpellBtn.dataset.nivel = nivelRanura;
+                const disponibles = parseInt(ranurasState[nivelRanura]);
+                useSpellBtn.disabled = disponibles <= 0;
+                useSpellBtn.textContent = disponibles > 0
+                    ? `Usar Hechizo (${disponibles} en ${nivelRanura})`
+                    : 'Sin ranuras disponibles';
+            } else {
+                modalActions.style.display = 'none';
+            }
+        } else if (esHabilidad || item.tipo === 'smite') {
+            modalActions.style.display = 'block';
+
+            // Caso especial: Divine Smite no se puede usar directamente
+            if (item.tipo === 'smite') {
+                useSpellBtn.dataset.smite = 'true';
+                useSpellBtn.disabled = false;
+                useSpellBtn.textContent = 'Intentar usar';
+            } else {
+                useSpellBtn.dataset.habilidad = item.nombre;
+                useSpellBtn.dataset.smite = '';
+                const dispActuales = parseInt(habilidadesUsoState[item.nombre].split('/')[0]);
+                useSpellBtn.disabled = dispActuales <= 0;
+                useSpellBtn.textContent = dispActuales > 0
+                    ? `Usar Habilidad (${habilidadesUsoState[item.nombre]})`
+                    : 'Sin usos disponibles';
+            }
+        } else {
+            modalActions.style.display = 'none';
+        }
+    }
 
     function abrirModalEquipo(item, equipoData) {
         itemModalActual = item;
+        itemContextoActual = { tipo: 'equipo', item: item };
+
         modalTitle.innerHTML = item.nombre;
         modalDesc.innerHTML = item.desc.replace(/\n/g, '<br>');
-        if (modalActions) modalActions.style.display = 'none';
 
+        // Llenar badges (mini cards) y línea celeste
+        renderModalBadges(item);
+        renderModalInfoLinea(item);
+
+        // Mostrar botón "Usar" si tiene daño (es un arma)
+        renderBotonUsar(item, 'arma');
+
+        // Botón Equipar (solo armaduras, escudos o armas con manos)
         const modalEquipar = document.getElementById('modal-equipar');
         const btnEqModal = document.getElementById('btn-equipar-modal');
-
-        // Solo mostrar botón si el ítem es equipable (armadura, escudo o arma con manos)
         const esEquipable = item.esArmadura || (item.manos && item.manos > 0);
 
         if (esEquipable && modalEquipar && btnEqModal) {
@@ -782,7 +1083,6 @@ async function init() {
                 btnEqModal.style.color = 'white';
                 btnEqModal.disabled = false;
             } else {
-                // 1° Validar restricción por clase
                 const validacion = validarArmaduraPorClase(item, claseActual);
                 if (!validacion.permitido) {
                     btnEqModal.textContent = `🚫 ${validacion.razon}`;
@@ -790,12 +1090,9 @@ async function init() {
                     btnEqModal.style.color = 'white';
                     btnEqModal.disabled = true;
                 } else {
-                    // 2° Validar manos disponibles
                     const manosNecesarias = item.manos || 0;
                     const manosLibres = 2 - manosUsadas;
-                    const tieneEspacio = manosNecesarias <= manosLibres;
-
-                    if (tieneEspacio) {
+                    if (manosNecesarias <= manosLibres) {
                         btnEqModal.textContent = 'Equipar';
                         btnEqModal.style.backgroundColor = 'var(--accent-color)';
                         btnEqModal.style.color = 'white';
@@ -891,9 +1188,75 @@ async function init() {
     // Inicializar el contador de manos en el header
     actualizarManosDOM();
 
+    // Inicializar sistema de turno (acá ya está STORAGE_PREFIX definido)
+    extraAttacks = calcularExtraAttacks(data.rasgos, claseActual, nivelPersonaje);
+    cargarTurnoEstado();
+    actualizarTurnoDOM();
+
+    // Detectar Divine Smite (si la clase tiene una habilidad con tipo "smite")
+    if (data.habilidadesUso) {
+        smiteData = data.habilidadesUso.find(h => h.tipo === 'smite') || null;
+    }
+
+    // === Listeners del menú flotante de turno ===
+    const turnoToggle = document.getElementById('turno-toggle');
+    const turnoPanel = document.getElementById('turno-panel');
+    const turnoReset = document.getElementById('turno-reset');
+
+    if (turnoToggle && turnoPanel) {
+        turnoToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const visible = turnoPanel.style.display === 'block';
+            turnoPanel.style.display = visible ? 'none' : 'block';
+        });
+
+        // Cerrar al hacer click fuera (con verificación más estricta)
+        document.addEventListener('click', (e) => {
+            const fab = document.getElementById('turno-fab');
+            if (fab && !fab.contains(e.target)) {
+                turnoPanel.style.display = 'none';
+            }
+        });
+    }
+
+    // Click en cada contador → solo permite RESTAURAR (no gastar manualmente)
+    document.querySelectorAll('.turno-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tipo = btn.dataset.tipo;
+            if (turnoEstado[tipo] === 0) {
+                turnoEstado[tipo] = 1;
+                guardarTurnoEstado();
+                actualizarTurnoDOM();
+                const nombre = tipo === 'bonus' ? 'Acción Bonus' : tipo === 'accion' ? 'Acción' : 'Reacción';
+                mostrarToast(`${nombre} restaurada`);
+            }
+            // Si está en 1, no hacemos nada (no se puede gastar manualmente)
+        });
+    }); 
+
+    // Botón "Terminé mi turno"
+    if (turnoReset) {
+        turnoReset.addEventListener('click', (e) => {
+            e.stopPropagation();
+            resetearTurno();
+            mostrarToast('🔄 Turno reiniciado');
+            turnoPanel.style.display = 'none';
+        });
+    }
+
     // Calcular y mostrar Save DC y Spell Attack Bonus en headers
     const saveDC = 8 + proficienciaActual + modPrincipal;
     const spellAttackBonus = formatMod(proficienciaActual + modPrincipal);
+
+    // Calcular Atk Bonus de armas Melee (STR) y Finesse (DEX)
+    const atkMeleeBonus = formatMod(proficienciaActual + modStr);
+    const atkFinesseBonus = formatMod(proficienciaActual + modDexNum);
+
+    // Detectar si el personaje tiene armas de cada tipo
+    const tieneMelee = data.equipo.some(e => e.tipo === 'melee');
+    const tieneFinesse = data.equipo.some(e => e.tipo === 'finesse');
+
     document.querySelectorAll('.proficient').forEach(span => {
         const txt = span.textContent;
         if (txt.includes('Spell Attack Bonus')) {
@@ -902,6 +1265,12 @@ async function init() {
             span.textContent = `Spell Save DC: ${saveDC}`;
         } else if (txt.includes('Save DC')) {
             span.textContent = `Save DC: ${saveDC}`;
+        } else if (txt.includes('Atk Melee')) {
+            span.textContent = `Atk Melee: ${atkMeleeBonus}`;
+            if (!tieneMelee) span.style.display = 'none';
+        } else if (txt.includes('Atk Finesse')) {
+            span.textContent = `Atk Finesse: ${atkFinesseBonus}`;
+            if (!tieneFinesse) span.style.display = 'none';
         }
     });
 
@@ -909,8 +1278,10 @@ async function init() {
     if (data.habilidadesUso) {
         // Inicializar estado: localStorage > JSON
         data.habilidadesUso.forEach(h => {
-            habilidadesUsoOriginales[h.nombre] = h.usos;
-            habilidadesInfo[h.nombre] = h.recupera || 'largo';
+            if (h.usos) {
+                habilidadesUsoOriginales[h.nombre] = h.usos;
+                habilidadesInfo[h.nombre] = h.recupera || 'largo';
+            }
         });
         const guardadasHab = localStorage.getItem(STORAGE_PREFIX + 'habilidadesUso');
         if (guardadasHab) {
@@ -931,32 +1302,56 @@ async function init() {
             btn.style.alignItems = 'flex-start';
             btn.style.height = 'auto';
             const usosActuales = habilidadesUsoState[h.nombre];
+
+            // Construir línea celeste de info (acción, distancia, duración)
+            const partesInfoH = [];
+            if (h.accion) partesInfoH.push(h.accion);
+            if (h.distancia) partesInfoH.push(h.distancia);
+            if (h.duracion) partesInfoH.push(h.duracion);
+            const infoLineaHabHTML = partesInfoH.length > 0
+                ? `<span style="color: #0277bd; font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 4px;">${partesInfoH.join(' • ')}</span>`
+                : '';
+
+            // Badge de usos solo si existe
+            const usosBadgeHTML = usosActuales
+                ? `<span class="skill-mod usos-valor">${usosActuales}</span>`
+                : '';
+
+            // Si es Smite, mostrar badge especial con tipo de daño
+            const smiteBadgeHTML = h.tipo === 'smite' && h.tipoDano
+                ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${h.tipoDano}</span>`
+                : '';
+
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px;">
                     <span style="font-weight: bold;">${h.nombre}</span>
-                    <span class="skill-mod usos-valor">${usosActuales}</span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        ${smiteBadgeHTML}
+                        ${usosBadgeHTML}
+                    </div>
                 </div>
+                ${infoLineaHabHTML}
                 <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${h.desc.replace(/\n/g, '<br>')}</span>
             `;
-            // Marcar agotada al cargar si corresponde
-            const disponibles = parseInt(usosActuales.split('/')[0]);
-            if (disponibles <= 0) btn.classList.add('ranura-vacia');
+
+            // Marcar agotada al cargar si corresponde (solo si tiene usos)
+            if (usosActuales) {
+                const disponibles = parseInt(usosActuales.split('/')[0]);
+                if (disponibles <= 0) btn.classList.add('ranura-vacia');
+            }
 
             btn.onclick = () => {
+                itemContextoActual = h;
                 modalTitle.innerHTML = h.nombre;
                 modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
+
                 const modalEquipar = document.getElementById('modal-equipar');
                 if (modalEquipar) modalEquipar.style.display = 'none';
-                if (modalActions && useSpellBtn) {
-                    modalActions.style.display = 'block';
-                    useSpellBtn.dataset.nivel = '';
-                    useSpellBtn.dataset.habilidad = h.nombre;
-                    const dispActuales = parseInt(habilidadesUsoState[h.nombre].split('/')[0]);
-                    useSpellBtn.disabled = dispActuales <= 0;
-                    useSpellBtn.textContent = dispActuales > 0
-                        ? `Usar Habilidad (${habilidadesUsoState[h.nombre]})`
-                        : 'Sin usos disponibles';
-                }
+
+                renderModalBadges(h);
+                renderModalInfoLinea(h);
+                renderBotonUsar(h, 'habilidad');
+
                 modal.style.display = 'flex';
             };
             habGrid.appendChild(btn);
@@ -1002,6 +1397,16 @@ async function init() {
             const danoTexto = h.ataques && h.ataques > 1 ? `${h.dano} ×${h.ataques}` : h.dano;
             const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTexto}</span>` : '';
             const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${h.tipoDano}</span>` : '';
+
+            // Línea celeste de info
+            const partesInfoSpell = [];
+            if (h.accion) partesInfoSpell.push(h.accion);
+            if (h.distancia) partesInfoSpell.push(h.distancia);
+            if (h.duracion) partesInfoSpell.push(h.duracion);
+            const infoLineaSpellHTML = partesInfoSpell.length > 0
+                ? `<span style="color: #0277bd; font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 4px;">${partesInfoSpell.join(' • ')}</span>`
+                : '';
+
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px; gap: 10px; flex-wrap: wrap;">
                     <span style="font-weight: bold;">${h.nombre}</span>
@@ -1010,64 +1415,104 @@ async function init() {
                         ${tipoDanoHTML}
                     </div>
                 </div>
+                ${infoLineaSpellHTML}
                 <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${h.desc.replace(/\n/g, '<br>')}</span>
             `;
             btn.onclick = () => {
+                itemContextoActual = h;
                 modalTitle.innerHTML = h.nombre;
                 modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
 
-                // Ocultar el botón Equipar (este NO es un ítem de equipo)
                 const modalEquipar = document.getElementById('modal-equipar');
                 if (modalEquipar) modalEquipar.style.display = 'none';
 
-                if (modalActions && useSpellBtn) {
-                    if (h.nivel === "CANTRIPS") {
-                        // Cantrips: se pueden usar libremente, no consumen ranura
-                        modalActions.style.display = 'block';
-                        useSpellBtn.dataset.nivel = '';
-                        useSpellBtn.dataset.cantrip = 'true';
-                        useSpellBtn.disabled = false;
-                        useSpellBtn.textContent = 'Usar Cantrip';
-                    } else {
-                        const nivelRanura = mapNivelHechizoARanura(h.nivel);
-                        if (nivelRanura) {
-                            modalActions.style.display = 'block';
-                            useSpellBtn.dataset.nivel = nivelRanura;
-                            useSpellBtn.dataset.cantrip = '';
-                            const disponibles = parseInt(ranurasState[nivelRanura]);
-                            useSpellBtn.disabled = disponibles <= 0;
-                            useSpellBtn.textContent = disponibles > 0
-                                ? `Usar Hechizo (${disponibles} disponibles en ${nivelRanura})`
-                                : 'Sin ranuras disponibles';
-                        } else {
-                            modalActions.style.display = 'none';
-                        }
-                    }
-                }
+                renderModalBadges(h);
+                renderModalInfoLinea(h);
+
+                const tipoHechizo = (h.nivel === "CANTRIPS") ? 'cantrip' : 'hechizo';
+                renderBotonUsar(h, tipoHechizo);
+
                 modal.style.display = 'flex';
             };
             grid.appendChild(btn);
         });
     });
 
-    // Listener: Usar Hechizo (cierra modal al usarse)
+    // Listener: Usar Hechizo / Cantrip / Arma / Habilidad
     if (useSpellBtn) {
         useSpellBtn.addEventListener('click', () => {
-            // Caso 1: es una habilidad con usos
+            // Obtener el item desde el contexto actual para saber su tipo de acción
+            const item = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
+            const tipoAccion = item ? item.accion : '';
+
+            // Validar que tenga acciones disponibles ANTES de consumir
+            if (tipoAccion) {
+                const t = tipoAccion.toLowerCase();
+                if (t.includes('bonus') || t.includes('adicional')) {
+                    if (turnoEstado.bonus === 0 && turnoEstado.accion === 0) {
+                        mostrarToast('No te quedan acciones disponibles este turno', 'warning');
+                        return;
+                    }
+                } else if (t.includes('reacción') || t.includes('reaccion')) {
+                    if (turnoEstado.reaccion === 0) {
+                        mostrarToast('Ya usaste tu Reacción este turno', 'warning');
+                        return;
+                    }
+                } else if (t.includes('acción') || t.includes('accion')) {
+                    if (turnoEstado.accion === 0) {
+                        mostrarToast('Ya usaste tu Acción este turno', 'warning');
+                        return;
+                    }
+                }
+            }
+
+            // Caso 0: intento de usar Smite directamente → bloquear
+            if (useSpellBtn.dataset.smite === 'true') {
+                modal.style.display = 'none';
+                mostrarToast('❌ Necesitás golpear con un arma melee primero', 'warning');
+                useSpellBtn.dataset.smite = '';
+                return;
+            }
+
+            // Caso 1: habilidad con usos
             const habilidad = useSpellBtn.dataset.habilidad;
             if (habilidad) {
                 usarHabilidad(habilidad);
                 useSpellBtn.dataset.habilidad = '';
+                const r = consumirAccion(tipoAccion);
+                if (r.mensaje) mostrarToast(r.mensaje);
                 return;
             }
-            // Caso 2: es un cantrip (no consume ranura)
+
+            // Caso 2: cantrip
             if (useSpellBtn.dataset.cantrip === 'true') {
                 modal.style.display = 'none';
-                mostrarToast('¡Cantrip usado! ✨');
+                const r = consumirAccion(tipoAccion);
+                mostrarToast(`¡Cantrip usado! ✨ ${r.mensaje}`.trim());
                 useSpellBtn.dataset.cantrip = '';
                 return;
             }
-            // Caso 3: es un hechizo (ranura)
+
+            // Caso 3: arma
+            const arma = useSpellBtn.dataset.arma;
+            if (arma) {
+                if (!armasEquipadas.includes(arma)) {
+                    mostrarToast(`No podés usar ${arma} sin equiparla`, 'warning');
+                    return;
+                }
+                modal.style.display = 'none';
+                const r = consumirAccion(tipoAccion);
+                mostrarToast(`¡${arma} usada! ⚔️ ${r.mensaje}`.trim());
+                useSpellBtn.dataset.arma = '';
+
+                // Si la clase tiene Smite y el arma califica, abrir modal de Smite
+                if (smiteData && armaPuedeGatillarSmite(arma, data.equipo)) {
+                    setTimeout(() => abrirModalSmite(), 400);
+                }
+                return;
+            }
+
+            // Caso 4: hechizo con ranura
             const nivel = useSpellBtn.dataset.nivel;
             if (!nivel) return;
             let actual = parseInt(ranurasState[nivel]);
@@ -1077,10 +1522,11 @@ async function init() {
                 guardarRanuras();
                 actualizarRanuraDOM(nivel);
                 modal.style.display = 'none';
+                const r = consumirAccion(tipoAccion);
                 if (actual === 0) {
-                    mostrarToast(`¡Hechizo usado! Ya no quedan ranuras de ${nivel}`, 'warning');
+                    mostrarToast(`¡Hechizo usado! Sin ranuras de ${nivel}. ${r.mensaje}`.trim(), 'warning');
                 } else {
-                    mostrarToast(`¡Hechizo usado! Quedan ${actual} ranuras de ${nivel}`);
+                    mostrarToast(`¡Hechizo usado! Quedan ${actual} de ${nivel}. ${r.mensaje}`.trim());
                 }
             }
         });
@@ -1267,6 +1713,21 @@ async function init() {
             mostrarToast(`Te curaste ${curacion} HP usando ${hdCantidadAUsar}${hitDiceDado}`);
         });
     }
+
+    // Modal de Smite: cerrar
+    const smiteModal = document.getElementById('smite-modal');
+    const smiteCloseBtn = document.querySelector('.close-btn-smite');
+    const smiteCancelar = document.getElementById('smite-cancelar');
+    if (smiteCloseBtn) {
+        smiteCloseBtn.addEventListener('click', () => smiteModal.style.display = 'none');
+    }
+    if (smiteCancelar) {
+        smiteCancelar.addEventListener('click', () => {
+            smiteModal.style.display = 'none';
+            mostrarToast('Smite no usado');
+        });
+    }
+    window.addEventListener('click', (e) => { if (e.target === smiteModal) smiteModal.style.display = 'none'; });
 
     // Modal de Hit Dice: cerrar
     const hdModal = document.getElementById('hd-modal');
