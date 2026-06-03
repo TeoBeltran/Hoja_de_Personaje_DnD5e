@@ -46,6 +46,9 @@ let tamanoPersonaje = 'estandar';
 // === Sistema de turno ===
 let turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
 let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)", etc.
+let actionSurgeActivo = false; // Flag: cuando se usa Action Surge, el próximo "Terminé mi turno" no termina sino que reinicia
+let mageArmorActivo = false; // Flag: si Mage Armor está activo, la CA se calcula con armaduraMagicaBase + DEX
+let mageArmorBase = 13; // CA base cuando Mage Armor está activo
 
 // === Sistema de efectos automáticos ===
 
@@ -79,6 +82,9 @@ function tieneRasgo(nombreRasgo) {
     return rasgosGlobal.some(r => r.nombre === nombreRasgo);
 }
 
+// Flag global para indicar que al cerrar el modal de efectos, hay que abrir el modal de vida
+let abrirModalVidaTrasEfectos = false;
+
 // Procesa los efectos de un item y muestra el modal si hay alguno aplicable
 function procesarEfectos(item, contexto) {
     if (!item || !item.efectos || !Array.isArray(item.efectos)) return;
@@ -90,6 +96,9 @@ function procesarEfectos(item, contexto) {
     });
 
     if (efectosAplicables.length === 0) return;
+
+    // Si hay un efecto de tipo "notificacionYAbreVida", marcar para abrir modal de vida al cerrar
+    abrirModalVidaTrasEfectos = efectosAplicables.some(e => e.tipo === 'notificacionYAbreVida');
 
     // Construir HTML del modal
     const lista = document.getElementById('efectos-lista');
@@ -107,8 +116,31 @@ function procesarEfectos(item, contexto) {
         } else if (efecto.tipo === 'autoDano') {
             const valor = evaluarFormula(efecto.formula, contexto);
             mensaje = `Recibís <strong style="color: #c62828; font-size: 1.2rem;">${valor} de daño</strong>`;
-        } else if (efecto.tipo === 'notificacion') {
-            mensaje = efecto.mensaje || '';
+        } else if (efecto.tipo === 'notificacion' || efecto.tipo === 'notificacionYAbreVida' || efecto.tipo === 'activarActionSurge' || efecto.tipo === 'toggleArmaduraMagica') {
+            // Reemplazar placeholders en el mensaje: {nivelPersonaje}, {WIS}, {STR}, etc.
+            mensaje = (efecto.mensaje || '').replace(/\{(\w+)\}/g, (match, key) => {
+                if (key === 'nivelPersonaje') return contexto.nivelPersonaje || 0;
+                if (key === 'nivelHechizo') return contexto.nivelHechizo || 0;
+                if (['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].includes(key)) {
+                    return statAMod(statsGlobal[key] || 10);
+                }
+                return match;
+            });
+            // Si es Action Surge, activar el flag
+            if (efecto.tipo === 'activarActionSurge') {
+                actionSurgeActivo = true;
+                turnoEstado.accion = 1;
+                guardarTurnoEstado();
+                actualizarTurnoDOM();
+            }
+            // Si es toggleArmaduraMagica, activar Mage Armor y recalcular CA
+            if (efecto.tipo === 'toggleArmaduraMagica') {
+                mageArmorActivo = true;
+                mageArmorBase = efecto.caBase || 13;
+                localStorage.setItem(STORAGE_PREFIX + 'mageArmorActivo', 'true');
+                localStorage.setItem(STORAGE_PREFIX + 'mageArmorBase', String(mageArmorBase));
+                recalcularYActualizarCA();
+            }
         }
 
         div.innerHTML = `
@@ -258,6 +290,9 @@ function calcularCA() {
         } else {
             ca = armaduraEquipadaBase + modDexGlobal;
         }
+    } else if (mageArmorActivo) {
+        // Mage Armor: 13 + DEX (sin tope)
+        ca = mageArmorBase + modDexGlobal;
     } else {
         // Sin armadura: 10 + DEX
         ca = 10 + modDexGlobal;
@@ -270,7 +305,8 @@ function calcularCA() {
 
 function recalcularYActualizarCA() {
     caActual = calcularCA();
-    caOriginal = caActual;
+    // NO actualizamos caOriginal acá: queremos que se mantenga el valor "base" sin Mage Armor
+    // para que el botón se marque como modificado cuando hay un cambio
     guardarCA();
     actualizarCaDOM();
 }
@@ -599,6 +635,24 @@ function actualizarPesoInventarioDOM() {
     }
 }
 
+// === ASI (Ability Score Improvement) ===
+
+// Aplica los ASIs definidos en habilidadesUso al statsGlobal
+// Suma a las stats base del JSON cada vez que se carga la página (sin guardar en localStorage)
+function aplicarASIs(habilidadesUsoData) {
+    if (!habilidadesUsoData || !Array.isArray(habilidadesUsoData)) return;
+
+    habilidadesUsoData.forEach(hab => {
+        if (hab.tipo === 'asi' && hab.stats) {
+            Object.keys(hab.stats).forEach(statKey => {
+                if (statsGlobal[statKey] !== undefined) {
+                    statsGlobal[statKey] += hab.stats[statKey];
+                }
+            });
+        }
+    });
+}
+
 // === Background ===
 
 // Aplica el background al personaje (solo mergea rasgos)
@@ -775,6 +829,40 @@ function calcularBonosDano(item, esHechizo, rasgos, stats, equipoData) {
     });
 
     return { totalBono: total, detalles };
+}
+
+// Resuelve la cantidad de ataques de un cantrip que escala con nivel del personaje
+function resolverAtaques(item, nivelPersonaje) {
+    if (!item.escalaAtaques || typeof item.escalaAtaques !== 'object') {
+        return item.ataques || 1;
+    }
+    let ataquesFinal = item.ataques || 1;
+    Object.keys(item.escalaAtaques)
+        .map(k => parseInt(k))
+        .sort((a, b) => a - b)
+        .forEach(umbral => {
+            if (nivelPersonaje >= umbral) {
+                ataquesFinal = item.escalaAtaques[String(umbral)];
+            }
+        });
+    return ataquesFinal;
+}
+
+// Resuelve el daño base de un cantrip que escala con nivel del personaje
+function resolverDanoBase(item, nivelPersonaje) {
+    if (!item.escala || typeof item.escala !== 'object') return item.dano;
+
+    // Buscar el umbral más alto que sea <= nivelPersonaje
+    let danoFinal = item.dano;
+    Object.keys(item.escala)
+        .map(k => parseInt(k))
+        .sort((a, b) => a - b)
+        .forEach(umbral => {
+            if (nivelPersonaje >= umbral) {
+                danoFinal = item.escala[String(umbral)];
+            }
+        });
+    return danoFinal;
 }
 
 // Genera el string de daño con bonos: "1d10+3+2"
@@ -1120,6 +1208,15 @@ function tomarDescanso(tipo) {
         hitDiceActual = hitDiceMaximo;
         guardarHitDice();
         actualizarHitDiceDOM();
+
+        // Desactivar Mage Armor (dura 8 hs, se cae con descanso largo)
+        if (mageArmorActivo) {
+            mageArmorActivo = false;
+            localStorage.removeItem(STORAGE_PREFIX + 'mageArmorActivo');
+            localStorage.removeItem(STORAGE_PREFIX + 'mageArmorBase');
+            recalcularYActualizarCA();
+            mostrarToast('🛡️ Mage Armor expiró (descanso largo)', 'warning');
+        }
     }
 
     // Cerrar modal y notificar
@@ -1142,8 +1239,16 @@ function tomarDescanso(tipo) {
 }
 
 // Obtener qué personaje cargar desde la URL (?p=gangstur)
+// Obtener qué personaje cargar desde la URL (?p=gangstur)
 const params = new URLSearchParams(window.location.search);
-const personajeId = params.get('p') || 'gangstur'; // default por si no viene
+const personajeIdParam = params.get('p');
+
+// Si no se especificó personaje en la URL, redirigir al menú principal
+if (!personajeIdParam) {
+    window.location.replace('index.html');
+}
+
+const personajeId = personajeIdParam || 'gangstur';
 
 // Prefijo único para localStorage de este personaje
 const STORAGE_PREFIX = `pj_${personajeId}_`;
@@ -1207,10 +1312,15 @@ async function init() {
     const profBonusTmp = parseMod(calcularProficiencia(nivelTmp));
 
     if (data.personaje && data.personaje.stats) {
-        statsGlobal = data.personaje.stats;
-        data.modificadores = generarModificadores(data.personaje.stats, data.personaje.clase);
-        data.salvaciones = generarSalvaciones(data.personaje.stats, data.personaje.clase, profBonusTmp);
-        data.habilidades = generarHabilidades(data.habilidades, data.personaje.stats, profBonusTmp);
+        // Hacemos una copia profunda para que el JSON original no se modifique entre cargas
+        statsGlobal = { ...data.personaje.stats };
+
+        // Aplicar ASIs ANTES de generar modificadores/salvaciones/skills
+        aplicarASIs(data.habilidadesUso);
+
+        data.modificadores = generarModificadores(statsGlobal, data.personaje.clase);
+        data.salvaciones = generarSalvaciones(statsGlobal, data.personaje.clase, profBonusTmp);
+        data.habilidades = generarHabilidades(data.habilidades, statsGlobal, profBonusTmp);
     }
 
     // Stat principal según clase (para Spell Save DC, Spell Attack Bonus, etc)
@@ -1262,6 +1372,14 @@ async function init() {
 
     // Pre-cargar armadura, escudo y armas equipadas desde localStorage
     modDexGlobal = obtenerMod(data.modificadores, "DEX");
+
+    // Pre-cargar estado de Mage Armor
+    const mageArmorGuardado = localStorage.getItem(STORAGE_PREFIX + 'mageArmorActivo');
+    if (mageArmorGuardado === 'true') {
+        mageArmorActivo = true;
+        const baseGuardada = localStorage.getItem(STORAGE_PREFIX + 'mageArmorBase');
+        if (baseGuardada) mageArmorBase = parseInt(baseGuardada);
+    }
     const armaduraGuardada = localStorage.getItem(STORAGE_PREFIX + 'armaduraEquipada');
     const escudoGuardado = localStorage.getItem(STORAGE_PREFIX + 'escudoEquipado');
     const armasGuardadas = localStorage.getItem(STORAGE_PREFIX + 'armasEquipadas');
@@ -1504,8 +1622,9 @@ async function init() {
 
         // Daño + multiplicador + bonos
         if (item.dano) {
-            let danoTexto = item.dano;
             const esHechizoItem = !item.manos && !item.esArmadura;
+            const danoBase = esHechizoItem ? resolverDanoBase(item, nivelPersonaje) : item.dano;
+            let danoTexto = danoBase;
             let modUsado = 0;
             let nombreModUsado = '';
             if (item.tipo) {
@@ -1513,8 +1632,9 @@ async function init() {
                 nombreModUsado = (item.tipo === 'finesse') ? 'DEX' : 'STR';
             }
             const bonosModalInfo = calcularBonosDano(item, esHechizoItem, rasgosGlobal, statsGlobal, data.equipo);
-            danoTexto = formatearDanoConBonos(item.dano, modUsado, bonosModalInfo.detalles);
-            if (item.ataques && item.ataques > 1) danoTexto = `${danoTexto} ×${item.ataques}`;
+            const ataquesItem = esHechizoItem ? resolverAtaques(item, nivelPersonaje) : (item.ataques || 1);
+            danoTexto = formatearDanoConBonos(danoBase, modUsado, bonosModalInfo.detalles);
+            if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
 
             // Tooltip con detalle de bonos
@@ -1903,30 +2023,58 @@ async function init() {
     }
 
     // Click en cada contador → solo permite RESTAURAR (no gastar manualmente)
+    // Acción Adicional y Reacción NO se pueden restaurar a mano (solo al terminar turno).
+    // Acción solo se puede restaurar si tiene Extra Attack (max > 1).
     document.querySelectorAll('.turno-item').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             const tipo = btn.dataset.tipo;
+            // Bonus y Reacción no se restauran manualmente
+            if (tipo !== 'accion') return;
+            // Solo restaurar Acción si tiene Extra Attack
+            if (extraAttacks <= 1) return;
             if (turnoEstado[tipo] === 0) {
                 turnoEstado[tipo] = 1;
                 guardarTurnoEstado();
                 actualizarTurnoDOM();
-                const nombre = tipo === 'bonus' ? 'Acción Bonus' : tipo === 'accion' ? 'Acción' : 'Reacción';
-                mostrarToast(`${nombre} restaurada`);
+                mostrarToast('Acción restaurada');
             }
-            // Si está en 1, no hacemos nada (no se puede gastar manualmente)
         });
-    }); 
+    });
 
     // Botón "Terminé mi turno"
     if (turnoReset) {
         turnoReset.addEventListener('click', (e) => {
             e.stopPropagation();
+            // Si Action Surge está activo, abrir modal de recordatorio en vez de resetear directamente
+            if (actionSurgeActivo) {
+                turnoPanel.style.display = 'none';
+                document.getElementById('action-surge-modal').style.display = 'flex';
+                return;
+            }
             resetearTurno();
             mostrarToast('🔄 Turno reiniciado');
             turnoPanel.style.display = 'none';
         });
     }
+
+    // Modal Action Surge: listeners
+    const actionSurgeModal = document.getElementById('action-surge-modal');
+    const actionSurgeCerrar = document.getElementById('action-surge-cerrar');
+    const actionSurgeCloseBtn = document.querySelector('.close-btn-action-surge');
+    if (actionSurgeCerrar) {
+        actionSurgeCerrar.addEventListener('click', () => {
+            actionSurgeActivo = false; // Apagar el flag
+            actionSurgeModal.style.display = 'none';
+            // Ahora sí terminar el turno definitivamente
+            resetearTurno();
+            mostrarToast('🔄 Turno terminado');
+        });
+    }
+    if (actionSurgeCloseBtn) {
+        actionSurgeCloseBtn.addEventListener('click', () => actionSurgeModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === actionSurgeModal) actionSurgeModal.style.display = 'none'; });
 
     // Calcular y mostrar Save DC y Spell Attack Bonus en headers
     const saveDC = 8 + proficienciaActual + modPrincipal;
@@ -1978,6 +2126,9 @@ async function init() {
 
         const habGrid = document.getElementById('habilidades-uso-grid');
         data.habilidadesUso.forEach(h => {
+            // Skipear ASIs (son silenciosos, solo modifican stats)
+            if (h.tipo === 'asi' || h.oculto) return;
+
             const btn = document.createElement('button');
             btn.className = 'skill-btn';
             btn.id = `hab-uso-${h.nombre.replace(/[^a-zA-Z0-9]/g, '-')}`;
@@ -2077,11 +2228,13 @@ async function init() {
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'flex-start';
             btn.style.height = 'auto';
-            let danoTextoSpell = h.dano || '';
-            if (h.dano) {
+            const danoBaseSpell = resolverDanoBase(h, nivelPersonaje);
+            const ataquesSpell = resolverAtaques(h, nivelPersonaje);
+            let danoTextoSpell = danoBaseSpell || '';
+            if (danoBaseSpell) {
                 const bonosSpellInfo = calcularBonosDano(h, true, rasgosGlobal, statsGlobal, data.equipo);
-                danoTextoSpell = formatearDanoConBonos(h.dano, 0, bonosSpellInfo.detalles);
-                if (h.ataques && h.ataques > 1) danoTextoSpell = `${danoTextoSpell} ×${h.ataques}`;
+                danoTextoSpell = formatearDanoConBonos(danoBaseSpell, 0, bonosSpellInfo.detalles);
+                if (ataquesSpell > 1) danoTextoSpell = `${danoTextoSpell} ×${ataquesSpell}`;
             }
             const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTextoSpell}</span>` : '';
             const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${h.tipoDano}</span>` : '';
@@ -2169,6 +2322,16 @@ async function init() {
                 useSpellBtn.dataset.habilidad = '';
                 const r = consumirAccion(tipoAccion);
                 if (r.mensaje) mostrarToast(r.mensaje);
+
+                // Procesar efectos de la habilidad (Second Wind, etc.)
+                const habObj = data.habilidadesUso ? data.habilidadesUso.find(h => h.nombre === habilidad) : null;
+                if (habObj && habObj.efectos) {
+                    setTimeout(() => {
+                        procesarEfectos(habObj, {
+                            nivelPersonaje: nivelPersonaje
+                        });
+                    }, 400);
+                }
                 return;
             }
 
@@ -2193,9 +2356,19 @@ async function init() {
                 mostrarToast(`¡${arma} usada! ⚔️ ${r.mensaje}`.trim());
                 useSpellBtn.dataset.arma = '';
 
+                // Procesar efectos del arma (Great Weapon Fighting, Improved Critical, etc.)
+                const armaObj = data.equipo.find(e => e.nombre === arma);
+                if (armaObj && armaObj.efectos) {
+                    setTimeout(() => {
+                        procesarEfectos(armaObj, {
+                            nivelPersonaje: nivelPersonaje
+                        });
+                    }, 400);
+                }
+
                 // Si la clase tiene Smite y el arma califica, abrir modal de Smite
                 if (smiteData && armaPuedeGatillarSmite(arma, data.equipo)) {
-                    setTimeout(() => abrirModalSmite(), 400);
+                    setTimeout(() => abrirModalSmite(), 600);
                 }
                 return;
             }
@@ -2491,13 +2664,26 @@ async function init() {
     const efectosModal = document.getElementById('efectos-modal');
     const efectosCloseBtn = document.querySelector('.close-btn-efectos');
     const efectosCerrar = document.getElementById('efectos-cerrar');
+
+    const cerrarEfectosYContinuar = () => {
+        efectosModal.style.display = 'none';
+        // Si hay un efecto de Second Wind o similar que requiere abrir modal de vida
+        if (abrirModalVidaTrasEfectos) {
+            abrirModalVidaTrasEfectos = false;
+            setTimeout(() => {
+                document.getElementById('hp-modal').style.display = 'flex';
+                actualizarVidaDOM();
+            }, 200);
+        }
+    };
+
     if (efectosCloseBtn) {
-        efectosCloseBtn.addEventListener('click', () => efectosModal.style.display = 'none');
+        efectosCloseBtn.addEventListener('click', cerrarEfectosYContinuar);
     }
     if (efectosCerrar) {
-        efectosCerrar.addEventListener('click', () => efectosModal.style.display = 'none');
+        efectosCerrar.addEventListener('click', cerrarEfectosYContinuar);
     }
-    window.addEventListener('click', (e) => { if (e.target === efectosModal) efectosModal.style.display = 'none'; });
+    window.addEventListener('click', (e) => { if (e.target === efectosModal) cerrarEfectosYContinuar(); });
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -1,0 +1,9 @@
+{
+  "Datos": [
+    { "Uno": "Los personajes al subir a niveles 4, 8, 12, 16 y 19 consiguen un bono extra."},
+    { "Uno": "El picaro tambien al 10, y el guerrero al 6 y 14 pero no al 10."},
+    { "Uno": "Ese bono consta de poder subir 2 puntos a las habilidades como STR, INT, etc, o bien conseguir un Feat."},
+    { "Uno": "Fighter (Guerrero): Niveles 4, 6, 8, 12, 14, 16 y 19. (7 mejoras en total)."},
+    { "Uno": "Rogue (Pícaro): Niveles 4, 8, 10, 12, 16 y 19. (6 mejoras en total)."}
+  ]
+}
