@@ -44,75 +44,131 @@
     { "nombre": "Trato animal", "proficiente": false }
   ],
   "background": {
-    "nombre": "False Identity",
+    "nombre": "Soldier",
     "habilidades": [
       {
-        "nombre": "False Identity",
-        "desc": "Creaste una segunda identidad creíble que incluye documentación, contactos y disfraces. Podés asumir esa identidad como una persona real."
+        "nombre": "Military Rank",
+        "desc": "Tenés un rango militar de tu carrera como soldado. Otros soldados leales a tu antigua organización militar te reconocen como autoridad y te respetan acorde a tu rango. Podés ejercer influencia sobre soldados de menor rango y, generalmente, podés acceder a campamentos y fortalezas militares amigas. Además, tu reputación te facilita conseguir suministros básicos, refugio temporal y comida en zonas controladas por tu antigua facción."
       }
     ]
   },
   "rasgos": [
-    { "nombre": "Pact Magic", "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos." },
-    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.", "bonoDano": "CHA", "aplicaA": "hechizo:Eldritch Blast" },
-    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta." },
-    { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
-    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel)." },
-    { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
-    { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
-    { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia al fuego", "desc": "Tienes resistencia al daño de fuego." }
+    { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos." },
+    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20)." }
   ],
   "habilidadesUso": [
-    { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
-    { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
-    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
-  ],
-  "equipo": [
-    { 
-      "nombre": "Cuero Tachonado", 
-      "esArmadura": true, 
-      "tipoArmadura": "ligera", 
-      "armaduraBase": 12, 
-      "manos": 0, 
-      "peso": 13,
-      "valor": 45,
-      "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb."
+    {
+      "nombre": "ASI Nivel 4",
+      "tipo": "asi",
+      "stats": { "STR": 2 },
+      "desc": "Mejora de característica del nivel 4: +2 STR."
     },
     {
-      "nombre": "Ballesta Ligera", 
-      "dano": "1d8", 
-      "tipoDano": "perforante", 
-      "tipo": "finesse", 
-      "manos": 2, 
-      "peso": 5,
-      "valor": 25,
-      "accion": "Acción", 
-      "distancia": "80/320 ft", 
-      "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Munición.</strong>"
+      "nombre": "ASI Nivel 6",
+      "tipo": "asi",
+      "stats": { "STR": 2 },
+      "desc": "Mejora de característica del nivel 6: +2 STR."
+    },
+    {
+      "nombre": "Second Wind",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "desc": "Tenés una reserva limitada de resistencia. En tu turno, podés usar una Acción Bonus para recuperar HP igual a 1d10 + tu nivel de Guerrero.",
+      "efectos": [
+        {
+          "tipo": "notificacionYAbreVida",
+          "descripcion": "Second Wind",
+          "mensaje": "Tirá <strong>1d10 + {nivelPersonaje}</strong> y curate ese total. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
+        }
+      ]
+    },
+    {
+      "nombre": "Action Surge",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Especial",
+      "distancia": "Propio",
+      "desc": "Una vez por descanso corto, en tu turno podés tomar una acción adicional además de tu acción normal. Tu Acción se restaurá automáticamente al usarlo. Cuando intentes terminar el turno, te aparecerá un recordatorio.",
+      "efectos": [
+        {
+          "tipo": "activarActionSurge",
+          "descripcion": "Action Surge",
+          "mensaje": "Tu Acción fue <strong>restaurada</strong>. Podés hacer otra acción este mismo turno. Al terminar el turno aparecerá un modal de confirmación."
+        }
+      ]
+    },
+    {
+      "nombre": "Extra Attack",
+      "usos": "",
+      "recupera": "",
+      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1.",
+      "oculto": true
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Greatsword",
+      "dano": "2d6",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 2,
+      "peso": 6,
+      "valor": 50,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Espada a dos manos, arma pesada. 2d6+STR cortante.",
+      "efectos": [
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Fighting Style: Great Weapon Fighting",
+          "descripcion": "Great Weapon Fighting",
+          "mensaje": "Si en alguno de los dados de daño sacaste 1 o 2, podés re-tirarlo. Te quedás con el segundo resultado aunque sea peor."
+        },
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Improved Critical",
+          "descripcion": "Improved Critical",
+          "mensaje": "Recordá: hacés crítico con 19 o 20 en el d20 del ataque."
+        }
+      ]
+    },
+    {
+      "nombre": "Handaxe",
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 5,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Hacha de mano. Arrojadiza. 1d6+STR cortante. Podés lanzarla hasta 20 ft (60 ft con desventaja).",
+      "efectos": [
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Improved Critical",
+          "descripcion": "Improved Critical",
+          "mensaje": "Recordá: hacés crítico con 19 o 20 en el d20 del ataque."
+        }
+      ]
+    },
+    {
+      "nombre": "Serpent Scale Armor",
+      "esArmadura": true,
+      "tipoArmadura": "mediana",
+      "armaduraBase": 14,
+      "manos": 0,
+      "peso": 45,
+      "valor": 50,
+      "desc": "Armadura mediana de escamas de serpiente. CA: 14 + DEX (máx +2)."
     }
   ],
   "hechizos": {
-        "ranuras": [
-            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 3", "cantidad": "2", "recupera": "largo" },
-            { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
-        ],
-        "lista": [
-          { "nivel": "CANTRIPS", "nombre": "Eldritch Blast", "dano": "1d10", "ataques": 2, "tipoDano": "fuerza", "accion": "Acción", "distancia": "120 ft", "desc": "Lanza 2 rayos, cada uno se hace tirada para acertar por separado. Si aciertan, cada uno hace 1d10 (incluye Agonizing Blast) de daño de fuerza." },
-          { "nivel": "CANTRIPS", "nombre": "Mage Hand", "accion": "Acción", "distancia": "30 ft", "duracion": "1 minuto", "desc": "Crea una mano espectral que dura hasta 1 minuto y desaparece si se aleja más de 30ft del usuario. Puede manipular objetos no mágicos ni cargar más de 10 pounds." },
-          { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "tipoDano": "psíquico", "accion": "Acción", "distancia": "60 ft", "duracion": "1 ronda", "desc": "Dispara un pico de energía psíquica que pueda ver. El objetivo tiene que pasar una tirada de salvación de INT o recibir 1d6 de daño psíquico y restar 1d4 de su próxima tirada de salvación antes del f inal de tu próximo turno." },
-          { "nivel": "NIVEL 1", "nombre": "Find Familiar", "accion": "Acción", "distancia": "10 ft", "duracion": "1 hora", "desc": "Puede invocar un familiar animal o especial y se comunican telepáticamente." },
-          { "nivel": "NIVEL 1", "nombre": "Hex", "dano": "1d6", "tipoDano": "necrótico", "accion": "Acción Bonus", "distancia": "90 ft", "duracion": "Concentración, 1 hora", "desc": "Pone una maldición en una criatura que pueda ver en rango, hasta que termine el hechizo hace 1d6 de daño necrotic extra cada vez que hagas daño a esa criatura. También elegis una habilidad y el objetivo tiene desventaja en tiradas de salvación de ese tipo.  Si el objetivo muere mientras Hex sigue activo, podes gastar tu Acción Bonus para maldecir otra criatura." },
-          { "nivel": "NIVEL 2", "nombre": "Misty Step", "accion": "Acción Bonus", "distancia": "Propio", "desc": "Teletransporte hasta 30 ft a un lugar que puedas ver." },
-          { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "dano": "2d6", "ataques": 3, "tipoDano": "fuego", "accion": "Acción", "distancia": "120 ft", "desc": "Crea 3 rayos de fuego y los gira hacia enemigos en rango, pueden ser enemigos distintos. Cada rayo acierta o falla por separado. Si aciertan, hacen 2d6 de daño de fuego. Cada nivel por encima del nivel 2 que se use es 1d6 extra de daño." },
-          { "nivel": "NIVEL 3", "nombre": "Counterspell", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
-          { "nivel": "NIVEL 3", "nombre": "Fear", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal, cada criatura a 30ft del cono tienen que pasar una tirada de Sabiduría o soltar lo que tengan y pasan a estar Frightened. Mientras estén así, usan su acción para correr hacia la ruta mas segura. Si perdes visión de la criatura, puede hacer una tirada de salvación de Sabiduría." },
-          { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
-          { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 min", "desc": "Los enemigos hacen tirada de salvación de Sabiduría o quedan bajo el efecto de Charm. Bajo Charm, su velocidad es 0. Al recibir daño dejan de tener Charm." }
-        ]
-    },
+    "ranuras": [],
+    "lista": []
+  },
     "inventario": [
         {
             "nombre": "Leña",

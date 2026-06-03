@@ -179,11 +179,12 @@
       {
         "nivel": "CANTRIPS",
         "nombre": "Sacred Flame",
-        "dano": "2d8",
+        "dano": "1d8",
+        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
         "tipoDano": "radiante",
         "accion": "Acción",
         "distancia": "60 ft",
-        "desc": "Una criatura dentro del rango debe hacer salvación de DEX. Si falla, recibe 2d8 de daño radiante (escala con nivel de clérigo). Ignora cobertura."
+        "desc": "Una criatura dentro del rango debe hacer salvación de DEX. Si falla, recibe daño radiante (escala con nivel). Ignora cobertura."
       },
       {
         "nivel": "CANTRIPS",

@@ -54,6 +54,7 @@
   },
   "rasgos": [
     { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.", "bonoDano": 2, "aplicaA": "duelingMelee" },
+    { "nombre": "Aura of Protection", "desc": "Vos y cualquier criatura aliada dentro de 10 ft tuyos suman tu modificador de CHA (mínimo +1) a sus tiradas de salvación. Necesitás estar consciente para que el aura funcione." },
     { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
     { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
