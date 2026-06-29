@@ -1,0 +1,355 @@
+#generarResumen{
+
+    background:#1d1813;
+    color:#efe4c8;
+    font-family:Georgia,serif;
+    min-height:100vh;
+    padding:40px;
+
+}
+
+/* ================= HEADER ================= */
+
+#generarResumen .gr-header{
+
+    text-align:center;
+    margin-bottom:35px;
+
+}
+
+#generarResumen .gr-header h1{
+
+    font-size:42px;
+    color:#d7b05b;
+    margin-bottom:10px;
+    letter-spacing:2px;
+    text-shadow:2px 2px 5px rgba(0,0,0,.5);
+
+}
+
+#generarResumen .gr-header p{
+
+    color:#bfae8a;
+    font-size:17px;
+
+}
+
+/* ================= PANEL ================= */
+
+#generarResumen .gr-panel{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+    margin-bottom:35px;
+    flex-wrap:wrap;
+
+}
+
+#generarResumen #gr-btnGenerar{
+
+    background:#6b4522;
+    color:white;
+    border:2px solid #d7b05b;
+    border-radius:8px;
+    padding:14px 30px;
+    cursor:pointer;
+    font-size:17px;
+    transition:.2s;
+
+}
+
+#generarResumen #gr-btnGenerar:hover{
+
+    background:#8c5d2e;
+
+}
+
+#generarResumen #gr-btnGenerar:disabled{
+
+    opacity:.6;
+    cursor:not-allowed;
+
+}
+
+#generarResumen #gr-estado{
+
+    color:#d7b05b;
+    font-style:italic;
+
+}
+
+/* ================= GRID ================= */
+
+#generarResumen #gr-contenedorResumen{
+
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(420px,1fr));
+    gap:28px;
+
+}
+
+/* ================= TARJETA ================= */
+
+#generarResumen .gr-personaje{
+
+    background:#2f241a;
+    border:2px solid #8b6b3f;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 0 18px rgba(0,0,0,.45);
+    transition:.2s;
+
+}
+
+#generarResumen .gr-personaje:hover{
+
+    transform:translateY(-4px);
+
+}
+
+#generarResumen .gr-cabecera{
+
+    background:#45301d;
+    padding:18px;
+    border-bottom:2px solid #8b6b3f;
+
+}
+
+#generarResumen .gr-nombre{
+
+    font-size:30px;
+    color:#f1ca72;
+    margin-bottom:12px;
+
+}
+
+/* ================= INFO ================= */
+
+#generarResumen .gr-info{
+
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+
+}
+
+#generarResumen .gr-linea{
+
+    background:#5a4027;
+    border:1px solid #967341;
+    border-radius:5px;
+    padding:7px 10px;
+    font-size:15px;
+
+}
+
+/* ================= CUERPO ================= */
+
+#generarResumen .gr-cuerpo{
+
+    padding:20px;
+
+}
+
+#generarResumen .gr-seccion{
+
+    margin-bottom:22px;
+
+}
+
+#generarResumen .gr-seccion:last-child{
+
+    margin-bottom:0;
+
+}
+
+#generarResumen .gr-seccion h3{
+
+    color:#d7b05b;
+    margin-bottom:10px;
+    padding-bottom:5px;
+    border-bottom:1px solid #73522d;
+    font-size:18px;
+
+}
+
+/* ================= LISTAS ================= */
+
+#generarResumen .gr-seccion ul{
+
+    list-style:none;
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+}
+
+#generarResumen .gr-seccion li{
+
+    background:#56402a;
+
+    border:1px solid #957341;
+
+    border-radius:6px;
+
+    padding:6px 10px;
+
+    font-size:14px;
+
+    line-height:1.3;
+
+    transition:.15s;
+
+}
+
+#generarResumen .gr-seccion li:hover{
+
+    background:#6a4d30;
+
+    transform:translateY(-1px);
+
+}
+
+#generarResumen .gr-vacio{
+
+    opacity:.55;
+
+    font-style:italic;
+
+}
+
+/* ================= ICONOS ================= */
+
+#generarResumen .gr-raza::before{
+
+    content:"🧬 ";
+    margin-right:3px;
+
+}
+
+#generarResumen .gr-clase::before{
+
+    content:"🎓 ";
+    margin-right:3px;
+
+}
+
+#generarResumen .gr-subclase::before{
+
+    content:"👑 ";
+    margin-right:3px;
+
+}
+
+/* ================= SECCIONES ================= */
+
+#generarResumen .gr-secRasgos h3{
+
+    color:#ffdb7d;
+
+}
+
+#generarResumen .gr-secHab h3{
+
+    color:#ffb95d;
+
+}
+
+#generarResumen .gr-secEquipo h3{
+
+    color:#9fd0ff;
+
+}
+
+#generarResumen .gr-secHechizos h3{
+
+    color:#c78cff;
+
+}
+
+/* ================= OCULTAR SECCIONES ================= */
+
+#generarResumen .gr-oculto{
+
+    display:none;
+
+}
+
+/* ================= SCROLL ================= */
+
+#generarResumen::-webkit-scrollbar{
+
+    width:10px;
+
+}
+
+#generarResumen::-webkit-scrollbar-track{
+
+    background:#1d1813;
+
+}
+
+#generarResumen::-webkit-scrollbar-thumb{
+
+    background:#6b4522;
+
+    border-radius:20px;
+
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+    #generarResumen{
+
+        padding:20px;
+
+    }
+
+    #generarResumen #gr-contenedorResumen{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    #generarResumen .gr-header h1{
+
+        font-size:30px;
+
+    }
+
+    #generarResumen .gr-panel{
+
+        flex-direction:column;
+
+    }
+
+    #generarResumen .gr-nombre{
+
+        font-size:24px;
+
+    }
+
+    #generarResumen .gr-linea{
+
+        font-size:14px;
+
+    }
+
+    #generarResumen .gr-seccion li{
+
+        width:100%;
+
+    }
+
+}
