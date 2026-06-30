@@ -47,28 +47,31 @@
 
 }
 
-#generarResumen #gr-btnGenerar{
+#generarResumen #gr-btnGenerar,
+#generarResumen #gr-btnDescargar{
 
     background:#6b4522;
     color:white;
     border:2px solid #d7b05b;
     border-radius:8px;
-    padding:14px 30px;
+    padding:14px 28px;
     cursor:pointer;
     font-size:17px;
     transition:.2s;
 
 }
 
-#generarResumen #gr-btnGenerar:hover{
+#generarResumen #gr-btnGenerar:hover,
+#generarResumen #gr-btnDescargar:hover{
 
     background:#8c5d2e;
 
 }
 
-#generarResumen #gr-btnGenerar:disabled{
+#generarResumen #gr-btnGenerar:disabled,
+#generarResumen #gr-btnDescargar:disabled{
 
-    opacity:.6;
+    opacity:.55;
     cursor:not-allowed;
 
 }
@@ -145,6 +148,42 @@
 
 }
 
+/* ================= STATS ================= */
+
+#generarResumen .gr-stats{
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+
+}
+
+#generarResumen .gr-stat{
+
+    background:#56402a;
+    border:1px solid #967341;
+    border-radius:6px;
+    text-align:center;
+    padding:10px 6px;
+
+}
+
+#generarResumen .gr-stat strong{
+
+    display:block;
+    color:#f4cb70;
+    font-size:14px;
+    margin-bottom:4px;
+
+}
+
+#generarResumen .gr-stat span{
+
+    font-size:20px;
+    font-weight:bold;
+
+}
+
 /* ================= CUERPO ================= */
 
 #generarResumen .gr-cuerpo{
@@ -180,11 +219,8 @@
 #generarResumen .gr-seccion ul{
 
     list-style:none;
-
     display:flex;
-
     flex-wrap:wrap;
-
     gap:8px;
 
 }
@@ -192,17 +228,11 @@
 #generarResumen .gr-seccion li{
 
     background:#56402a;
-
     border:1px solid #957341;
-
     border-radius:6px;
-
     padding:6px 10px;
-
     font-size:14px;
-
     line-height:1.3;
-
     transition:.15s;
 
 }
@@ -210,16 +240,7 @@
 #generarResumen .gr-seccion li:hover{
 
     background:#6a4d30;
-
     transform:translateY(-1px);
-
-}
-
-#generarResumen .gr-vacio{
-
-    opacity:.55;
-
-    font-style:italic;
 
 }
 
@@ -228,25 +249,34 @@
 #generarResumen .gr-raza::before{
 
     content:"🧬 ";
-    margin-right:3px;
 
 }
 
 #generarResumen .gr-clase::before{
 
     content:"🎓 ";
-    margin-right:3px;
 
 }
 
 #generarResumen .gr-subclase::before{
 
     content:"👑 ";
-    margin-right:3px;
 
 }
 
-/* ================= SECCIONES ================= */
+#generarResumen .gr-asi::before{
+
+    content:"📈 ";
+
+}
+
+/* ================= COLORES ================= */
+
+#generarResumen .gr-secStats h3{
+
+    color:#9fe0ff;
+
+}
 
 #generarResumen .gr-secRasgos h3{
 
@@ -272,33 +302,11 @@
 
 }
 
-/* ================= OCULTAR SECCIONES ================= */
+/* ================= UTILIDADES ================= */
 
 #generarResumen .gr-oculto{
 
     display:none;
-
-}
-
-/* ================= SCROLL ================= */
-
-#generarResumen::-webkit-scrollbar{
-
-    width:10px;
-
-}
-
-#generarResumen::-webkit-scrollbar-track{
-
-    background:#1d1813;
-
-}
-
-#generarResumen::-webkit-scrollbar-thumb{
-
-    background:#6b4522;
-
-    border-radius:20px;
 
 }
 
@@ -349,6 +357,12 @@
     #generarResumen .gr-seccion li{
 
         width:100%;
+
+    }
+
+    #generarResumen .gr-stats{
+
+        grid-template-columns:repeat(2,1fr);
 
     }
 

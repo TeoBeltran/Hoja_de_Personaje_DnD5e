@@ -1264,6 +1264,10 @@ async function init() {
     const response = await fetch(`personajes/${personajeId}.json`);
     const data = await response.json();
 
+    data.personaje.improvements = data.improvements;
+
+    aplicarImprovements(data.personaje);
+
     // Cargar Nombre, Clase y Raza desde el JSON
     if (data.personaje) {
         const nombreTextoEl = document.getElementById('nombre-texto');
@@ -1364,6 +1368,7 @@ async function init() {
     const mG = document.getElementById('mods-grid');
     const vG = document.getElementById('saves-grid');
     const skG = document.getElementById('skills-grid');
+    const impG = document.getElementById('improvements-grid');
 
     // Calcular valores automáticos antes de renderizar
     const nivelPersonaje = nivelTmp;
@@ -1407,6 +1412,56 @@ async function init() {
             } catch(e) { armasEquipadas = []; }
         }
         recalcularManosUsadas(data.equipo);
+    }
+
+    if (impG && data.improvements) {
+        const agregar = (titulo, texto) => {
+            const btn = document.createElement('button');
+            btn.className = 'skill-btn';
+            btn.style.flexDirection = 'column';
+            btn.style.alignItems = 'flex-start';
+            btn.style.height = 'auto';
+
+            btn.innerHTML = `
+                <strong>${titulo}</strong>
+                <span style="font-size:.9rem;color:var(--text-muted)">
+                    ${texto}
+                </span>
+            `;
+
+            impG.appendChild(btn);
+        };
+
+        if (Array.isArray(data.improvements.race)) {
+            data.improvements.race.forEach(r=>{
+                agregar(
+                    "Racial",
+                    `${r.atributo} +${r.valor} (${r.motivo})`
+                );
+            });
+        }
+
+        if (Array.isArray(data.improvements.feats)) {
+            data.improvements.feats.forEach(f=>{
+                Object.entries(f.atributos).forEach(([a,v])=>{
+                    agregar(
+                        `Feat - ${f.nombre}`,
+                        `${a} +${v}`
+                    );
+                });
+            });
+        }
+
+        if (Array.isArray(data.improvements.asi)) {
+            data.improvements.asi.forEach(a=>{
+                Object.entries(a.atributos).forEach(([atr,v])=>{
+                    agregar(
+                        `ASI Nivel ${a.nivel}`,
+                        `${atr} +${v}`
+                    );
+                });
+            });
+        }
     }
 
     data.estadisticas.forEach(i => {
@@ -2688,3 +2743,107 @@ async function init() {
 
 document.addEventListener('DOMContentLoaded', init);
 
+function aplicarImprovements(personaje){
+
+    console.log("Aplicando improvements TRUE");
+
+    if(!personaje?.improvements){
+        console.log("No existe improvements");
+        return;
+    }
+
+    const stats = personaje.stats;
+
+    console.log("Stats antes:", JSON.parse(JSON.stringify(stats)));
+    console.log("Improvements:", personaje.improvements);
+
+    // Race
+    if(Array.isArray(personaje.improvements.race)){
+
+        console.log("Race:", personaje.improvements.race);
+
+        personaje.improvements.race.forEach(r=>{
+
+            console.log("Procesando Race:", r);
+            console.log("Antes:", r.atributo, stats[r.atributo]);
+
+            if(stats[r.atributo]!=null){
+
+                stats[r.atributo]+=Number(r.valor)||0;
+
+                console.log("Después:", r.atributo, stats[r.atributo]);
+
+            }else{
+
+                console.log("No existe stat:", r.atributo);
+
+            }
+
+        });
+
+    }
+
+    // Feats
+    if(Array.isArray(personaje.improvements.feats)){
+
+        console.log("Feats:", personaje.improvements.feats);
+
+        personaje.improvements.feats.forEach(f=>{
+
+            if(!f.atributos)
+                return;
+
+            Object.entries(f.atributos).forEach(([stat,valor])=>{
+
+                console.log("Feat:", stat, valor, "Antes:", stats[stat]);
+
+                if(stats[stat]!=null){
+
+                    stats[stat]+=valor;
+
+                    console.log("Después:", stat, stats[stat]);
+
+                }else{
+
+                    console.log("No existe stat:", stat);
+
+                }
+
+            });
+
+        });
+
+    }
+
+    // ASI
+    if(Array.isArray(personaje.improvements.asi)){
+
+        console.log("ASI:", personaje.improvements.asi);
+
+        personaje.improvements.asi.forEach(a=>{
+
+            Object.entries(a.atributos).forEach(([stat,valor])=>{
+
+                console.log("ASI:", stat, valor, "Antes:", stats[stat]);
+
+                if(stats[stat]!=null){
+
+                    stats[stat]+=valor;
+
+                    console.log("Después:", stat, stats[stat]);
+
+                }else{
+
+                    console.log("No existe stat:", stat);
+
+                }
+
+            });
+
+        });
+
+    }
+
+    console.log("Stats finales:", JSON.parse(JSON.stringify(stats)));
+
+}
