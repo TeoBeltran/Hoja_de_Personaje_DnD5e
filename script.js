@@ -1,3 +1,39 @@
+import {
+    ICONOS_PERSONAJE,
+    PROFICIENCIAS_POR_CLASE,
+    NOMBRES_STATS,
+    SKILL_STAT,
+    SKILL_DESC
+} from "./Scripts/Datos/Constantes.js";
+
+import {
+    calcularProficiencia,
+    parseMod,
+    formatMod,
+    obtenerMod,
+    statAMod,
+    calcularValorSkill,
+    generarHabilidades,
+    generarModificadores,
+    generarSalvaciones
+} from "./Scripts/Core/Estadisticas.js";
+
+import {
+    resolverAtaques,
+    resolverDanoBase,
+    formatearDanoConBonos,
+    formatearDetalleBonos,
+    calcularExtraAttacks,
+    resolverBono,
+    bonoAplicaA,
+    calcularBonosDano,
+    obtenerHitDiceSegunClase,
+    armaduraMaximaSegunClase,
+    puedeUsarEscudoSegunClase,
+    validarRequerimientosStats,
+    validarArmaduraPorClase
+} from "./Scripts/Core/Util.js";
+
 let modal, modalTitle, modalDesc, closeBtn, modalActions, useSpellBtn;
 
 // Estado global
@@ -49,6 +85,56 @@ let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)
 let actionSurgeActivo = false; // Flag: cuando se usa Action Surge, el próximo "Terminé mi turno" no termina sino que reinicia
 let mageArmorActivo = false; // Flag: si Mage Armor está activo, la CA se calcula con armaduraMagicaBase + DEX
 let mageArmorBase = 13; // CA base cuando Mage Armor está activo
+
+// === FUNCIONES DE GUARDADO
+function guardarRanuras() {
+    localStorage.setItem(STORAGE_PREFIX + 'ranurasHechizos', JSON.stringify(ranurasState));
+}
+
+function guardarVida() {
+    localStorage.setItem(STORAGE_PREFIX + 'vidaActual', String(vidaActual));
+    localStorage.setItem(STORAGE_PREFIX + 'vidaMaxima', String(vidaMaxima));
+}
+
+function guardarCA() {
+    localStorage.setItem(STORAGE_PREFIX + 'caActual', String(caActual));
+}
+
+function guardarArmaduraEquipada() {
+    if (armaduraEquipadaId) {
+        localStorage.setItem(STORAGE_PREFIX + 'armaduraEquipada', armaduraEquipadaId);
+    } else {
+        localStorage.removeItem(STORAGE_PREFIX + 'armaduraEquipada');
+    }
+}
+
+function guardarEscudoEquipado() {
+    if (escudoEquipadoId) {
+        localStorage.setItem(STORAGE_PREFIX + 'escudoEquipado', escudoEquipadoId);
+    } else {
+        localStorage.removeItem(STORAGE_PREFIX + 'escudoEquipado');
+    }
+}
+
+function guardarArmasEquipadas() {
+    localStorage.setItem(STORAGE_PREFIX + 'armasEquipadas', JSON.stringify(armasEquipadas));
+}
+
+function guardarHitDice() {
+    localStorage.setItem(STORAGE_PREFIX + 'hitDiceActual', String(hitDiceActual));
+}
+
+function guardarHabilidadesUso() {
+    localStorage.setItem(STORAGE_PREFIX + 'habilidadesUso', JSON.stringify(habilidadesUsoState));
+}
+
+function guardarInventario() {
+    localStorage.setItem(STORAGE_PREFIX + 'inventario', JSON.stringify(inventarioState));
+}
+
+function guardarTurnoEstado() {
+    localStorage.setItem(STORAGE_PREFIX + 'turno', JSON.stringify(turnoEstado));
+}
 
 // === Sistema de efectos automáticos ===
 
@@ -170,9 +256,7 @@ function mapNivelHechizoARanura(nivelHechizo) {
 let ranurasInfo = {}; // Guarda qué descanso recupera cada ranura
 let habilidadesInfo = {}; // Guarda qué descanso recupera cada habilidad
 
-function guardarRanuras() {
-    localStorage.setItem(STORAGE_PREFIX + 'ranurasHechizos', JSON.stringify(ranurasState));
-}
+
 
 function actualizarRanuraDOM(nivel) {
     const id = `ranura-${nivel.replace(' ', '-')}`;
@@ -198,11 +282,6 @@ function mostrarToast(mensaje, tipo = 'normal') {
     toastTimeout = setTimeout(() => {
         toast.className = '';
     }, 2000);
-}
-
-function guardarVida() {
-    localStorage.setItem(STORAGE_PREFIX + 'vidaActual', String(vidaActual));
-    localStorage.setItem(STORAGE_PREFIX + 'vidaMaxima', String(vidaMaxima));
 }
 
 function actualizarVidaDOM() {
@@ -255,26 +334,6 @@ function modificarVida(cantidad) {
     }
 }
 
-function guardarCA() {
-    localStorage.setItem(STORAGE_PREFIX + 'caActual', String(caActual));
-}
-
-function guardarArmaduraEquipada() {
-    if (armaduraEquipadaId) {
-        localStorage.setItem(STORAGE_PREFIX + 'armaduraEquipada', armaduraEquipadaId);
-    } else {
-        localStorage.removeItem(STORAGE_PREFIX + 'armaduraEquipada');
-    }
-}
-
-function guardarEscudoEquipado() {
-    if (escudoEquipadoId) {
-        localStorage.setItem(STORAGE_PREFIX + 'escudoEquipado', escudoEquipadoId);
-    } else {
-        localStorage.removeItem(STORAGE_PREFIX + 'escudoEquipado');
-    }
-}
-
 function calcularCA() {
     let ca = 0;
     if (armaduraEquipadaId) {
@@ -309,10 +368,6 @@ function recalcularYActualizarCA() {
     // para que el botón se marque como modificado cuando hay un cambio
     guardarCA();
     actualizarCaDOM();
-}
-
-function guardarArmasEquipadas() {
-    localStorage.setItem(STORAGE_PREFIX + 'armasEquipadas', JSON.stringify(armasEquipadas));
 }
 
 function recalcularManosUsadas(equipoData) {
@@ -360,10 +415,6 @@ function modificarCa(cantidad) {
     }
 }
 
-function guardarHitDice() {
-    localStorage.setItem(STORAGE_PREFIX + 'hitDiceActual', String(hitDiceActual));
-}
-
 function actualizarHitDiceDOM() {
     const btn = document.getElementById('hd-btn');
     if (btn) {
@@ -376,173 +427,6 @@ function actualizarHitDiceDOM() {
     }
     const display = document.getElementById('hd-display');
     if (display) display.textContent = `${hitDiceActual} / ${hitDiceMaximo}`;
-}
-
-function calcularProficiencia(nivel) {
-    if (nivel >= 17) return '+6';
-    if (nivel >= 13) return '+5';
-    if (nivel >= 9) return '+4';
-    if (nivel >= 5) return '+3';
-    return '+2';
-}
-
-// Convierte "+3" o "-1" a número 3 o -1
-function parseMod(modStr) {
-    return parseInt(modStr.replace('+', '')) || 0;
-}
-
-// Formatea un número como "+3", "-1", "+0"
-function formatMod(num) {
-    return (num >= 0 ? '+' : '') + num;
-}
-
-// Obtiene el modificador de un atributo desde data.modificadores
-function obtenerMod(modificadores, nombreParcial) {
-    const stat = modificadores.find(m => m.nombre.includes(nombreParcial));
-    return stat ? parseMod(stat.valor) : 0;
-}
-
-// === Funciones del sistema de turno ===
-
-// Íconos por personaje (los mismos que en el menú principal)
-const ICONOS_PERSONAJE = {
-    'gangstur': '🔮',
-    'nika': '🛡️',
-    'lothar': '🗡️',
-    'lunareth': '📖',
-    'leonidas': '✨',
-    'orfe': '🌿'
-};
-
-// === Sistema de stats y proficiencias ===
-
-// Stats con proficiencia de Saving Throw por clase
-// El primero es la stat principal (también proficiente en modificadores)
-// El segundo es solo proficiente en saving throws
-const PROFICIENCIAS_POR_CLASE = {
-    'Bárbaro':   { principal: 'STR', savingExtra: 'CON' },
-    'Bardo':     { principal: 'CHA', savingExtra: 'DEX' },
-    'Brujo':     { principal: 'CHA', savingExtra: 'WIS' },
-    'Clérigo':   { principal: 'WIS', savingExtra: 'CHA' },
-    'Druida':    { principal: 'WIS', savingExtra: 'INT' },
-    'Explorador':{ principal: 'WIS', savingExtra: 'STR' },
-    'Ranger':    { principal: 'WIS', savingExtra: 'STR' },
-    'Guerrero':  { principal: 'STR', savingExtra: 'CON' },
-    'Hechicero': { principal: 'CHA', savingExtra: 'CON' },
-    'Mago':      { principal: 'INT', savingExtra: 'WIS' },
-    'Monje':     { principal: 'DEX', savingExtra: 'STR' },
-    'Paladín':   { principal: 'CHA', savingExtra: 'WIS' },
-    'Pícaro':    { principal: 'DEX', savingExtra: 'INT' },
-    'Artífice':  { principal: 'INT', savingExtra: 'CON' }
-};
-
-// Nombres completos para mostrar en el grid
-const NOMBRES_STATS = {
-    'STR': 'Fuerza (STR)',
-    'DEX': 'Destreza (DEX)',
-    'CON': 'Constitución (CON)',
-    'INT': 'Inteligencia (INT)',
-    'WIS': 'Sabiduría (WIS)',
-    'CHA': 'Carisma (CHA)'
-};
-
-// Mapa de skill → stat asociada
-const SKILL_STAT = {
-    'Atletismo': 'STR',
-    'Acrobacias': 'DEX',
-    'Juego de manos': 'DEX',
-    'Sigilo': 'DEX',
-    'Conoc. Arcano': 'INT',
-    'Historia': 'INT',
-    'Investigación': 'INT',
-    'Naturaleza': 'INT',
-    'Religión': 'INT',
-    'Trato animal': 'WIS',
-    'Perspicacia': 'WIS',
-    'Medicina': 'WIS',
-    'Percepción': 'WIS',
-    'Supervivencia': 'WIS',
-    'Engaño': 'CHA',
-    'Intimidación': 'CHA',
-    'Interpretación': 'CHA',
-    'Persuasión': 'CHA'
-};
-
-// Descripciones genéricas de cada skill
-const SKILL_DESC = {
-    'Atletismo': 'Escalar, saltar, nadar o cualquier acción atlética.',
-    'Acrobacias': 'Controla tu capacidad para mantenerte en pie y movimientos ágiles.',
-    'Juego de manos': 'Habilidad manual, robar de forma sigilosa y prestidigitación.',
-    'Sigilo': 'Escabullirse sin ser visto ni oído.',
-    'Conoc. Arcano': 'Saber sobre magia, hechizos, planos y criaturas mágicas.',
-    'Historia': 'Recordar eventos antiguos, reinos perdidos, guerras y dinastías.',
-    'Investigación': 'Deducir hechos mediante pistas y razonamiento.',
-    'Naturaleza': 'Conocimiento sobre flora, fauna, clima y ciclos naturales.',
-    'Religión': 'Conocimiento sobre deidades, ritos sagrados y jerarquías religiosas.',
-    'Trato animal': 'Tu habilidad para calmar, entender o controlar animales.',
-    'Perspicacia': 'Mide tu capacidad de leer intenciones y mentiras.',
-    'Medicina': 'Estabilizar heridos y diagnosticar enfermedades.',
-    'Percepción': 'Notar detalles del entorno con todos tus sentidos.',
-    'Supervivencia': 'Seguir rastros, cazar, sobrevivir en la naturaleza.',
-    'Engaño': 'Convencer a otros de una falsedad con palabras o gestos.',
-    'Intimidación': 'Capacidad de infundir miedo mediante amenazas o presencia.',
-    'Interpretación': 'Tu capacidad para actuar, cantar, contar historias o entretener.',
-    'Persuasión': 'Influir en otros con tacto, diplomacia y razón.'
-};
-
-// Calcula el modificador a partir del score (8→-1, 10→0, 14→+2, etc.)
-function statAMod(score) {
-    return Math.floor((score - 10) / 2);
-}
-
-// Calcula el valor de una skill: mod de la stat + (proficiencia si aplica)
-function calcularValorSkill(skill, stats, profBonus) {
-    const statKey = SKILL_STAT[skill.nombre];
-    if (!statKey || !stats || stats[statKey] === undefined) return 0;
-    let valor = statAMod(stats[statKey]);
-    if (skill.proficiente) valor += profBonus;
-    return valor;
-}
-
-// Genera el array de habilidades enriquecido (con valor y desc dinámicos)
-function generarHabilidades(habilidadesBase, stats, profBonus) {
-    if (!habilidadesBase) return [];
-    return habilidadesBase.map(skill => {
-        const valor = calcularValorSkill(skill, stats, profBonus);
-        const statKey = SKILL_STAT[skill.nombre] || '';
-        return {
-            nombre: skill.nombre,
-            valor: formatMod(valor),
-            proficiente: skill.proficiente || false,
-            stat: statKey,
-            desc: SKILL_DESC[skill.nombre] || ''
-        };
-    });
-}
-
-// Genera el array de modificadores a partir de stats y clase
-function generarModificadores(stats, clase) {
-    const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
-    return Object.keys(stats).map(key => ({
-        nombre: NOMBRES_STATS[key],
-        valor: formatMod(statAMod(stats[key])),
-        proficiente: key === prof.principal
-    }));
-}
-
-// Genera el array de salvaciones a partir de stats, clase y proficiencia bonus
-function generarSalvaciones(stats, clase, profBonus) {
-    const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
-    return Object.keys(stats).map(key => {
-        const esProficiente = (key === prof.principal || key === prof.savingExtra);
-        const mod = statAMod(stats[key]);
-        const valor = esProficiente ? mod + profBonus : mod;
-        return {
-            nombre: NOMBRES_STATS[key],
-            valor: formatMod(valor),
-            proficiente: esProficiente
-        };
-    });
 }
 
 // === Sistema de peso y velocidad ===
@@ -673,10 +557,6 @@ function aplicarBackground(background, equipoData) {
 
 // === Inventario ===
 
-function guardarInventario() {
-    localStorage.setItem(STORAGE_PREFIX + 'inventario', JSON.stringify(inventarioState));
-}
-
 function cargarInventario(inventarioJSON) {
     const guardado = localStorage.getItem(STORAGE_PREFIX + 'inventario');
     if (guardado) {
@@ -765,155 +645,11 @@ function aplicarCambioInventario() {
     recalcularPesoYVelocidad(window._equipoData);
 }
 
-// === Sistema de bonos de daño dinámicos ===
-
-// Calcula el valor numérico de un bonoDano (puede ser número o nombre de stat)
-function resolverBono(bonoDano, stats) {
-    if (typeof bonoDano === 'number') return bonoDano;
-    if (typeof bonoDano === 'string' && stats && stats[bonoDano] !== undefined) {
-        return statAMod(stats[bonoDano]);
-    }
-    return 0;
-}
-
-// Determina si un bono se aplica a un item dado (arma o hechizo)
-function bonoAplicaA(rasgo, item, esHechizo, equipoData) {
-    if (!rasgo.aplicaA) return false;
-    const aplicaA = rasgo.aplicaA;
-
-    // Match por nombre específico
-    if (aplicaA.startsWith('hechizo:')) {
-        return esHechizo && aplicaA.substring(8).toLowerCase() === item.nombre.toLowerCase();
-    }
-    if (aplicaA.startsWith('arma:')) {
-        return !esHechizo && aplicaA.substring(5).toLowerCase() === item.nombre.toLowerCase();
-    }
-
-    // Match por categoría (solo armas)
-    if (esHechizo) return false;
-
-    if (aplicaA === 'armasUnaMano') return item.manos === 1;
-    if (aplicaA === 'armasDosManos') return item.manos === 2;
-    if (aplicaA === 'armasMelee') return item.tipo === 'melee';
-    if (aplicaA === 'armasRanged') return item.tipo === 'ranged';
-
-    // Caso especial: Dueling
-    if (aplicaA === 'duelingMelee') {
-        if (item.tipo !== 'melee' || item.manos !== 1) return false;
-        // Verificar que no haya OTRA arma equipada (escudo permitido)
-        const otrasArmas = armasEquipadas.filter(n => n !== item.nombre);
-        if (otrasArmas.length === 0) return true; // Solo este arma
-        // Si hay otras armas equipadas → no aplica
-        return false;
-    }
-
-    return false;
-}
-
-// Calcula los bonos aplicables a un item
-// Devuelve { totalBono: number, detalles: [{nombre, valor, fuente}] }
-function calcularBonosDano(item, esHechizo, rasgos, stats, equipoData) {
-    const detalles = [];
-    let total = 0;
-
-    if (!rasgos) return { totalBono: 0, detalles: [] };
-
-    rasgos.forEach(rasgo => {
-        if (rasgo.bonoDano !== undefined && bonoAplicaA(rasgo, item, esHechizo, equipoData)) {
-            const valor = resolverBono(rasgo.bonoDano, stats);
-            if (valor !== 0) {
-                detalles.push({ nombre: rasgo.nombre, valor: valor });
-                total += valor;
-            }
-        }
-    });
-
-    return { totalBono: total, detalles };
-}
-
-// Resuelve la cantidad de ataques de un cantrip que escala con nivel del personaje
-function resolverAtaques(item, nivelPersonaje) {
-    if (!item.escalaAtaques || typeof item.escalaAtaques !== 'object') {
-        return item.ataques || 1;
-    }
-    let ataquesFinal = item.ataques || 1;
-    Object.keys(item.escalaAtaques)
-        .map(k => parseInt(k))
-        .sort((a, b) => a - b)
-        .forEach(umbral => {
-            if (nivelPersonaje >= umbral) {
-                ataquesFinal = item.escalaAtaques[String(umbral)];
-            }
-        });
-    return ataquesFinal;
-}
-
-// Resuelve el daño base de un cantrip que escala con nivel del personaje
-function resolverDanoBase(item, nivelPersonaje) {
-    if (!item.escala || typeof item.escala !== 'object') return item.dano;
-
-    // Buscar el umbral más alto que sea <= nivelPersonaje
-    let danoFinal = item.dano;
-    Object.keys(item.escala)
-        .map(k => parseInt(k))
-        .sort((a, b) => a - b)
-        .forEach(umbral => {
-            if (nivelPersonaje >= umbral) {
-                danoFinal = item.escala[String(umbral)];
-            }
-        });
-    return danoFinal;
-}
-
-// Genera el string de daño con bonos: "1d10+3+2"
-function formatearDanoConBonos(danoBase, modBase, bonos) {
-    let resultado = danoBase;
-    if (modBase !== 0) {
-        resultado += formatMod(modBase);
-    }
-    bonos.forEach(b => {
-        if (b.valor !== 0) resultado += formatMod(b.valor);
-    });
-    return resultado;
-}
-
-// Genera el HTML de tooltip con detalles: "(+3 CHA, +2 Dueling)"
-function formatearDetalleBonos(modBase, nombreModBase, bonos) {
-    const partes = [];
-    if (modBase !== 0) partes.push(`${formatMod(modBase)} ${nombreModBase}`);
-    bonos.forEach(b => {
-        if (b.valor !== 0) partes.push(`${formatMod(b.valor)} ${b.nombre}`);
-    });
-    return partes.length > 0 ? `(${partes.join(', ')})` : '';
-}
-
-function calcularExtraAttacks(rasgos, clase, nivel) {
-    // Caso especial: Guerrero tiene escalado automático según nivel
-    if (clase === 'Guerrero') {
-        if (nivel >= 20) return 4;
-        if (nivel >= 11) return 3;
-        if (nivel >= 5) return 2;
-        return 1;
-    }
-
-    // Resto de clases: usar el rasgo del JSON
-    if (!rasgos) return 1;
-    const extra = rasgos.find(r => /extra attack/i.test(r.nombre));
-    if (!extra) return 1;
-    const match = extra.nombre.match(/\((\d+)\)/);
-    if (match) return 1 + parseInt(match[1]);
-    return 2;
-}
-
 function cargarTurnoEstado() {
     const guardado = localStorage.getItem(STORAGE_PREFIX + 'turno');
     if (guardado) {
         try { turnoEstado = JSON.parse(guardado); } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1 }; }
     }
-}
-
-function guardarTurnoEstado() {
-    localStorage.setItem(STORAGE_PREFIX + 'turno', JSON.stringify(turnoEstado));
 }
 
 function actualizarTurnoDOM() {
@@ -1026,97 +762,6 @@ function abrirModalSmite() {
     smiteModal.style.display = 'flex';
 }
 
-function obtenerHitDiceSegunClase(clase) {
-    const mapa = {
-        'Mago': 'd6',
-        'Hechicero': 'd6',
-        'Bardo': 'd8',
-        'Clérigo': 'd8',
-        'Druida': 'd8',
-        'Monje': 'd8',
-        'Pícaro': 'd8',
-        'Artífice': 'd8',
-        'Brujo': 'd8',
-        'Guerrero': 'd10',
-        'Paladín': 'd10',
-        'Ranger': 'd10',
-        'Bárbaro': 'd12'
-    };
-    return mapa[clase] || 'd8';
-}
-
-// Devuelve el nivel máximo de armadura permitido: 'ninguna' | 'ligera' | 'mediana' | 'pesada'
-function armaduraMaximaSegunClase(clase) {
-    const mapa = {
-        'Mago': 'ninguna',
-        'Hechicero': 'ninguna',
-        'Monje': 'ninguna',
-        'Bárbaro': 'ninguna',
-        'Bardo': 'ligera',
-        'Pícaro': 'ligera',
-        'Brujo': 'ligera',
-        'Artífice': 'ligera',
-        'Druida': 'mediana',
-        'Explorador': 'mediana',
-        'Ranger': 'mediana',
-        'Paladín': 'pesada',
-        'Guerrero': 'pesada',
-        'Clérigo': 'pesada'
-    };
-    return mapa[clase] || 'pesada'; // Default: permite todo si la clase no está mapeada
-}
-
-function puedeUsarEscudoSegunClase(clase) {
-    const conEscudo = ['Paladín', 'Guerrero', 'Clérigo', 'Druida', 'Explorador', 'Ranger', 'Bárbaro', 'Artífice'];
-    return conEscudo.includes(clase);
-}
-
-// Verifica si la clase puede equipar la armadura. Devuelve {permitido: bool, razon: string}
-// Verifica si el personaje cumple los requerimientos de stats del item
-// Devuelve { permitido: bool, razon: string }
-function validarRequerimientosStats(item, stats) {
-    if (!item.requiere || !stats) return { permitido: true, razon: '' };
-
-    for (const statKey of Object.keys(item.requiere)) {
-        const requerido = item.requiere[statKey];
-        const actual = stats[statKey] || 0;
-        if (actual < requerido) {
-            const nombreStat = NOMBRES_STATS[statKey] || statKey;
-            return {
-                permitido: false,
-                razon: `Requiere ${statKey} ${requerido} (Tenés ${actual})`
-            };
-        }
-    }
-    return { permitido: true, razon: '' };
-}
-
-function validarArmaduraPorClase(item, clase) {
-    if (!item.esArmadura) return { permitido: true, razon: '' };
-
-    // Escudo
-    if (item.tipoArmadura === 'escudo') {
-        if (!puedeUsarEscudoSegunClase(clase)) {
-            return { permitido: false, razon: `${clase} no puede usar escudos` };
-        }
-        return { permitido: true, razon: '' };
-    }
-
-    // Armadura corporal
-    const max = armaduraMaximaSegunClase(clase);
-    const orden = { 'ninguna': 0, 'ligera': 1, 'mediana': 2, 'pesada': 3 };
-    const nivelItem = orden[item.tipoArmadura] ?? 0;
-    const nivelMax = orden[max] ?? 0;
-
-    if (nivelItem > nivelMax) {
-        if (max === 'ninguna') {
-            return { permitido: false, razon: `${clase} no puede usar armaduras` };
-        }
-        return { permitido: false, razon: `${clase} solo puede usar armadura ${max} o menor` };
-    }
-    return { permitido: true, razon: '' };
-}
-
 function actualizarHdCantidadDOM() {
     const span = document.getElementById('hd-cantidad');
     if (span) span.textContent = hdCantidadAUsar;
@@ -1135,10 +780,6 @@ function actualizarHdCantidadDOM() {
         btnSiguiente.style.opacity = hdCantidadAUsar === 0 ? '0.5' : '1';
         btnSiguiente.style.cursor = hdCantidadAUsar === 0 ? 'not-allowed' : 'pointer';
     }
-}
-
-function guardarHabilidadesUso() {
-    localStorage.setItem(STORAGE_PREFIX + 'habilidadesUso', JSON.stringify(habilidadesUsoState));
 }
 
 function actualizarHabilidadUsoDOM(nombre) {
