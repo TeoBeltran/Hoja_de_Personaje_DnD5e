@@ -62,11 +62,25 @@ function generarHabilidades(habilidadesBase, stats, profBonus) {
 // Genera el array de modificadores a partir de stats y clase
 function generarModificadores(stats, clase) {
     const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
-    return Object.keys(stats).map(key => ({
+    /*return Object.keys(stats).map(key => ({
         nombre: NOMBRES_STATS[key],
         valor: formatMod(statAMod(stats[key])),
         proficiente: key === prof.principal
-    }));
+    }));*/
+    return Object.keys(stats).map(key => {
+
+        console.log(
+            key,
+            stats[key],
+            statAMod(stats[key])
+        );
+
+        return {
+            nombre: NOMBRES_STATS[key],
+            valor: formatMod(statAMod(stats[key])),
+            proficiente: key === prof.principal
+        };
+    });
 }
 
 // Genera el array de salvaciones a partir de stats, clase y proficiencia bonus

@@ -5,17 +5,43 @@
     "raza": "Humano",
     "tamano": "estandar",
     "stats": {
-        "STR": 18,
-        "DEX": 14,
+        "STR": 16,
+        "DEX": 16,
         "CON": 16,
         "INT": 9,
-        "WIS": 13,
-        "CHA": 10
+        "WIS": 9,
+        "CHA": 9
     }
   },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "STR",
+            "valor": 0,
+            "motivo": "Humano"
+        }
+    ],
+    "feats": [
+        {
+            "nivel": 1,
+            "nombre": "Great Weapon Master",
+            "atributos": {
+                "STR": 0
+            }
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 4,
+            "atributos": {
+                "STR": 2
+            }
+        }
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "53/53" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Vida", "valor": "67/67" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -54,21 +80,10 @@
   },
   "rasgos": [
     { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos." },
-    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20)." }
+    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20)." },
+    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft."}
   ],
   "habilidadesUso": [
-    {
-      "nombre": "ASI Nivel 4",
-      "tipo": "asi",
-      "stats": { "STR": 2 },
-      "desc": "Mejora de característica del nivel 4: +2 STR."
-    },
-    {
-      "nombre": "ASI Nivel 6",
-      "tipo": "asi",
-      "stats": { "STR": 2 },
-      "desc": "Mejora de característica del nivel 6: +2 STR."
-    },
     {
       "nombre": "Second Wind",
       "usos": "1/1",

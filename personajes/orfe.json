@@ -45,8 +45,8 @@
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "42/42" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Vida", "valor": "52/52" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -155,7 +155,8 @@
     "ranuras": [
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" }
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -262,6 +263,14 @@
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
         "desc": "Una criatura duplica su velocidad, obtiene +2 CA, ventaja en salvaciones de Destreza y una acción adicional limitada cada turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "REVISAR",
+        "accion": "REVISAR",
+        "distancia": "REVISAR",
+        "duracion": "REVISAR",
+        "desc": "REVISAR"
       }
     ]
   },

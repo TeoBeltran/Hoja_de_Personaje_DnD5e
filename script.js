@@ -1249,7 +1249,7 @@ async function init() {
         if (i.dano && i.tipo) {
             const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
             const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
-            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, data.equipo);
+            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, armasEquipadas);
             danoFinal = formatearDanoConBonos(i.dano, modUsado, bonosInfo.detalles);
         }
         if (i.ataques && i.ataques > 1 && danoFinal) {

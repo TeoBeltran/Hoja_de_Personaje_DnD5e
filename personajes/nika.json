@@ -9,13 +9,36 @@
         "DEX": 10,
         "CON": 14,
         "INT": 8,
-        "WIS": 11,
-        "CHA": 16
+        "WIS": 10,
+        "CHA": 14
     }
   },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "CHA",
+            "valor": 2,
+            "motivo": "Aasimar"
+        },
+        {
+            "atributo": "WIS",
+            "valor": 1,
+            "motivo": "Protector"
+        }
+    ],
+    "feats": [
+        {
+            "nivel": 1,
+            "nombre": "Polearm Master",
+            "atributos": {
+                "STR": 0
+            }
+        }
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "48/48" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Vida", "valor": "60/60" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -58,7 +81,9 @@
     { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
     { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." }
+    { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." },
+    {"nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
+    {"nombre": "Polearm Master", "desc": "Cuando atacás con la acción de Ataque usando solo un glaive, halberd, quarterstaff o spear, podés usar una acción bonus para hacer un ataque adicional con el extremo opuesto del arma (1d4+STR contundente). Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."}
   ],
   "habilidadesUso": [
     {
@@ -71,11 +96,16 @@
     },
     {
         "nombre": "Lay on Hands",
-        "usos": "25/25",
+        "usos": "{layOnHands}/{layOnHands}",
         "recupera": "largo",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Cura HP o enfermedades. Pool de 25 puntos curativos que se reparten como quieras."
+        "desc": "Tenés un pool de {layOnHands} HP. Como acción, tocás una criatura y gastás la cantidad de puntos que quieras para curarla. También podés gastar 5 puntos para curar una enfermedad o neutralizar un veneno.",
+        "efectos": [
+            {
+                "tipo": "layOnHands"
+            }
+        ]
     },
     {
         "nombre": "Divine Smite",

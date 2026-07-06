@@ -1,5 +1,6 @@
 import { formatMod } from "./Estadisticas.js";
 import { NOMBRES_STATS } from "../Datos/Constantes.js";
+import { statAMod } from "./Estadisticas.js";
 
 // Resuelve la cantidad de ataques de un cantrip que escala con nivel del personaje
 function resolverAtaques(item, nivelPersonaje) {
@@ -111,7 +112,8 @@ function bonoAplicaA(rasgo, item, esHechizo, equipoData) {
     if (aplicaA === 'duelingMelee') {
         if (item.tipo !== 'melee' || item.manos !== 1) return false;
         // Verificar que no haya OTRA arma equipada (escudo permitido)
-        const otrasArmas = armasEquipadas.filter(n => n !== item.nombre);
+        //const otrasArmas = equipoData.filter(n => n !== item.nombre);
+        const otrasArmas = (equipoData ?? []).filter(n => n !== item.nombre);
         if (otrasArmas.length === 0) return true; // Solo este arma
         // Si hay otras armas equipadas → no aplica
         return false;

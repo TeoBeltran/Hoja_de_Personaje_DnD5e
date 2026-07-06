@@ -10,12 +10,34 @@
         "CON": 15,
         "INT": 10,
         "WIS": 9,
-        "CHA": 17
+        "CHA": 15
     }
   },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "CHA",
+            "valor": 2,
+            "motivo": "Tiefling"
+        },
+        {
+            "atributo": "INT",
+            "valor": 1,
+            "motivo": "Mephistopheles"
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 4,
+            "atributos": {
+                "CHA": 2
+            }
+        }
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "42/42" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Vida", "valor": "52/52" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -66,7 +88,22 @@
   "habilidadesUso": [
     { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
     { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
-    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." }
+    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." },
+    {
+      "nombre": "Eldritch Invocation: Grasp of Hadar",
+      "requisito": "Eldritch Blast cantrip",
+      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, podés moverla en línea recta 10 ft hacia vos."
+    },
+    {
+      "nombre": "Eldritch Invocation: Lance of Lethargy",
+      "requisito": "Eldritch Blast cantrip",
+      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, reducís su velocidad en 10 ft hasta el final de tu próximo turno."
+    },
+    {
+      "nombre": "Eldritch Invocation: Repelling Blast",
+      "requisito": "Eldritch Blast cantrip",
+      "desc": "Cuando golpeás a una criatura con Eldritch Blast, la empujás 10 ft lejos de vos."
+    }
   ],
   "equipo": [
     { 
@@ -94,10 +131,10 @@
   ],
   "hechizos": {
         "ranuras": [
-            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 3", "cantidad": "2", "recupera": "largo" },
-            { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
+            { "nivel": "Nivel 1", "cantidad": "0", "recupera": "corto" },
+            { "nivel": "Nivel 2", "cantidad": "0", "recupera": "corto" },
+            { "nivel": "Nivel 3", "cantidad": "0", "recupera": "corto" },
+            { "nivel": "Nivel 4", "cantidad": "2", "recupera": "corto" }
         ],
         "lista": [
           { "nivel": "CANTRIPS", "nombre": "Eldritch Blast", "dano": "1d10", "ataques": 1, "escalaAtaques": { "5": 2, "11": 3, "17": 4 }, "tipoDano": "fuerza", "accion": "Acción", "distancia": "120 ft", "desc": "Lanza un rayo de energía. Hacé tirada de ataque por cada rayo. A nivel 5+ son 2 rayos, nivel 11+ son 3, nivel 17+ son 4. Cada rayo hace 1d10 + bono de Agonizing Blast (CHA) si lo tenés." },
@@ -110,7 +147,7 @@
           { "nivel": "NIVEL 3", "nombre": "Counterspell", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
           { "nivel": "NIVEL 3", "nombre": "Fear", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal, cada criatura a 30ft del cono tienen que pasar una tirada de Sabiduría o soltar lo que tengan y pasan a estar Frightened. Mientras estén así, usan su acción para correr hacia la ruta mas segura. Si perdes visión de la criatura, puede hacer una tirada de salvación de Sabiduría." },
           { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
-          { "nivel": "NIVEL 3", "nombre": "Hypnotic Pattern", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 min", "desc": "Los enemigos hacen tirada de salvación de Sabiduría o quedan bajo el efecto de Charm. Bajo Charm, su velocidad es 0. Al recibir daño dejan de tener Charm." }
+          { "nivel": "NIVEL 4", "nombre": "Banishment", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." }
         ]
     },
     "inventario": [

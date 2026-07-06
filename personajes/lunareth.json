@@ -6,15 +6,37 @@
     "tamano": "estandar",
     "stats": {
         "STR": 8,
-        "DEX": 16,
+        "DEX": 14,
         "CON": 14,
-        "INT": 16,
+        "INT": 15,
         "WIS": 12,
         "CHA": 8
     }
   },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "DEX",
+            "valor": 2,
+            "motivo": "Elf"
+        },
+        {
+            "atributo": "INT",
+            "valor": 1,
+            "motivo": "Half Elf"
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 1,
+            "atributos": {
+                "INT": 2
+            }
+        }
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "36/36" },
+    { "nombre": "Vida", "valor": "44/44" },
     { "nombre": "Nivel", "valor": "6" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
@@ -61,9 +83,9 @@
     { "nombre": "Darkvision", "desc": "Acostumbrado a las sombras del bosque, tenés visión superior en condiciones de poca luz. Podés ver en luz tenue dentro de 60 ft como si fuera luz brillante, y en oscuridad como si fuera luz tenue (en oscuridad solo distinguís en grises, no colores)." },
     { "nombre": "Keen Senses", "desc": "Tenés proficiencia en Percepción." },
     { "nombre": "Fey Ancestry", "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir." },
-    { "nombre": "Trance", "desc": "Los elfos no duermen. En cambio, meditan profundamente, manteniéndose semi-conscientes durante 4 horas al día. Tras descansar de esta forma, obtenés el mismo beneficio que un humano dormido 8 horas." },
     { "nombre": "Elf Weapon Training", "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
-    { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." }
+    { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." },
+    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."}
   ],
   "habilidadesUso": [
     {
@@ -105,7 +127,8 @@
     "ranuras": [
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" }
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -305,6 +328,21 @@
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
         "desc": "Una criatura voluntaria elegida obtiene: velocidad ×2, +2 CA, ventaja en salvaciones de DEX, y una acción adicional cada turno (solo para Atacar (un ataque), Dash, Disengage, Hide o Use an Object). Al terminar el hechizo, el objetivo queda lethargic: no puede moverse ni hacer acciones durante 1 turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Dimension Door",
+        "accion": "Acción",
+        "distancia": "500 ft",
+        "desc": "Te teletransportás instantáneamente a un punto que puedas ver o describir dentro del rango. Podés llevar contigo una criatura voluntaria de tu tamaño o menor. Si el destino está ocupado o fuera de línea de visión, el hechizo falla."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Polymorph",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Transformás a una criatura en una bestia cuyo CR sea igual o menor al nivel del objetivo o al nivel del hechizo. Si falla salvación de WIS, pierde su forma original y estadísticas, reemplazadas por las de la bestia. Si los HP de la bestia llegan a 0, el objetivo vuelve a su forma original con los HP que tenía antes."
       }
     ]
   },

@@ -6,16 +6,42 @@
     "tamano": "diminuto",
     "stats": {
         "STR": 10,
-        "DEX": 16,
+        "DEX": 14,
         "CON": 14,
         "INT": 8,
-        "WIS": 16,
+        "WIS": 15,
         "CHA": 10
     }
   },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "DEX",
+            "valor": 3,
+            "motivo": "Fairy"
+        }
+    ],
+    "feats": [
+        {
+            "nivel": 1,
+            "nombre": "Fey Touched",
+            "atributos": {
+                "WIS": 1
+            }
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 4,
+            "atributos": {
+                "WIS": 2
+            }
+        }
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "35/35" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Vida", "valor": "52/52" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -103,6 +129,22 @@
       "distancia": "30 ft",
       "duracion": "Concentración, 1 minuto",
       "desc": "Una criatura u objeto que veas dentro del rango aumenta o disminuye de tamaño. Si elige Enlarge: gana una categoría de tamaño, ventaja en tiradas de STR y +1d4 al daño con armas. Si Reduce: pierde una categoría, desventaja en STR y -1d4 al daño con armas."
+    },
+    {
+      "nombre": "Cure Wounds",
+      "nivel": "NIVEL 1",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "dano": "1d8",
+      "tipoDano": "curación",
+      "desc": "Tocás a una criatura y recupera 1d8 + modificador de SAB HP. Cada slot superior al nivel 1 aumenta la curación en 1d8."
+    },
+    {
+      "nombre": "Lesser Restoration",
+      "nivel": "NIVEL 2",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "desc": "Tocás a una criatura y podés terminar una de las siguientes condiciones: enfermedad, ceguera, sordera o parálisis."
     }
   ],
   "equipo": [
@@ -158,7 +200,8 @@
     "ranuras": [
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" }
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -193,6 +236,16 @@
         "distancia": "30 ft",
         "duracion": "Hasta 1 minuto",
         "desc": "Crea efectos mágicos menores: hacer temblar el suelo, abrir puertas, cambiar tu voz para amplificarla 3×, o generar sonidos sobrenaturales."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Toll the Dead",
+        "dano": "1d8",
+        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "tipoDano": "necrótico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Un enemigo dentro del rango debe hacer salvación de WIS. Si falla, recibe 1d8 de daño necrótico (o 1d12 si ya está herido). El daño escala con nivel del personaje."
       },
       {
         "nivel": "NIVEL 1",
@@ -280,6 +333,22 @@
         "distancia": "Propio (radio 15 ft)",
         "duracion": "Concentración, 10 minutos",
         "desc": "Invocás espíritus en un radio de 15 ft alrededor tuyo. Los enemigos dentro del área tienen velocidad reducida a la mitad. Cuando una criatura entra al área o empieza su turno ahí, hace salvación de WIS o recibe 3d8 radiante (mitad si pasa). Cada slot superior al 3 suma 1d8."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Revivify",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "componentes": "V, S, M (diamante de 300 gp consumido)",
+        "desc": "Tocás a una criatura que murió hace menos de 1 minuto. La criatura vuelve a la vida con 1 HP. No funciona si el cuerpo fue destruido o el alma no está libre."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Death Ward",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "8 horas",
+        "desc": "Si el objetivo cae a 0 HP por primera vez durante la duración, en vez de caer inconsciente baja a 1 HP. Si es afectado por un efecto que lo mataría instantáneamente, lo niega una vez."
       }
     ]
   },
