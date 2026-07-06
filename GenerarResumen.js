@@ -4,7 +4,7 @@ const estado = document.getElementById("gr-estado");
 const contenedor = document.getElementById("gr-contenedorResumen");
 const template = document.getElementById("gr-templatePersonaje");
 
-let htmlDescarga = "";
+let resumenJSON = [];
 
 btn.addEventListener("click", generarResumen);
 btnDescargar.addEventListener("click", descargarResumen);
@@ -115,8 +115,8 @@ async function generarResumen(){
 
     estado.textContent="Leyendo personajes...";
 
-    contenedor.innerHTML="";
-    htmlDescarga="";
+    contenedor.innerHTML = "";
+    resumenJSON = [];
 
     try{
 
@@ -150,94 +150,28 @@ async function generarResumen(){
 
 function descargarResumen(){
 
-    const html=`
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<title>Resumen de Personajes</title>
-<style>
+    const datos = {
 
-body{
+        fechaGeneracion: new Date().toISOString(),
 
-    background:#1d1813;
-    color:#efe4c8;
-    font-family:Georgia,serif;
-    padding:30px;
+        cantidad: resumenJSON.length,
 
-}
+        personajes: resumenJSON
 
-h1{
+    };
 
-    color:#f1ca72;
-    text-align:center;
+    const blob = new Blob(
+        [JSON.stringify(datos, null, 4)],
+        { type: "application/json" }
+    );
 
-}
+    const url = URL.createObjectURL(blob);
 
-.gr-personaje{
+    const a = document.createElement("a");
 
-    border:2px solid #8b6b3f;
-    background:#2f241a;
-    border-radius:10px;
-    margin-bottom:25px;
-    padding:18px;
+    a.href = url;
 
-}
-
-.gr-personaje h2{
-
-    color:#f1ca72;
-    margin-top:0;
-
-}
-
-.gr-stats{
-
-    display:grid;
-    grid-template-columns:repeat(6,1fr);
-    gap:8px;
-    margin:15px 0;
-
-}
-
-.gr-stat{
-
-    background:#56402a;
-    border:1px solid #967341;
-    text-align:center;
-    border-radius:6px;
-    padding:8px;
-
-}
-
-ul{
-
-    margin-top:6px;
-
-}
-
-</style>
-</head>
-
-<body>
-
-<h1>📜 Compendio de Personajes</h1>
-
-${htmlDescarga}
-
-</body>
-</html>
-`;
-
-    const blob=new Blob([html],{type:"text/html"});
-
-    const url=URL.createObjectURL(blob);
-
-    const a=document.createElement("a");
-
-    a.href=url;
-
-    a.download="ResumenPersonajes.html";
+    a.download = "ResumenPersonajes.json";
 
     a.click();
 
@@ -438,75 +372,30 @@ function crearFicha(datos){
     contenedor.appendChild(ficha);
 
     /* ===========================
-       HTML DESCARGA
+    JSON DESCARGA
     =========================== */
 
-    htmlDescarga += `
-    <div class="gr-personaje">
+    resumenJSON.push({
 
-        <h2>${personaje.nombre ?? ""}</h2>
+        ...datos,
 
-        <p><strong>Raza:</strong> ${personaje.raza ?? "-"}</p>
+        resumen: {
 
-        <p><strong>Clase:</strong> ${personaje.clase ?? "-"} ${nivel}</p>
+            nivel,
 
-        ${
-            personaje.subclase
-            ? `<p><strong>Subclase:</strong> ${personaje.subclase}</p>`
-            : ""
+            asi: detectarASI(personaje),
+
+            rasgos,
+
+            habilidades,
+
+            equipo,
+
+            hechizos
+
         }
 
-        <p><strong>ASI:</strong> ${detectarASI(personaje)}</p>
-
-        <div class="gr-stats">
-
-            ${
-                personaje.stats
-                ? Object.entries(personaje.stats).map(([k,v])=>`
-                    <div class="gr-stat">
-                        <strong>${k}</strong>
-                        <div>${v}</div>
-                    </div>
-                `).join("")
-                : ""
-            }
-
-        </div>
-
-        <h3>⭐ Rasgos</h3>
-
-        <ul>
-
-            ${rasgos.map(x=>`<li>${x}</li>`).join("")}
-
-        </ul>
-
-        <h3>⚔️ Acciones y habilidades</h3>
-
-        <ul>
-
-            ${habilidades.map(x=>`<li>${x}</li>`).join("")}
-
-        </ul>
-
-        <h3>🛡️ Equipo</h3>
-
-        <ul>
-
-            ${equipo.map(x=>`<li>${x}</li>`).join("")}
-
-        </ul>
-
-        <h3>✨ Hechizos</h3>
-
-        <ul>
-
-            ${hechizos.map(x=>`<li>${x}</li>`).join("")}
-
-        </ul>
-
-    </div>
-    `;
+    });
 
 }
 
