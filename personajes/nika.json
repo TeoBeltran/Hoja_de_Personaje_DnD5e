@@ -96,16 +96,11 @@
     },
     {
         "nombre": "Lay on Hands",
-        "usos": "{layOnHands}/{layOnHands}",
+        "usos": "1/1",
         "recupera": "largo",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Tenés un pool de {layOnHands} HP. Como acción, tocás una criatura y gastás la cantidad de puntos que quieras para curarla. También podés gastar 5 puntos para curar una enfermedad o neutralizar un veneno.",
-        "efectos": [
-            {
-                "tipo": "layOnHands"
-            }
-        ]
+        "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5."
     },
     {
         "nombre": "Divine Smite",
