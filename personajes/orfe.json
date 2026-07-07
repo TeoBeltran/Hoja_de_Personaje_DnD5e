@@ -131,9 +131,9 @@
       "esArmadura": true,
       "tipoArmadura": "media",
       "armaduraBase": 13,
-      "manos": 500,
+      "manos": 0,
       "peso": 12,
-      "valor": 0,
+      "valor": 500,
       "magico": true,
       "desc": "Armadura de cuero endurecido mágica. CA: 14 + Modificador de Destreza (máximo +2)."
     },
@@ -148,8 +148,8 @@
       "desc": "Escudo. Otorga +2 a la Clase de Armadura mientras se empuña."
     },
     {
-      "nombre": "Moon Sickle +1",
-      "dano": "1d4",
+      "nombre": "Moon Scimitar +1",
+      "dano": "1d6",
       "tipoDano": "cortante",
       "tipo": "melee",
       "manos": 1,

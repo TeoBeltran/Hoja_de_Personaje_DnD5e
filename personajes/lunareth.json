@@ -133,11 +133,13 @@
     },
     {
       "nombre": "Varita del mago de guerra (Wand of the War Mage) +1",
-      "esArmadura": true,
-      "tipoArmadura": "varita",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "rango",
       "manos": 1,
       "peso": 1,
       "valor": 500,
+      "accion": "Acción",
       "magico": true,
       "desc": "Varita mágica. Otorga +1 a las tiradas de ataque con hechizos e ignora media cobertura al lanzar conjuros.",
       "efectos": [

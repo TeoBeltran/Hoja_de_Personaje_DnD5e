@@ -160,7 +160,7 @@
     },
         {
         "nombre": "Espada Larga (Longsword) +1",
-        "dano": "1d8",
+        "dano": "1d8+1",
         "tipoDano": "cortante",
         "tipo": "melee",
         "manos": 1,

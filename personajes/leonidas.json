@@ -147,7 +147,7 @@
       "desc": "Tocás a una criatura y podés terminar una de las siguientes condiciones: enfermedad, ceguera, sordera o parálisis."
     },
     {
-      "nombre": "Amulet of the Devout +1",
+      "nombre": "Amuleto del Devoto (Amulet of the Devout) +1",
       "usos": "1/1",
       "recupera": "largo",
       "accion": "Acción",
@@ -161,7 +161,7 @@
       "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor."
     },
     {
-      "nombre": "Periapt de cierre de heridas (Periapt of Wound Closure)",
+      "nombre": "Amuleto de cicatrización de heridas (Periapt of Wound Closure)",
       "usos": "pasivo",
       "accion": "Ninguna",
       "desc": "Mientras llevás puesto este amuleto, estabilizás automáticamente cuando estás moribundo. Además, cada vez que tirás un dado de golpe para recuperar puntos de vida, recuperás el máximo posible en vez de tirar el dado."
