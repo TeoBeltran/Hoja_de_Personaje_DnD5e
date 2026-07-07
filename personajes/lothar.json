@@ -124,16 +124,56 @@
   ],
   "equipo": [
     {
-      "nombre": "Greatsword",
-      "dano": "2d6",
+      "nombre": "Armadura de placas (Plate Armor)",
+      "esArmadura": true,
+      "tipoArmadura": "pesada",
+      "armaduraBase": 18,
+      "manos": 0,
+      "peso": 65,
+      "valor": 1500,
+      "desc": "Armadura pesada. CA: 18."
+    },
+    {
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "esArmadura": true,
+      "tipoArmadura": "accesorio",
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
+      ]
+    },
+    {
+      "nombre": "Botas de zancada y salto (Boots of Striding and Springing)",
+      "esArmadura": true,
+      "tipoArmadura": "botas",
+      "manos": 0,
+      "peso": 5,
+      "valor": 500,
+      "magico": true,
+      "desc": "Mientras uses estas botas, tu velocidad no puede reducirse excepto si estás sobrecargado. Además, tu distancia de salto largo y salto alto se triplica."
+    },
+    {
+      "nombre": "Espada Larga (Greatsword) +2",
+      "dano": "2d6+2",
       "tipoDano": "cortante",
       "tipo": "melee",
       "manos": 2,
       "peso": 6,
-      "valor": 50,
+      "valor": 4000,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Espada a dos manos, arma pesada. 2d6+STR cortante.",
+      "desc": "Espada pesada mágica a dos manos, arma pesada. 2d6+STR cortante. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades.",
       "efectos": [
         {
           "tipo": "notificacion",
@@ -150,52 +190,37 @@
       ]
     },
     {
-      "nombre": "Handaxe",
-      "dano": "1d6",
-      "tipoDano": "cortante",
-      "tipo": "melee",
-      "manos": 1,
+      "nombre": "Arco Largo (Longbow) +1",
+      "dano": "1d8+1",
+      "tipoDano": "perforante",
+      "tipo": "ranged",
+      "manos": 2,
       "peso": 2,
-      "valor": 5,
+      "valor": 1000,
       "accion": "Acción",
-      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
-      "desc": "Hacha de mano. Arrojadiza. 1d6+STR cortante. Podés lanzarla hasta 20 ft (60 ft con desventaja).",
-      "efectos": [
-        {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Improved Critical",
-          "descripcion": "Improved Critical",
-          "mensaje": "Recordá: hacés crítico con 19 o 20 en el d20 del ataque."
-        }
-      ]
-    },
-    {
-      "nombre": "Serpent Scale Armor",
-      "esArmadura": true,
-      "tipoArmadura": "mediana",
-      "armaduraBase": 14,
-      "manos": 0,
-      "peso": 45,
-      "valor": 50,
-      "desc": "Armadura mediana de escamas de serpiente. CA: 14 + DEX (máx +2)."
+      "distancia": "150/600 ft",
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "desc": "Arco largo mágico. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
     }
   ],
   "hechizos": {
     "ranuras": [],
     "lista": []
   },
-    "inventario": [
-        {
-            "nombre": "Leña",
-            "peso": 1,
-            "cantidad": 2,
-            "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-        },
-        {
-            "nombre": "Oro",
-            "peso": 0.02,
-            "cantidad": 150,
-            "desc": "Piezas de Oro."
-        }
-    ]
+  "inventario": [
+      {
+          "nombre": "Leña",
+          "peso": 1,
+          "cantidad": 2,
+          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+      },
+      {
+          "nombre": "Oro",
+          "peso": 0.02,
+          "cantidad": 150,
+          "desc": "Piezas de Oro."
+      }
+  ]
 }

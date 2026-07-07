@@ -89,38 +89,67 @@
   ],
   "habilidadesUso": [
     {
-      "nombre": "Arcane Recovery",
+      "nombre": "Recuperación Arcana (Arcane Recovery)",
       "usos": "1/1",
       "recupera": "largo",
       "accion": "Especial",
       "distancia": "Propio",
       "desc": "Una vez por día, después de terminar un descanso corto, podés recuperar ranuras de hechizo gastadas. Las ranuras pueden tener un nivel total combinado igual o menor a la mitad de tu nivel de mago (redondeado hacia arriba), y ninguna ranura individual puede ser de nivel 6 o superior. A nivel 6 podés recuperar 3 niveles totales (ej: 1 ranura de Nivel 3, o 1 de Nivel 2 + 1 de Nivel 1)."
+    },
+    {
+      "nombre": "Perla de poder (Pearl of Power)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor."
+    },
+    {
+      "nombre": "Sombrero del disfraz (Hat of Disguise)",
+      "usos": "ilimitado",
+      "accion": "Acción",
+      "desc": "(No sirve en combate) Permite lanzar Disguise Self ilimitadamente mientras uses este sombrero."
     }
   ],
   "equipo": [
     {
-      "nombre": "Quarterstaff (1 mano)",
-      "dano": "1d6",
-      "tipoDano": "contundente",
-      "tipo": "melee",
-      "manos": 1,
-      "peso": 4,
-      "valor": 2,
-      "accion": "Acción",
-      "distancia": "Melee 5 ft",
-      "desc": "Versátil empuñado a una mano: 1d6+STR contundente."
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "esArmadura": true,
+      "tipoArmadura": "accesorio",
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
+      ]
     },
     {
-      "nombre": "Quarterstaff (2 manos)",
-      "dano": "1d8",
-      "tipoDano": "contundente",
-      "tipo": "melee",
-      "manos": 2,
-      "peso": 0,
-      "valor": 0,
-      "accion": "Acción",
-      "distancia": "Melee 5 ft",
-      "desc": "Versátil empuñado a dos manos: 1d8+STR contundente."
+      "nombre": "Varita del mago de guerra (Wand of the War Mage) +1",
+      "esArmadura": true,
+      "tipoArmadura": "varita",
+      "manos": 1,
+      "peso": 1,
+      "valor": 500,
+      "magico": true,
+      "desc": "Varita mágica. Otorga +1 a las tiradas de ataque con hechizos e ignora media cobertura al lanzar conjuros.",
+      "efectos": [
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "ignorarCobertura",
+          "valor": "media"
+        }
+      ]
     }
   ],
   "hechizos": {
@@ -338,11 +367,12 @@
       },
       {
         "nivel": "NIVEL 4",
-        "nombre": "Polymorph",
+        "nombre": "Wall of Fire",
+        "dano": "5d8",
+        "tipoDano": "fuego",
         "accion": "Acción",
-        "distancia": "60 ft",
-        "duracion": "Concentración, 1 hora",
-        "desc": "Transformás a una criatura en una bestia cuyo CR sea igual o menor al nivel del objetivo o al nivel del hechizo. Si falla salvación de WIS, pierde su forma original y estadísticas, reemplazadas por las de la bestia. Si los HP de la bestia llegan a 0, el objetivo vuelve a su forma original con los HP que tenía antes."
+        "distancia": "120 ft",
+        "desc": "Creas un muro de fuego sobre una superficie sólida dentro del alcance. Puede ser una línea de hasta 60 ft de largo, 20 ft de alto y 1 ft de grosor, o un anillo de hasta 20 ft de diámetro, 20 ft de alto y 1 ft de grosor. Al aparecer, las criaturas en su área hacen salvación de DEX o reciben 5d8 fuego (mitad si pasan). Un lado del muro emite calor intenso; las criaturas que terminan su turno a 10 ft o menos de ese lado o lo atraviesan por primera vez en un turno reciben 5d8 fuego. Cada slot superior al 4 suma 1d8. Cada slot superior al 4 aumenta el daño en 1d8."
       }
     ]
   },
@@ -364,6 +394,20 @@
       "peso": 3,
       "cantidad": 1,
       "desc": "Tu libro de hechizos. Contiene todos los hechizos que conocés. Si lo perdés, no podés preparar hechizos nuevos hasta recuperarlo o reescribirlo (gastando oro y tiempo)."
+    },
+    {
+      "nombre": "Scroll of Fireball",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Fireball una única vez. Luego de usarlo, el pergamino se destruye."
+    },
+    {
+      "nombre": "Scroll of Fly",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Fly una única vez. Luego de usarlo, el pergamino se destruye."
     }
   ]
 }

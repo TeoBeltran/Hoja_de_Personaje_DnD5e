@@ -2,144 +2,93 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Resumen de Personajes</title>
-
     <link rel="stylesheet" href="GenerarResumen.css">
-
 </head>
 
 <body>
-
 <div id="generarResumen">
-
     <header class="gr-header">
-
         <h1>📜 Compendio de Personajes</h1>
-
         <p>
             Resumen automático de todos los personajes de la campaña.
         </p>
-
     </header>
 
     <section class="gr-panel">
-
         <button id="gr-btnGenerar">
-
             📖 Generar resumen
-
         </button>
 
         <button id="gr-btnDescargar" disabled>
-
             💾 Descargar
-
         </button>
 
         <span id="gr-estado">
-
             Esperando...
-
         </span>
 
     </section>
 
     <section id="gr-contenedorResumen">
-
     </section>
 
 </div>
 
 <template id="gr-templatePersonaje">
-
     <article class="gr-personaje">
-
         <div class="gr-cabecera">
-
             <h2 class="gr-nombre"></h2>
-
             <div class="gr-info">
-
                 <div class="gr-linea gr-raza"></div>
-
                 <div class="gr-linea gr-clase"></div>
-
                 <div class="gr-linea gr-subclase"></div>
-
                 <div class="gr-linea gr-asi"></div>
-
             </div>
-
         </div>
 
         <div class="gr-cuerpo">
-
             <section class="gr-seccion gr-secStats">
-
                 <h3>
-
                     💪 Estadísticas
-
                 </h3>
-
                 <div class="gr-stats"></div>
-
             </section>
 
             <section class="gr-seccion gr-secRasgos">
-
                 <h3>
-
                     ⭐ Rasgos
-
                 </h3>
 
                 <ul></ul>
-
             </section>
 
             <section class="gr-seccion gr-secHab">
-
                 <h3>
-
                     ⚔️ Acciones y habilidades
-
                 </h3>
 
                 <ul></ul>
-
             </section>
 
             <section class="gr-seccion gr-secEquipo">
-
                 <h3>
-
                     🛡️ Equipo
-
                 </h3>
 
                 <ul></ul>
-
             </section>
 
             <section class="gr-seccion gr-secHechizos">
-
                 <h3>
-
                     ✨ Hechizos
-
                 </h3>
 
                 <ul></ul>
-
             </section>
-
         </div>
-
     </article>
 
 </template>
@@ -147,5 +96,4 @@
 <script src="GenerarResumen.js"></script>
 
 </body>
-
 </html>

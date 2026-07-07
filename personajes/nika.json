@@ -149,39 +149,70 @@
   ],
   "equipo": [
     {
-      "nombre": "Lanza (1 mano)",
-      "dano": "1d6",
-      "tipoDano": "perforante",
-      "tipo": "melee",
-      "manos": 1,
-      "peso": 3,
-      "valor": 1,
-      "accion": "Acción",
-      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
-      "desc": "Versátil y arrojadiza. Empuñada a una mano: 1d6+2+STR perforante. El +2 viene de Dueling (solo si tenés la otra mano libre). Como arma arrojadiza, podés lanzarla hasta 20 ft (60 ft con desventaja).\n Sumar Fighting Style: Dueling"
+        "nombre": "Armadura de placas (Plate Armor)",
+        "esArmadura": true,
+        "tipoArmadura": "pesada",
+        "armaduraBase": 18,
+        "manos": 0,
+        "peso": 60,
+        "valor": 1500,
+        "desc": "Armadura pesada. CA: 18."
+    },
+        {
+        "nombre": "Espada Larga (Longsword) +1",
+        "dano": "1d8",
+        "tipoDano": "cortante",
+        "tipo": "melee",
+        "manos": 1,
+        "peso": 5,
+        "valor": 2000,
+        "accion": "Acción",
+        "distancia": "Melee 5 ft",
+        "magico": true,
+        "bonoAtaque": 1,
+        "bonoDano": 1,
+        "desc": "Espada larga mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
     },
     {
-      "nombre": "Lanza (2 manos)",
-      "dano": "1d8",
-      "tipoDano": "perforante",
-      "tipo": "melee",
-      "manos": 2,
-      "peso": 0,
-      "valor": 0,
-      "accion": "Acción",
-      "distancia": "Melee 5 ft",
-      "desc": "Versátil empuñada a dos manos: 1d8+2+STR perforante. Nota: a dos manos NO aplica el +2 de Dueling."
+        "nombre": "Capa de protección (Cloak of Protection)",
+        "esArmadura": true,
+        "tipoArmadura": "accesorio",
+        "manos": 0,
+        "peso": 1,
+        "valor": 2000,
+        "magico": true,
+        "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+        "efectos": [
+            {
+            "tipo": "CA",
+            "valor": 1
+            },
+            {
+            "tipo": "salvaciones",
+            "valor": 1
+            }
+        ]
     },
-    { 
-      "nombre": "Cota de Malla", 
-      "esArmadura": true, 
-      "tipoArmadura": "pesada", 
-      "armaduraBase": 16, 
-      "manos": 0, 
-      "peso": 55,
-      "valor": 75,
-      "requiere": { "STR": 13 },
-      "desc": "Armadura pesada"
+    {
+        "nombre": "Escudo centinela (Sentinel Shield)",
+        "esArmadura": true,
+        "tipoArmadura": "escudo",
+        "manos": 1,
+        "peso": 6,
+        "valor": 500,
+        "magico": true,
+        "desc": "Escudo mágico. No aumenta la Clase de Armadura. Mientras esté equipado otorga ventaja en tiradas de iniciativa y ventaja en pruebas de Sabiduría (Percepción).",
+        "efectos": [
+            {
+            "tipo": "ventaja",
+            "tirada": "Iniciativa"
+            },
+            {
+            "tipo": "ventaja",
+            "habilidad": "Percepción",
+            "atributo": "WIS"
+            }
+        ]
     },
     { 
       "nombre": "Escudo", 
@@ -189,7 +220,7 @@
       "tipoArmadura": "escudo", 
       "armaduraBase": 2, 
       "manos": 1, 
-      "peso": 6,
+      "peso": 0,
       "valor": 10,
       "desc": "Escudo."
     }
@@ -331,7 +362,7 @@
         {
             "nombre": "Leña",
             "peso": 1,
-            "cantidad": 2,
+            "cantidad": 1,
             "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
         },
         {
@@ -339,6 +370,14 @@
             "peso": 0.02,
             "cantidad": 50,
             "desc": "Piezas de Oro."
-        }
+        },
+        {
+            "nombre": "Potion of Heroism",
+            "peso": 0.5,
+            "cantidad": 1,
+            "accion": "Acción",
+            "duracion": "1 hora",
+            "desc": "Durante 1 hora obtenés 10 puntos de vida temporales y el efecto de Bless sin requerir concentración. Sumás 1d4 a las tiradas de ataque y salvaciones."
+            }
     ]
 }

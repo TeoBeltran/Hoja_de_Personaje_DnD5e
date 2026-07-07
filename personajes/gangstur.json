@@ -107,14 +107,38 @@
   ],
   "equipo": [
     { 
-      "nombre": "Cuero Tachonado", 
+      "nombre": "Cuero Tachonado +1", 
       "esArmadura": true, 
       "tipoArmadura": "ligera", 
-      "armaduraBase": 12, 
+      "armaduraBase": 13, 
       "manos": 0, 
       "peso": 13,
-      "valor": 45,
-      "desc": "Armadura ligera. CA: 12 + Modificador de Destreza. Peso: 13lb."
+      "valor": 1000,
+      "desc": "Armadura ligera mágica. CA: 13 + Modificador de Destreza. Peso: 13lb."
+    },
+    {
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 1,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada obtenés +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
+      ]
+    },
+        {
+      "nombre": "Vara del Guardián del Pacto (Rod of the Pact Keeper) +1",
+      "manos": 1, 
+      "peso": 5,
+      "valor": 1000,
+      "desc": "Mientras sostengas esta vara mágica, obtenés +1 a las tiradas de ataque con hechizos de brujo y +1 a la CD de salvación de tus hechizos de brujo."
     },
     {
       "nombre": "Ballesta Ligera", 
@@ -127,6 +151,21 @@
       "accion": "Acción", 
       "distancia": "80/320 ft", 
       "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Munición.</strong>"
+    },
+    {
+      "nombre": "Daga +1",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 1,
+      "valor": 500,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "desc": "Daga mágica. Finesse, ligera y arrojadiza. +1 a las tiradas de ataque y al daño. Sus ataques cuentan como mágicos para superar resistencias e inmunidades."
     }
   ],
   "hechizos": {
@@ -149,19 +188,33 @@
           { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
           { "nivel": "NIVEL 4", "nombre": "Banishment", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." }
         ]
-    },
-    "inventario": [
-        {
-            "nombre": "Leña",
-            "peso": 1,
-            "cantidad": 2,
-            "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-        },
-        {
-            "nombre": "Oro",
-            "peso": 0.02,
-            "cantidad": 150,
-            "desc": "Piezas de Oro."
-        }
-    ]
+  },
+  "inventario": [
+      {
+          "nombre": "Leña",
+          "peso": 1,
+          "cantidad": 2,
+          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+      },
+      {
+          "nombre": "Oro",
+          "peso": 0.02,
+          "cantidad": 150,
+          "desc": "Piezas de Oro."
+      },
+      {
+        "nombre": "Greater Healing Potion",
+        "peso": 0.5,
+        "cantidad": 2,
+        "accion": "Acción",
+        "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
+      },
+      {
+        "nombre": "Scroll of Counterspell",
+        "peso": 0,
+        "cantidad": 1,
+        "accion": "Acción",
+        "desc": "Pergamino mágico que permite lanzar Counterspell una única vez. Luego de usarlo, el pergamino se destruye."
+      }
+  ]
 }

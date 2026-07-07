@@ -145,9 +145,40 @@
       "accion": "Acción",
       "distancia": "Toque",
       "desc": "Tocás a una criatura y podés terminar una de las siguientes condiciones: enfermedad, ceguera, sordera o parálisis."
+    },
+    {
+      "nombre": "Amulet of the Devout +1",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "desc": "Recupera un uso gastado de Channel Divinity. Además, mientras tengas el amuleto equipado, otorga +1 a las tiradas de ataque con hechizos de clérigo y +1 a la CD de los conjuros de clérigo."
+    },
+    {
+      "nombre": "Perla de poder (Pearl of Power)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor."
+    },
+    {
+      "nombre": "Periapt de cierre de heridas (Periapt of Wound Closure)",
+      "usos": "pasivo",
+      "accion": "Ninguna",
+      "desc": "Mientras llevás puesto este amuleto, estabilizás automáticamente cuando estás moribundo. Además, cada vez que tirás un dado de golpe para recuperar puntos de vida, recuperás el máximo posible en vez de tirar el dado."
     }
   ],
   "equipo": [
+    {
+      "nombre": "Breastplate +1",
+      "esArmadura": true,
+      "tipoArmadura": "media",
+      "armaduraBase": 16,
+      "manos": 0,
+      "peso": 19,
+      "valor": 0,
+      "magico": true,
+      "desc": "Armadura media mágica. CA: 16 + Modificador de Destreza (máximo +2)."
+    },
     {
       "nombre": "Martillo de Guerra (1 mano)",
       "dano": "1d8",
@@ -178,25 +209,14 @@
       "tipoDano": "contundente",
       "tipo": "melee",
       "manos": 1,
-      "peso": 2,
+      "peso": 1,
       "valor": 2,
       "accion": "Acción",
       "distancia": "Melee 5 ft / Arrojadizo 20/60 ft",
       "desc": "Arrojadizo. Empuñado a una mano: 1d4+STR contundente. Como arma arrojadiza, podés lanzarlo hasta 20 ft (60 ft con desventaja)."
-    },
-    {
-      "nombre": "Martillo Liviano (2 manos)",
-      "dano": "1d6",
-      "tipoDano": "contundente",
-      "tipo": "melee",
-      "manos": 2,
-      "peso": 0,
-      "valor": 0,
-      "accion": "Acción",
-      "distancia": "Melee 5 ft",
-      "desc": "Empuñado a dos manos: 1d6+STR contundente."
     }
-  ],"hechizos": {
+  ],
+  "hechizos": {
     "ranuras": [
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
@@ -352,18 +372,25 @@
       }
     ]
   },
-    "inventario": [
-        {
-            "nombre": "Leña",
-            "peso": 1,
-            "cantidad": 2,
-            "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-        },
-        {
-            "nombre": "Oro",
-            "peso": 0.02,
-            "cantidad": 50,
-            "desc": "Piezas de Oro."
-        }
-    ]
+  "inventario": [
+      {
+          "nombre": "Leña",
+          "peso": 1,
+          "cantidad": 0,
+          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+      },
+      {
+          "nombre": "Oro",
+          "peso": 0.02,
+          "cantidad": 50,
+          "desc": "Piezas de Oro."
+      },
+      {
+        "nombre": "Greater Healing Potion",
+        "peso": 0.5,
+        "cantidad": 3,
+        "accion": "Acción",
+        "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
+      }
+  ]
 }

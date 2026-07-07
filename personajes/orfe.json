@@ -116,18 +116,26 @@
       "recupera": "corto",
       "accion": "Acción",
       "desc": "Te transformás en una bestia que hayas visto de CR 1/2 o menor durante un máximo de 3 horas."
+    },
+    {
+      "nombre": "Staff of the Python",
+      "usos": "1/1",
+      "recupera": "ninguno",
+      "accion": "Acción",
+      "desc": "El bastón se transforma en una Pitón Gigante amistosa bajo tu control. Puede combatir junto al druida. Si la pitón muere, el bastón queda destruido."
     }
   ],
   "equipo": [
     {
-      "nombre": "Leather Armor",
+      "nombre": "Hide Armor +1",
       "esArmadura": true,
-      "tipoArmadura": "ligera",
-      "armaduraBase": 11,
-      "manos": 0,
-      "peso": 10,
-      "valor": 10,
-      "desc": "Armadura ligera. CA: 11 + Modificador de Destreza."
+      "tipoArmadura": "media",
+      "armaduraBase": 13,
+      "manos": 500,
+      "peso": 12,
+      "valor": 0,
+      "magico": true,
+      "desc": "Armadura de cuero endurecido mágica. CA: 14 + Modificador de Destreza (máximo +2)."
     },
     {
       "nombre": "Shield",
@@ -140,15 +148,43 @@
       "desc": "Escudo. Otorga +2 a la Clase de Armadura mientras se empuña."
     },
     {
-      "nombre": "Scimitar",
-      "dano": "1d6",
+      "nombre": "Moon Sickle +1",
+      "dano": "1d4",
       "tipoDano": "cortante",
-      "tipo": "finesse",
+      "tipo": "melee",
       "manos": 1,
-      "peso": 3,
-      "valor": 25,
+      "peso": 2,
+      "valor": 1000,
       "accion": "Acción",
-      "desc": "Arma melee. Propiedades: Finesse, Ligera."
+      "distancia": "Melee 5 ft",
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "desc": "Hoz mágica. Otorga +1 a las tiradas de ataque y daño con esta arma. También otorga +1 a las tiradas de ataque con hechizos y +1 a la CD de los conjuros. Cuando curás con un hechizo, una criatura afectada recupera 1d4 puntos de vida adicionales.",
+      "efectos": [
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoCDHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "curacionExtra",
+          "valor": "1d4"
+        }
+      ]
+    },
+    {
+      "nombre": "Boots of Elvenkind",
+      "esArmadura": true,
+      "tipoArmadura": "botas",
+      "manos": 0,
+      "peso": 1,
+      "valor": 250,
+      "magico": true,
+      "desc": "Botas mágicas. Tus pasos no producen sonido. Las criaturas tienen desventaja en pruebas para escucharte cuando te movés."
     }
   ],
   "hechizos": {
@@ -286,6 +322,13 @@
       "peso": 0.02,
       "cantidad": 50,
       "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Scroll of Protection from Energy",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Protection from Energy una única vez. Luego de usarlo, el pergamino se destruye.\n\nProtection from Energy: Durante hasta 1 hora (requiere concentración), una criatura que toques obtiene resistencia a un tipo de daño elegido: ácido, frío, fuego, relámpago o trueno."
     }
   ]
 }
