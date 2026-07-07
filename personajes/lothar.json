@@ -135,9 +135,6 @@
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
-      "esArmadura": true,
-      "tipoArmadura": "accesorio",
-      "manos": 0,
       "peso": 1,
       "valor": 2000,
       "magico": true,
