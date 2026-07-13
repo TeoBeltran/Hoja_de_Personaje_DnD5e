@@ -86,6 +86,11 @@ let actionSurgeActivo = false; // Flag: cuando se usa Action Surge, el próximo 
 let mageArmorActivo = false; // Flag: si Mage Armor está activo, la CA se calcula con armaduraMagicaBase + DEX
 let mageArmorBase = 13; // CA base cuando Mage Armor está activo
 
+// === Familiar / Steed (Find Familiar, Find Steed, etc.) ===
+let familiarDataActual = null; // { id, nombre, tipo, emoji, ca, mod, vidaMaxima, ataques: [{nombre, dano, desc}] }
+let familiarVidaActual = 0;
+let familiarActivo = false; // true mientras esté vivo y no haya sido despedido. NO se resetea con descansos.
+
 // === FUNCIONES DE GUARDADO
 function guardarRanuras() {
     localStorage.setItem(STORAGE_PREFIX + 'ranurasHechizos', JSON.stringify(ranurasState));
@@ -134,6 +139,22 @@ function guardarInventario() {
 
 function guardarTurnoEstado() {
     localStorage.setItem(STORAGE_PREFIX + 'turno', JSON.stringify(turnoEstado));
+}
+
+// Guarda solo el ID del familiar (para saber cuál era) y su vida actual.
+// Los datos completos (ataques, CA, etc.) siempre se vuelven a leer del JSON del personaje.
+// Esto NO se toca en tomarDescanso(): el familiar sigue vivo/activo hasta que llega a 0 HP
+// o se lo despide manualmente, sin importar cuántos descansos cortos o largos pasen.
+function guardarFamiliar() {
+    if (familiarActivo && familiarDataActual) {
+        localStorage.setItem(STORAGE_PREFIX + 'familiar', JSON.stringify({
+            id: familiarDataActual.id,
+            vidaActual: familiarVidaActual,
+            activo: true
+        }));
+    } else {
+        localStorage.removeItem(STORAGE_PREFIX + 'familiar');
+    }
 }
 
 // === Sistema de efectos automáticos ===
@@ -243,19 +264,12 @@ function procesarEfectos(item, contexto) {
 let smiteData = null; // Guarda el objeto smite del JSON si la clase lo tiene
 
 // Mapea nivel de hechizo a ranura. Si es Brujo, TODO va a Nivel 3.
+// Genérico: soporta cualquier "NIVEL n" (1-9), no solo hasta el 4.
 function mapNivelHechizoARanura(nivelHechizo) {
     if (nivelHechizo === "CANTRIPS") return null; // Cantrips nunca consumen
-    if (claseEsBrujo) return "Nivel 3"; // Pact Magic: todo cuenta como nivel 3
-    if (nivelHechizo === "NIVEL 1") return "Nivel 1";
-    if (nivelHechizo === "NIVEL 2") return "Nivel 2";
-    if (nivelHechizo === "NIVEL 3") return "Nivel 3";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 4";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 5";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 6";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 7";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 8";
-    if (nivelHechizo === "NIVEL 4") return "Nivel 9";
-    return null;
+    const match = /^NIVEL (\d+)$/.exec(nivelHechizo || '');
+    if (!match) return null;
+    return `Nivel ${match[1]}`;
 }
 
 let ranurasInfo = {}; // Guarda qué descanso recupera cada ranura
@@ -322,6 +336,118 @@ function modificarVidaMaxima(cantidad) {
         mostrarToast(`Vida máxima reducida: ${vidaMaxima}`, 'warning');
     } else {
         mostrarToast(`Vida máxima aumentada: ${vidaMaxima}`);
+    }
+}
+
+// === Lógica del Familiar / Steed ===
+
+function actualizarFamiliarFabVisibilidad() {
+    const fab = document.getElementById('familiar-fab');
+    if (fab) fab.style.display = familiarActivo ? 'block' : 'none';
+}
+
+function actualizarFamiliarVidaDOM() {
+    if (!familiarDataActual) return;
+    const display = document.getElementById('familiar-hp-display');
+    const barFill = document.getElementById('familiar-hp-bar-fill');
+    if (display) display.textContent = `${familiarVidaActual} / ${familiarDataActual.vidaMaxima}`;
+    if (barFill) {
+        const porcentaje = familiarDataActual.vidaMaxima > 0 ? (familiarVidaActual / familiarDataActual.vidaMaxima) * 100 : 0;
+        barFill.style.width = `${porcentaje}%`;
+        if (porcentaje > 50) barFill.style.backgroundColor = '#2e7d32';
+        else if (porcentaje > 25) barFill.style.backgroundColor = '#f9a825';
+        else barFill.style.backgroundColor = '#c62828';
+    }
+}
+
+// Pinta el contenido completo del modal (nombre, badges, vida, ataques) según familiarDataActual
+function renderFamiliarModal() {
+    if (!familiarDataActual) return;
+    const f = familiarDataActual;
+
+    const titulo = document.getElementById('familiar-modal-title');
+    if (titulo) titulo.innerHTML = `${f.emoji || '🐾'} ${f.nombre}${f.tipo ? ` <span style="font-size:0.9rem; color: var(--text-muted); font-weight:normal;">(${f.tipo})</span>` : ''}`;
+
+    const badges = document.getElementById('familiar-badges');
+    if (badges) {
+        const partes = [];
+        if (f.ca !== undefined && f.ca !== null && f.ca !== '') {
+            partes.push(`<span class="proficient" style="font-weight:bold; padding:2px 8px; border:1px solid #6a1b9a; border-radius:4px;">CA ${f.ca}</span>`);
+        }
+        if (f.mod) {
+            partes.push(`<span class="proficient" style="font-weight:bold; padding:2px 8px; border:1px solid #6a1b9a; border-radius:4px;">${f.mod}</span>`);
+        }
+        badges.innerHTML = partes.join('');
+    }
+
+    actualizarFamiliarVidaDOM();
+
+    // Nota opcional (ej: "los familiares no pueden atacar"), se muestra arriba de los ataques
+    const notasEl = document.getElementById('familiar-notas');
+    if (notasEl) {
+        notasEl.textContent = f.notas || '';
+        notasEl.style.display = f.notas ? 'block' : 'none';
+    }
+
+    const lista = document.getElementById('familiar-ataques-lista');
+    if (lista) {
+        lista.innerHTML = '';
+        if (!f.ataques || f.ataques.length === 0) {
+            const vacio = document.createElement('div');
+            vacio.style.cssText = 'font-size: 0.9rem; color: var(--text-muted); text-align: center; padding: 8px;';
+            vacio.textContent = 'No tiene ataques.';
+            lista.appendChild(vacio);
+        }
+        (f.ataques || []).forEach(a => {
+            const div = document.createElement('div');
+            div.style.cssText = 'padding: 10px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius);';
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-weight:bold;">${a.nombre}</span>
+                    ${a.dano ? `<span class="skill-mod" style="background-color:#6a1b9a; color:white; flex-shrink:0;">${a.dano}</span>` : ''}
+                </div>
+                ${a.desc ? `<span style="font-size:0.9rem; color: var(--text-muted);">${a.desc}</span>` : ''}
+            `;
+            lista.appendChild(div);
+        });
+    }
+}
+
+// Se llama cuando se usa un hechizo que trae un campo "familiar" en su JSON (Find Familiar, Find Steed, etc.)
+function activarFamiliar(datosFamiliar) {
+    if (!datosFamiliar || !datosFamiliar.id) return;
+    familiarDataActual = datosFamiliar;
+    familiarVidaActual = datosFamiliar.vidaMaxima;
+    familiarActivo = true;
+    guardarFamiliar();
+    actualizarFamiliarFabVisibilidad();
+    renderFamiliarModal();
+    mostrarToast(`${datosFamiliar.emoji || '🐾'} ¡${datosFamiliar.nombre} fue invocado!`);
+}
+
+// Despedir/matar al familiar: cierra el modal, oculta el botón flotante y borra el guardado.
+// Se usa tanto al llegar a 0 HP como al apretar "Despedir familiar" manualmente.
+function desactivarFamiliar() {
+    familiarActivo = false;
+    const modalFamiliar = document.getElementById('familiar-modal');
+    if (modalFamiliar) modalFamiliar.style.display = 'none';
+    actualizarFamiliarFabVisibilidad();
+    guardarFamiliar();
+}
+
+function modificarVidaFamiliar(cantidad) {
+    if (!familiarDataActual) return;
+    familiarVidaActual = Math.max(0, Math.min(familiarDataActual.vidaMaxima, familiarVidaActual + cantidad));
+    guardarFamiliar();
+    actualizarFamiliarVidaDOM();
+    if (cantidad < 0) {
+        mostrarToast(`${familiarDataActual.nombre} recibió ${Math.abs(cantidad)} de daño`, 'warning');
+    } else if (cantidad > 0) {
+        mostrarToast(`${familiarDataActual.nombre} se curó ${cantidad} HP`);
+    }
+    if (familiarVidaActual === 0) {
+        mostrarToast(`💀 ${familiarDataActual.nombre} cayó a 0 HP y desaparece`, 'warning');
+        setTimeout(() => desactivarFamiliar(), 700);
     }
 }
 
@@ -991,6 +1117,26 @@ async function init() {
         });
     } else {
         ranurasState = { ...ranurasOriginales };
+    }
+
+    // Restaurar Familiar/Steed activo (si había uno). Los datos completos (ataques, CA, etc.)
+    // se vuelven a buscar en el JSON por su "id", solo la vida actual se guarda en localStorage.
+    // No se toca en descansos: sigue activo hasta 0 HP o hasta que se lo despide manualmente.
+    const familiarGuardado = localStorage.getItem(STORAGE_PREFIX + 'familiar');
+    if (familiarGuardado) {
+        try {
+            const saved = JSON.parse(familiarGuardado);
+            if (saved && saved.activo && saved.id) {
+                const spellConFamiliar = (data.hechizos.lista || []).find(h => h.familiar && h.familiar.id === saved.id);
+                if (spellConFamiliar) {
+                    familiarDataActual = spellConFamiliar.familiar;
+                    familiarVidaActual = Math.max(0, Math.min(saved.vidaActual, familiarDataActual.vidaMaxima));
+                    familiarActivo = true;
+                }
+            }
+        } catch (e) {
+            // Datos corruptos en localStorage: ignorar y seguir sin familiar activo
+        }
     }
 
     const createBtn = (item) => {
@@ -1702,6 +1848,40 @@ async function init() {
         });
     }
 
+    // === Listeners del Familiar / Steed ===
+    const familiarToggle = document.getElementById('familiar-toggle');
+    const familiarModal = document.getElementById('familiar-modal');
+    const familiarCloseBtn = document.querySelector('.close-btn-familiar');
+    const familiarDespedirBtn = document.getElementById('familiar-despedir');
+
+    // Mostrar el botón flotante si ya había un familiar activo guardado de una sesión anterior
+    actualizarFamiliarFabVisibilidad();
+    if (familiarActivo) renderFamiliarModal();
+
+    if (familiarToggle && familiarModal) {
+        familiarToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            renderFamiliarModal();
+            familiarModal.style.display = 'flex';
+        });
+    }
+    if (familiarCloseBtn) {
+        familiarCloseBtn.addEventListener('click', () => familiarModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === familiarModal) familiarModal.style.display = 'none'; });
+
+    document.getElementById('familiar-hp-menos1')?.addEventListener('click', () => modificarVidaFamiliar(-1));
+    document.getElementById('familiar-hp-mas1')?.addEventListener('click', () => modificarVidaFamiliar(1));
+    document.getElementById('familiar-hp-menos5')?.addEventListener('click', () => modificarVidaFamiliar(-5));
+    document.getElementById('familiar-hp-mas5')?.addEventListener('click', () => modificarVidaFamiliar(5));
+
+    if (familiarDespedirBtn) {
+        familiarDespedirBtn.addEventListener('click', () => {
+            if (familiarDataActual) mostrarToast(`👋 ${familiarDataActual.nombre} fue despedido`);
+            desactivarFamiliar();
+        });
+    }
+
     // === Listeners del menú flotante de turno ===
     const turnoToggle = document.getElementById('turno-toggle');
     const turnoPanel = document.getElementById('turno-panel');
@@ -1908,7 +2088,13 @@ async function init() {
 
     // Renderizar Lista de Hechizos
     const contenedorHechizos = document.getElementById('hechizos-contenedor');
-    const niveles = ["CANTRIPS", "NIVEL 1", "NIVEL 2", "NIVEL 3", "NIVEL 4", "NIVEL 5", "NIVEL 6", "NIVEL 7", "NIVEL 8", "NIVEL 9"];
+    // Antes esto estaba hardcodeado hasta "NIVEL 3", por eso los hechizos de nivel 4+
+    // nunca se mostraban aunque estuvieran bien cargados en el JSON.
+    // Ahora se arma dinámicamente según qué niveles existan realmente en data.hechizos.lista,
+    // soportando cantrips + niveles 1 a 9 (D&D 5e no tiene hechizos de nivel 10+).
+    const nivelesConHechizos = new Set(data.hechizos.lista.map(h => h.nivel));
+    const niveles = ["CANTRIPS", ...Array.from({ length: 9 }, (_, i) => `NIVEL ${i + 1}`)]
+        .filter(lvl => nivelesConHechizos.has(lvl));
 
     niveles.forEach(lvl => {
         const h4 = document.createElement('h4');
@@ -2101,6 +2287,11 @@ async function init() {
                             nivelPersonaje: nivelPersonaje
                         });
                     }, 400);
+                }
+
+                // Si el hechizo trae datos de familiar (Find Familiar, Find Steed, etc.), invocarlo
+                if (hechizoUsado && hechizoUsado.familiar) {
+                    setTimeout(() => activarFamiliar(hechizoUsado.familiar), hechizoUsado.efectos ? 900 : 400);
                 }
             }
         });

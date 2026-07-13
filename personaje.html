@@ -302,6 +302,11 @@
         <button id="inventario-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Inventario">🎒</button>
     </div>
 
+    <!-- Botón flotante de Familiar/Steed (oculto hasta que se invoque uno) -->
+    <div id="familiar-fab" style="position: fixed; bottom: 30px; right: 170px; z-index: 90; display: none;">
+        <button id="familiar-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: #6a1b9a; color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Familiar">🐾</button>
+    </div>
+
     <!-- Menú flotante de turno -->
     <div id="turno-fab" style="position: fixed; bottom: 30px; right: 30px; z-index: 90;">
         <button id="turno-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Mi turno">⚔️</button>
@@ -363,6 +368,32 @@
             <p style="line-height: 1.5; margin-bottom: 10px;">Al usar este hechizo se activaron los siguientes efectos:</p>
             <div id="efectos-lista" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0;"></div>
             <button id="efectos-cerrar" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white; padding: 10px; font-weight: bold;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal del Familiar / Steed -->
+    <div id="familiar-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-familiar">&times;</span>
+            <h3 id="familiar-modal-title" style="color: var(--accent-color); margin-top: 0;"></h3>
+            <div id="familiar-badges" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px;"></div>
+            <p id="familiar-notas" style="display: none; font-size: 0.9rem; color: var(--text-muted); font-style: italic; margin: -5px 0 15px 0;"></p>
+
+            <div id="familiar-hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 10px 0; color: var(--accent-color);"></div>
+            <div id="familiar-hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 15px;">
+                <div id="familiar-hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <button id="familiar-hp-menos1" class="hp-btn hp-damage">-1 HP</button>
+                <button id="familiar-hp-mas1" class="hp-btn hp-heal">+1 HP</button>
+                <button id="familiar-hp-menos5" class="hp-btn hp-damage">-5 HP</button>
+                <button id="familiar-hp-mas5" class="hp-btn hp-heal">+5 HP</button>
+            </div>
+
+            <h4 style="margin: 15px 0 8px 0; color: var(--accent-color); border-bottom: 1px solid var(--text-muted); padding-bottom: 4px;">Ataques</h4>
+            <div id="familiar-ataques-lista" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;"></div>
+
+            <button id="familiar-despedir" class="hp-btn hp-damage" style="width: 100%; padding: 10px; font-weight: bold;">👋 Despedir familiar</button>
         </div>
     </div>
 

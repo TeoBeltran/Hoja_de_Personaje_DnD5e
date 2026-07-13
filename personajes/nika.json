@@ -311,7 +311,21 @@
             "accion": "Acción",
             "distancia": "30 ft",
             "duracion": "Hasta que muera",
-            "desc": "Invocás un espíritu en forma física: Colapinto. Si baja a 0 HP desaparece sin dejar rastro. Mientras estén a menos de 1 milla, se comunican telepáticamente. Cast time: 10 minutos."
+            "desc": "Invocás un espíritu en forma física: Colapinto. Si baja a 0 HP desaparece sin dejar rastro. Mientras estén a menos de 1 milla, se comunican telepáticamente. Cast time: 10 minutos.",
+            "familiar": {
+                "_nota": "Confirmado por el usuario: Warhorse, 20 HP, 11 CA. Ataque tomado del stat block estándar del Warhorse (STR 18).",
+                "id": "steed-nika",
+                "nombre": "Colapinto",
+                "tipo": "Steed (Warhorse)",
+                "emoji": "🐎",
+                "vidaMaxima": 20,
+                "ca": 11,
+                "mod": "STR +4",
+                "notas": "No escala con tu nivel de personaje (stats fijos del Warhorse). Podés montarlo mientras esté en rango.",
+                "ataques": [
+                    { "nombre": "Coces (Hooves)", "dano": "2d6+4", "desc": "Ataque cuerpo a cuerpo. +6 al ataque, alcance 5 ft. Daño contundente." }
+                ]
+            }
         },
         {
             "nivel": "NIVEL 2",

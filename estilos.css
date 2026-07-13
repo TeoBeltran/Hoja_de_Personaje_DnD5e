@@ -235,7 +235,7 @@ h2 {
 
 @media print {
     /* Ocultar botones de descarga y el modal al imprimir */
-    #download-pdf, .close-btn, #skill-modal {
+    #download-pdf, .close-btn, #skill-modal, #familiar-fab, #familiar-modal {
         display: none !important;
     }
 

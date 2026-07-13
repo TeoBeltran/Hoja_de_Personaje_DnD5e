@@ -221,7 +221,19 @@
         "accion": "Acción",
         "distancia": "10 ft",
         "duracion": "Permanente",
-        "desc": "Invocás un familiar (forma de animal pequeño). Es leal y te asiste. Podés ver/oír a través de él, comunicarte telepáticamente a 100 ft, y darle órdenes. Si llega a 0 HP desaparece y podés re-invocarlo con otra ceremonia. Cast time: 1 hora."
+        "desc": "Invocás un familiar (forma de animal pequeño). Es leal y te asiste. Podés ver/oír a través de él, comunicarte telepáticamente a 100 ft, y darle órdenes. Si llega a 0 HP desaparece y podés re-invocarlo con otra ceremonia. Cast time: 1 hora.",
+        "familiar": {
+          "_nota": "Forma elegida sin especificar (SRD permite: murciélago, gato, cangrejo, rana, halcón, lagartija, pulpo, búho, serpiente venenosa, pez, rata, cuervo, caballito de mar, araña o comadreja). Puse Búho de placeholder: ajustá nombre/emoji/CA/vida si eligió otra forma.",
+          "id": "familiar-lunareth",
+          "nombre": "Búho",
+          "tipo": "Familiar",
+          "emoji": "🦉",
+          "vidaMaxima": 1,
+          "ca": 11,
+          "mod": "DEX +1",
+          "notas": "Un familiar NO puede atacar (regla oficial). Puede usar su Reacción para entregar hechizos de toque a 100ft de vos, prestarte sus sentidos (acción: ver/oír a través de él hasta tu próximo turno), y espiar. No escala con tu nivel de personaje.",
+          "ataques": []
+        }
       },
       {
         "nivel": "NIVEL 1",
