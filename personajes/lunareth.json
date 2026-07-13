@@ -37,7 +37,7 @@
   },
   "estadisticas": [
     { "nombre": "Vida", "valor": "44/44" },
-    { "nombre": "Nivel", "valor": "6" },
+    { "nombre": "Nivel", "valor": "7" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },

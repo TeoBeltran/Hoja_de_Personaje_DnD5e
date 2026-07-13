@@ -154,24 +154,24 @@
         "tipoArmadura": "pesada",
         "armaduraBase": 18,
         "manos": 0,
-        "peso": 60,
+        "peso": 65,
         "valor": 1500,
         "desc": "Armadura pesada. CA: 18."
     },
         {
-        "nombre": "Espada Larga (Longsword) +1",
-        "dano": "1d8+1",
+        "nombre": "Lanza (Spear) +1",
+        "dano": "1d6+1",
         "tipoDano": "cortante",
         "tipo": "melee",
         "manos": 1,
-        "peso": 5,
-        "valor": 2000,
+        "peso": 3,
+        "valor": 1500,
         "accion": "Acción",
         "distancia": "Melee 5 ft",
         "magico": true,
         "bonoAtaque": 1,
         "bonoDano": 1,
-        "desc": "Espada larga mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
+        "desc": "Lanza mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
     },
     {
         "nombre": "Capa de protección (Cloak of Protection)",
@@ -195,7 +195,7 @@
         "esArmadura": true,
         "tipoArmadura": "escudo",
         "manos": 1,
-        "peso": 6,
+        "peso": 4,
         "valor": 500,
         "magico": true,
         "desc": "Escudo mágico. No aumenta la Clase de Armadura. Mientras esté equipado otorga ventaja en tiradas de iniciativa y ventaja en pruebas de Sabiduría (Percepción).",
@@ -359,7 +359,7 @@
         {
             "nombre": "Leña",
             "peso": 1,
-            "cantidad": 1,
+            "cantidad": 0,
             "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
         },
         {

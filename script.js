@@ -250,6 +250,11 @@ function mapNivelHechizoARanura(nivelHechizo) {
     if (nivelHechizo === "NIVEL 2") return "Nivel 2";
     if (nivelHechizo === "NIVEL 3") return "Nivel 3";
     if (nivelHechizo === "NIVEL 4") return "Nivel 4";
+    if (nivelHechizo === "NIVEL 4") return "Nivel 5";
+    if (nivelHechizo === "NIVEL 4") return "Nivel 6";
+    if (nivelHechizo === "NIVEL 4") return "Nivel 7";
+    if (nivelHechizo === "NIVEL 4") return "Nivel 8";
+    if (nivelHechizo === "NIVEL 4") return "Nivel 9";
     return null;
 }
 
@@ -1903,7 +1908,7 @@ async function init() {
 
     // Renderizar Lista de Hechizos
     const contenedorHechizos = document.getElementById('hechizos-contenedor');
-    const niveles = ["CANTRIPS", "NIVEL 1", "NIVEL 2", "NIVEL 3"];
+    const niveles = ["CANTRIPS", "NIVEL 1", "NIVEL 2", "NIVEL 3", "NIVEL 4", "NIVEL 5", "NIVEL 6", "NIVEL 7", "NIVEL 8", "NIVEL 9"];
 
     niveles.forEach(lvl => {
         const h4 = document.createElement('h4');
