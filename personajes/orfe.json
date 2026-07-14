@@ -98,7 +98,7 @@
     },
     {
       "nombre": "Natural Recovery",
-      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado de hasta 3."
+      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado de la mitad de tu nivel redondeado para arriba, no podes recuperar slots mayores a nivel 6"
     },
     {
       "nombre": "Land's Stride",

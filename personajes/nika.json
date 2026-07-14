@@ -84,9 +84,9 @@
     { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." },
     { "nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
     { "nombre": "Aura del Gran Panal",
-      "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+1 (máximo 4) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo."
+      "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+1 (máximo 4) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo. <br><br> Las criaturas salvajes tienen 1d4+1 (máximo 4) de daño extra al atacar objetivos Enmielados. <br> Si la criatura es un Oso, tiene ventaja en la tirada de ataque."
     },
-    { "nombre": "Polearm Master", "desc": "Cuando atacás con la acción de Ataque usando solo un glaive, halberd, quarterstaff o spear, podés usar una acción bonus para hacer un ataque adicional con el extremo opuesto del arma (1d4+STR contundente). Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."}
+    { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"}
   ],
   "habilidadesUso": [
     {
@@ -148,6 +148,13 @@
         "accion": "Acción",
         "duracion": "1 minuto",
         "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Una vez por turno hacés daño radiante extra igual a tu nivel al usar un ataque o spell. Se apaga con Acción Bonus."
+    },
+    {
+        "nombre": "Polearm Master",
+        "usos": "99/99",
+        "accion": "Acción Bonus",
+        "danio": "1d4+STR",
+        "desc": "Puedes usar la acción bonus para hacer un ataque adicional con el extremo opuesto de una lanza o arma similar (1d4+STR contundente). <br>Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."
     },
     {
         "nombre": "Honey Smite",
@@ -409,6 +416,18 @@
             "accion": "Acción",
             "duracion": "1 hora",
             "desc": "Durante 1 hora obtenés 10 puntos de vida temporales y el efecto de Bless sin requerir concentración. Sumás 1d4 a las tiradas de ataque y salvaciones."
-            }
+        },
+        {
+            "nombre": "Tarro de Miel",
+            "peso": 0.1,
+            "cantidad": 1,
+            "desc": "Tarro que contiene miel. No se puede rellenar de ninguna forma."
+        },
+        {
+            "nombre": "Miel",
+            "peso": 0.01,
+            "cantidad": 35,
+            "desc": "Miel congelada dentro del tarro, puede lanzarse a enemigos que esten a 15ft."
+        }
     ]
 }

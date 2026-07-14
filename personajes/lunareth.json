@@ -85,7 +85,7 @@
     { "nombre": "Fey Ancestry", "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir." },
     { "nombre": "Elf Weapon Training", "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
     { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." },
-    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."}
+    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. <br>Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate. <br>(Si se hace un descanso corto y es de 4 horas, cuenta como descanso largo)."}
   ],
   "habilidadesUso": [
     {
