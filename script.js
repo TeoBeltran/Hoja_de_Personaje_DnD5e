@@ -61,6 +61,52 @@ let armaduraEquipadaTipo = '';
 let escudoEquipadoId = null;
 let escudoEquipadoBase = 0;
 let armasEquipadas = [];   // array de nombres de armas equipadas
+let notasEquipoActuales = []; // notas de items equipados a mostrar al lanzar hechizos (ej: "ignora cobertura")
+
+// === Circle of the Land (DnD 5.5e) ===
+let circuloDeLaTierraGlobal = null; // { landActual, opciones } del JSON, si la clase lo tiene
+let landActualGlobal = null;        // Land elegida actualmente (o null si no eligió)
+
+// Emojis para cada Land, solo estético
+const EMOJI_LAND = {
+    'Arid': '🏜️',
+    'Polar': '❄️',
+    'Temperate': '🌳',
+    'Tropical': '🌴',
+    'Underdark': '🕳️'
+};
+
+// Abre el selector de Land. Función top-level (no depende de closures de init) para poder
+// llamarla también desde tomarDescanso() al terminar un descanso largo.
+function abrirModalLand() {
+    if (!circuloDeLaTierraGlobal) return;
+    const landModal = document.getElementById('land-modal');
+    const landOpcionesCont = document.getElementById('land-opciones');
+    if (!landModal || !landOpcionesCont) return;
+
+    landOpcionesCont.innerHTML = '';
+    Object.keys(circuloDeLaTierraGlobal.opciones).forEach(nombreLand => {
+        const info = circuloDeLaTierraGlobal.opciones[nombreLand];
+        const emoji = EMOJI_LAND[nombreLand] || '🌍';
+        const btn = document.createElement('button');
+        btn.className = 'skill-btn';
+        btn.style.cssText = 'display: flex; align-items: flex-start; gap: 10px; height: auto; text-align: left; padding: 12px;';
+        btn.innerHTML = `
+            <span style="font-size: 1.8rem; line-height: 1;">${emoji}</span>
+            <span style="display: flex; flex-direction: column;">
+                <strong>${nombreLand}${landActualGlobal === nombreLand ? ' ✓ (actual)' : ''}</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">${info.descCorta || ''}</span>
+            </span>
+        `;
+        btn.onclick = () => {
+            localStorage.setItem(STORAGE_PREFIX + 'landActual', nombreLand);
+            mostrarToast(`${emoji} Land elegida: ${nombreLand}. Recargando la hoja...`);
+            setTimeout(() => location.reload(), 700);
+        };
+        landOpcionesCont.appendChild(btn);
+    });
+    landModal.style.display = 'flex';
+}
 let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
 let modDexGlobal = 0;
 let modStrGlobal = 0;
@@ -80,7 +126,7 @@ let pesoMaximo = 0;
 let tamanoPersonaje = 'estandar';
 
 // === Sistema de turno ===
-let turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
+let turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 };
 let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)", etc.
 let actionSurgeActivo = false; // Flag: cuando se usa Action Surge, el próximo "Terminé mi turno" no termina sino que reinicia
 let mageArmorActivo = false; // Flag: si Mage Armor está activo, la CA se calcula con armaduraMagicaBase + DEX
@@ -193,11 +239,17 @@ function tieneRasgo(nombreRasgo) {
 // Flag global para indicar que al cerrar el modal de efectos, hay que abrir el modal de vida
 let abrirModalVidaTrasEfectos = false;
 
+// Efectos "pasivos" de equipo: se aplican solos (CA, salvaciones, bonos de ataque, etc. via
+// calcularBonosEquipoActivo) y NUNCA deben disparar el modal de notificaciones de procesarEfectos.
+const TIPOS_EFECTO_PASIVO_EQUIPO = ['CA', 'salvaciones', 'bonoAtaqueHechizo', 'bonoCDHechizo', 'bonoAtaqueMelee', 'ignorarCobertura', 'curacionExtra'];
+
 // Procesa los efectos de un item y muestra el modal si hay alguno aplicable
 function procesarEfectos(item, contexto) {
     if (!item || !item.efectos || !Array.isArray(item.efectos)) return;
 
     const efectosAplicables = item.efectos.filter(e => {
+        // Los efectos pasivos de equipo no van en este modal, se aplican solos
+        if (TIPOS_EFECTO_PASIVO_EQUIPO.includes(e.tipo)) return false;
         // Si requiere un rasgo, validar que el personaje lo tenga
         if (e.rasgoRequerido && !tieneRasgo(e.rasgoRequerido)) return false;
         return true;
@@ -472,6 +524,64 @@ function modificarVida(cantidad) {
     }
 }
 
+// === Bonos de equipo (efectos de items NO-armadura que sí se llevan puestos) ===
+// Suma los "efectos" de: armadura equipada, escudo equipado, y todo lo que esté en
+// armasEquipadas (armas, varitas, capas, botas, etc — cualquier accesorio equipable
+// que no sea la armadura/escudo principal). También suma el bono de ataque intrínseco
+// de un arma mágica (item.bonoAtaque) al header de Atk Melee/Finesse correspondiente,
+// solo si esa arma está efectivamente equipada.
+function calcularBonosEquipoActivo() {
+    const bonos = { CA: 0, salvaciones: 0, bonoAtaqueHechizo: 0, bonoCDHechizo: 0, atkMeleeExtra: 0, atkFinesseExtra: 0 };
+    const notas = [];
+    const equipo = window._equipoData || [];
+
+    const itemsEquipados = [];
+    if (armaduraEquipadaId) {
+        const it = equipo.find(e => e.nombre === armaduraEquipadaId);
+        if (it) itemsEquipados.push(it);
+    }
+    if (escudoEquipadoId) {
+        const it = equipo.find(e => e.nombre === escudoEquipadoId);
+        if (it) itemsEquipados.push(it);
+    }
+    armasEquipadas.forEach(nombre => {
+        const it = equipo.find(e => e.nombre === nombre);
+        if (it) itemsEquipados.push(it);
+    });
+
+    itemsEquipados.forEach(it => {
+        if (it.efectos) {
+            it.efectos.forEach(ef => {
+                if (ef.tipo === 'CA') bonos.CA += (ef.valor || 0);
+                else if (ef.tipo === 'salvaciones') bonos.salvaciones += (ef.valor || 0);
+                else if (ef.tipo === 'bonoAtaqueHechizo') bonos.bonoAtaqueHechizo += (ef.valor || 0);
+                else if (ef.tipo === 'bonoCDHechizo') bonos.bonoCDHechizo += (ef.valor || 0);
+                else if (ef.tipo === 'bonoAtaqueMelee') bonos.atkMeleeExtra += (ef.valor || 0);
+                else if (ef.tipo === 'ignorarCobertura') notas.push(`${it.nombre}: ignora cobertura ${ef.valor}.`);
+            });
+        }
+        // Bono de ataque propio de un arma mágica (ej: Daga +1, Moon Scimitar +1)
+        if (it.bonoAtaque) {
+            if (it.tipo === 'finesse') bonos.atkFinesseExtra += it.bonoAtaque;
+            else if (it.tipo === 'melee') bonos.atkMeleeExtra += it.bonoAtaque;
+            // 'ranged' no tiene header propio todavía, así que no se refleja en ningún lado
+        }
+    });
+
+    return { bonos, notas };
+}
+
+// Devuelve los nombres de armasEquipadas que REALMENTE ocupan una mano (manos > 0).
+// Necesario porque armasEquipadas ahora también puede tener accesorios sin manos
+// (capas, botas) que no deberían contar para reglas tipo Dueling ("sin otra arma en la otra mano").
+function nombresQueOcupanMano() {
+    const equipo = window._equipoData || [];
+    return armasEquipadas.filter(nombre => {
+        const it = equipo.find(e => e.nombre === nombre);
+        return it && it.manos > 0;
+    });
+}
+
 function calcularCA() {
     let ca = 0;
     if (armaduraEquipadaId) {
@@ -497,6 +607,8 @@ function calcularCA() {
     if (escudoEquipadoId) {
         ca += escudoEquipadoBase;
     }
+    // Sumar CA de accesorios equipados que no son armadura (ej: Capa de Protección +1 CA)
+    ca += calcularBonosEquipoActivo().bonos.CA;
     return ca;
 }
 
@@ -509,14 +621,18 @@ function recalcularYActualizarCA() {
 }
 
 function recalcularManosUsadas(equipoData) {
+    // OJO: usar "!== undefined" y no "|| 1", porque un accesorio con "manos: 0" explícito
+    // (capas, botas, etc.) es un valor falsy en JS y el "||" lo confundiría con "sin definir".
+    // Solo si el campo "manos" no existe en absoluto asumimos 1 (arma por defecto).
+    const manosDe = (item) => (item.manos !== undefined && item.manos !== null) ? item.manos : 1;
     let manos = 0;
     if (escudoEquipadoId) {
         const esc = equipoData.find(e => e.nombre === escudoEquipadoId);
-        if (esc) manos += (esc.manos || 1);
+        if (esc) manos += manosDe(esc);
     }
     armasEquipadas.forEach(nombre => {
         const arma = equipoData.find(e => e.nombre === nombre);
-        if (arma) manos += (arma.manos || 1);
+        if (arma) manos += manosDe(arma);
     });
     manosUsadas = manos;
     return manos;
@@ -749,7 +865,44 @@ function abrirModalItemInventario(item) {
     document.getElementById('inv-item-desc').innerHTML = (item.desc || '').replace(/\n/g, '<br>');
     document.getElementById('inv-item-cantidad-actual').textContent = item.cantidad;
     document.getElementById('inv-item-input').value = 0;
+
+    // El botón "Usar" solo aparece si el item tiene un campo "accion" (ej: "Acción", "Acción Bonus",
+    // "Interacción c/Objeto") — así se sabe qué recurso del turno gastar al usarlo.
+    const usarCont = document.getElementById('inv-item-usar-cont');
+    const usarBtn = document.getElementById('inv-item-usar');
+    if (usarCont && usarBtn) {
+        if (item.accion && item.cantidad > 0) {
+            usarCont.style.display = 'block';
+            usarBtn.textContent = `Usar (gasta ${item.accion})`;
+            usarBtn.disabled = false;
+        } else if (item.accion) {
+            usarCont.style.display = 'block';
+            usarBtn.textContent = 'Sin unidades';
+            usarBtn.disabled = true;
+        } else {
+            usarCont.style.display = 'none';
+        }
+    }
+
     document.getElementById('inv-item-modal').style.display = 'flex';
+}
+
+// Gasta 1 unidad del item y consume el recurso de turno correspondiente (Acción, Acción Bonus,
+// Interacción c/Objeto, etc. según lo que diga item.accion en el JSON)
+function usarItemInventario(item) {
+    if (!item || !item.accion || item.cantidad <= 0) return;
+    const r = consumirAccion(item.accion);
+    if (!r.ok) {
+        mostrarToast(r.mensaje, 'warning');
+        return;
+    }
+    item.cantidad = Math.max(0, item.cantidad - 1);
+    guardarInventario();
+    document.getElementById('inv-item-cantidad-actual').textContent = item.cantidad;
+    renderInventarioLista();
+    recalcularPesoYVelocidad(window._equipoData);
+    mostrarToast(`¡${item.nombre} usado! ${r.mensaje}`.trim());
+    document.getElementById('inv-item-modal').style.display = 'none';
 }
 
 function modificarCantidadInventario(cantidad) {
@@ -786,7 +939,11 @@ function aplicarCambioInventario() {
 function cargarTurnoEstado() {
     const guardado = localStorage.getItem(STORAGE_PREFIX + 'turno');
     if (guardado) {
-        try { turnoEstado = JSON.parse(guardado); } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1 }; }
+        try {
+            turnoEstado = JSON.parse(guardado);
+            // Compatibilidad con turnos guardados antes de que existiera "objeto"
+            if (turnoEstado.objeto === undefined) turnoEstado.objeto = 1;
+        } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 }; }
     }
 }
 
@@ -811,7 +968,18 @@ function actualizarTurnoDOM() {
 function consumirAccion(tipoAccion) {
     if (!tipoAccion) return { ok: true, mensaje: '' };
     const t = tipoAccion.toLowerCase();
-    if (t.includes('bonus') || t.includes('adicional')) {
+    // OJO: este check va primero porque "interacción" contiene la palabra "acción" como substring,
+    // así que si no lo revisamos antes, caería en el branch genérico de Acción por error.
+    if (t.includes('objeto') || t.includes('interacción') || t.includes('interaccion')) {
+        if (turnoEstado.objeto > 0) {
+            turnoEstado.objeto = 0;
+            guardarTurnoEstado();
+            actualizarTurnoDOM();
+            return { ok: true, mensaje: '' };
+        } else {
+            return { ok: false, mensaje: 'Ya usaste tu Interacción con Objeto este turno' };
+        }
+    } else if (t.includes('bonus') || t.includes('adicional')) {
         if (turnoEstado.bonus > 0) {
             turnoEstado.bonus = 0;
             guardarTurnoEstado();
@@ -848,7 +1016,7 @@ function consumirAccion(tipoAccion) {
 }
 
 function resetearTurno() {
-    turnoEstado = { accion: 1, bonus: 1, reaccion: 1 };
+    turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 };
     guardarTurnoEstado();
     actualizarTurnoDOM();
 }
@@ -938,7 +1106,8 @@ function abrirModalEscalaSlot(item, tipoAccion) {
                 actualizarRanuraDOM(nivelKey);
                 escalaModal.style.display = 'none';
                 const r = consumirAccion(tipoAccion);
-                mostrarToast(`✨ ¡${item.nombre} usado! ${dano}${item.tipoDano ? ' ' + item.tipoDano : ''} (ranura Nivel ${nivelNum}). ${r.mensaje}`.trim());
+                const notasTxt = notasEquipoActuales.length ? ` 🪄 ${notasEquipoActuales.join(' ')}` : '';
+                mostrarToast(`✨ ¡${item.nombre} usado! ${dano}${item.tipoDano ? ' ' + item.tipoDano : ''} (ranura Nivel ${nivelNum}). ${r.mensaje}${notasTxt}`.trim());
 
                 // Disparar efectos automáticos y familiar igual que un hechizo normal
                 if (item.efectos) {
@@ -993,6 +1162,118 @@ function abrirModalFormaSalvaje(habObj, tipoAccion) {
     });
 
     wsModal.style.display = 'flex';
+}
+
+// === Recuperación de ranuras (Pearl of Power, Arcane Recovery, Natural Recovery) ===
+// Dos modos:
+// - Modo "1 sola ranura" (presupuesto null): Pearl of Power. Elegís UNA ranura gastada
+//   de nivel <= maxNivel y se restaura. Se cierra solo.
+// - Modo "presupuesto combinado" (presupuesto = número): Arcane/Natural Recovery. Podés
+//   restaurar varias ranuras mientras alcance el presupuesto (nivel combinado), sin
+//   superar maxNivel por ranura individual. Se cierra con "Listo".
+function abrirModalRestaurarRanura(habObj, tipoAccion, maxNivel, presupuestoInicial) {
+    const restModal = document.getElementById('restaurar-modal');
+    const cont = document.getElementById('restaurar-opciones');
+    const titulo = document.getElementById('restaurar-modal-titulo');
+    const desc = document.getElementById('restaurar-modal-desc');
+    const presupuestoEl = document.getElementById('restaurar-presupuesto');
+    const listoBtn = document.getElementById('restaurar-listo');
+    if (!restModal || !cont || !habObj) return;
+
+    const esBudget = (presupuestoInicial !== null && presupuestoInicial !== undefined);
+    let presupuesto = esBudget ? presupuestoInicial : null;
+    let usoConsumido = false; // el cargo de la habilidad se gasta recién en la 1ra restauración real
+
+    titulo.textContent = habObj.nombre;
+    desc.textContent = esBudget
+        ? `Elegí qué ranuras restaurar (nivel combinado disponible: ${presupuesto}). Ninguna puede ser mayor a Nivel ${maxNivel}.`
+        : `Elegí UNA ranura gastada de Nivel ${maxNivel} o menor para restaurar.`;
+
+    function consumirUsoSiHaceFalta() {
+        if (usoConsumido) return true;
+        const partes = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+        let actual = parseInt(partes[0]);
+        const max = parseInt(partes[1]);
+        if (actual <= 0) {
+            mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+            return false;
+        }
+        actual -= 1;
+        habilidadesUsoState[habObj.nombre] = `${actual}/${max}`;
+        guardarHabilidadesUso();
+        actualizarHabilidadUsoDOM(habObj.nombre);
+        usoConsumido = true;
+        return true;
+    }
+
+    function render() {
+        if (presupuestoEl) {
+            if (esBudget) {
+                presupuestoEl.style.display = 'block';
+                presupuestoEl.textContent = `Nivel combinado disponible: ${presupuesto}`;
+            } else {
+                presupuestoEl.style.display = 'none';
+            }
+        }
+        cont.innerHTML = '';
+        let hayOpciones = false;
+        Object.keys(ranurasOriginales)
+            .filter(nivelKey => /^Nivel (\d+)$/.test(nivelKey))
+            .sort((a, b) => parseInt(a.replace('Nivel ', '')) - parseInt(b.replace('Nivel ', '')))
+            .forEach(nivelKey => {
+                const nivelNum = parseInt(nivelKey.replace('Nivel ', ''));
+                if (nivelNum > maxNivel) return;
+                const actual = parseInt(ranurasState[nivelKey] || 0);
+                const max = parseInt(ranurasOriginales[nivelKey] || 0);
+                const gastadas = max - actual;
+                if (gastadas <= 0) return; // no hay nada gastado en este nivel para restaurar
+                hayOpciones = true;
+
+                const sinBudgetSuficiente = esBudget && nivelNum > presupuesto;
+
+                const btn = document.createElement('button');
+                btn.className = 'hp-btn';
+                btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${sinBudgetSuficiente ? 'background-color: #999; cursor: not-allowed;' : 'background-color: var(--accent-color); color: white;'}`;
+                btn.disabled = sinBudgetSuficiente;
+                btn.innerHTML = `Restaurar ${nivelKey} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${gastadas} gastada${gastadas === 1 ? '' : 's'})</span>`;
+                btn.onclick = () => {
+                    if (!consumirUsoSiHaceFalta()) return;
+                    ranurasState[nivelKey] = String(actual + 1);
+                    guardarRanuras();
+                    actualizarRanuraDOM(nivelKey);
+                    mostrarToast(`✨ Se restauró una ranura de ${nivelKey}`);
+                    if (esBudget) {
+                        presupuesto -= nivelNum;
+                        render(); // permite seguir eligiendo mientras alcance el presupuesto
+                    } else {
+                        restModal.style.display = 'none';
+                        const r = consumirAccion(tipoAccion);
+                        if (r.mensaje) mostrarToast(r.mensaje);
+                    }
+                };
+                cont.appendChild(btn);
+            });
+
+        if (!hayOpciones) {
+            const vacio = document.createElement('div');
+            vacio.style.cssText = 'text-align: center; color: var(--text-muted); padding: 10px;';
+            vacio.textContent = 'No tenés ranuras gastadas en ese rango para restaurar.';
+            cont.appendChild(vacio);
+        }
+    }
+
+    if (listoBtn) {
+        listoBtn.onclick = () => {
+            restModal.style.display = 'none';
+            if (usoConsumido) {
+                const r = consumirAccion(tipoAccion);
+                if (r.mensaje) mostrarToast(r.mensaje);
+            }
+        };
+    }
+
+    render();
+    restModal.style.display = 'flex';
 }
 
 function actualizarHdCantidadDOM() {
@@ -1091,12 +1372,24 @@ function tomarDescanso(tipo) {
             recalcularYActualizarCA();
             mostrarToast('🛡️ Mage Armor expiró (descanso largo)', 'warning');
         }
+
+        // Circle of the Land (DnD 5.5e): la Land elegida se resetea en cada descanso largo,
+        // así que hay que volver a elegir. El selector se abre solo al terminar el descanso.
+        if (circuloDeLaTierraGlobal) {
+            localStorage.removeItem(STORAGE_PREFIX + 'landActual');
+            landActualGlobal = null;
+            const landBadge = document.getElementById('land-badge');
+            if (landBadge) landBadge.textContent = '🌍 Land: Esperando selección';
+        }
     }
 
     // Cerrar modal y notificar
     document.getElementById('rest-modal').style.display = 'none';
     if (tipo === 'largo') {
         mostrarToast('🛏️ Descanso largo completado. ¡Todo restaurado!');
+        if (circuloDeLaTierraGlobal) {
+            setTimeout(() => abrirModalLand(), 600);
+        }
     } else {
         mostrarToast('☕ Descanso corto completado.');
         // Abrir automáticamente modal de Hit Dice
@@ -1235,10 +1528,14 @@ async function init() {
                     datosEncontrados = spellConFamiliar.familiar;
                 } else {
                     // Buscar también entre las formas salvajes de habilidadesUso (Wild Shape, etc.)
+                    // y entre habilidades que invocan un compañero fijo (ej: Staff of the Python).
                     (data.habilidadesUso || []).forEach(h => {
                         if (h.formasSalvajes) {
                             const encontrada = h.formasSalvajes.find(f => f.id === saved.id);
                             if (encontrada) datosEncontrados = encontrada;
+                        }
+                        if (h.familiar && h.familiar.id === saved.id) {
+                            datosEncontrados = h.familiar;
                         }
                     });
                 }
@@ -1279,6 +1576,22 @@ async function init() {
     // Calcular valores automáticos antes de renderizar
     const nivelPersonaje = nivelTmp;
     nivelPersonajeGlobal = nivelTmp;
+
+    // === Circle of the Land (DnD 5.5e): mezclar los hechizos de la Land elegida ===
+    // Se puede cambiar la Land en cualquier momento desde el badge (pensado para usarse
+    // en cada descanso largo). Solo se agregan los hechizos ya desbloqueados por nivel.
+    let landActual = null;
+    if (data.circuloDeLaTierra) {
+        const landGuardada = localStorage.getItem(STORAGE_PREFIX + 'landActual');
+        const candidata = landGuardada || data.circuloDeLaTierra.landActual || null;
+        if (candidata && data.circuloDeLaTierra.opciones[candidata]) {
+            landActual = candidata;
+            const spellsDeLand = data.circuloDeLaTierra.opciones[landActual].spells
+                .filter(s => (s.nivelDruidaRequerido || 0) <= nivelPersonaje);
+            data.hechizos.lista = [...data.hechizos.lista, ...spellsDeLand];
+        }
+    }
+
     const modDex = formatMod(obtenerMod(data.modificadores, "DEX"));
     proficienciaActual = profBonusTmp;
 
@@ -1320,6 +1633,11 @@ async function init() {
         }
         recalcularManosUsadas(data.equipo);
     }
+
+    // Guardar equipo globalmente cuanto antes: lo necesitan funciones top-level como
+    // calcularCA()/calcularBonosEquipoActivo() que corren ANTES de llegar al bloque
+    // original donde esto se seteaba (línea de más abajo, ahora redundante pero inofensiva).
+    window._equipoData = data.equipo;
 
     if (impG && data.improvements) {
         const agregar = (titulo, texto) => {
@@ -1441,7 +1759,12 @@ async function init() {
         sG.insertBefore(placeholder, sG.children[2]);
     }
     data.modificadores.forEach(i => mG.appendChild(createBtn(i)));
-    data.salvaciones.forEach(i => vG.appendChild(createBtn(i)));
+    data.salvaciones.forEach(i => {
+        const btn = createBtn(i);
+        btn.dataset.saveNombre = i.nombre;
+        btn.dataset.saveBase = String(parseMod(i.valor));
+        vG.appendChild(btn);
+    });
     data.habilidades.forEach(i => skG.appendChild(createBtn(i)));
 
     // Rasgos (mergeamos los del background primero para que aparezcan en la lista)
@@ -1515,8 +1838,11 @@ async function init() {
         if (i.dano && i.tipo) {
             const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
             const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
-            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, armasEquipadas);
-            danoFinal = formatearDanoConBonos(i.dano, modUsado, bonosInfo.detalles);
+            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
+            const detallesConMagico = i.bonoDano
+                ? [...bonosInfo.detalles, { nombre: 'Arma mágica', valor: i.bonoDano }]
+                : bonosInfo.detalles;
+            danoFinal = formatearDanoConBonos(i.dano, modUsado, detallesConMagico);
         }
         if (i.ataques && i.ataques > 1 && danoFinal) {
             danoFinal = `${danoFinal} ×${i.ataques}`;
@@ -1593,16 +1919,31 @@ async function init() {
                 modUsado = (item.tipo === 'finesse') ? modDexGlobal : modStrGlobal;
                 nombreModUsado = (item.tipo === 'finesse') ? 'DEX' : 'STR';
             }
-            const bonosModalInfo = calcularBonosDano(item, esHechizoItem, rasgosGlobal, statsGlobal, data.equipo);
+            const bonosModalInfo = calcularBonosDano(item, esHechizoItem, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
             const ataquesItem = esHechizoItem ? resolverAtaques(item, nivelPersonaje) : (item.ataques || 1);
-            danoTexto = formatearDanoConBonos(danoBase, modUsado, bonosModalInfo.detalles);
+            const detallesModalConMagico = (!esHechizoItem && item.bonoDano)
+                ? [...bonosModalInfo.detalles, { nombre: 'Arma mágica', valor: item.bonoDano }]
+                : bonosModalInfo.detalles;
+            danoTexto = formatearDanoConBonos(danoBase, modUsado, detallesModalConMagico);
             if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
 
             // Tooltip con detalle de bonos
-            const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, bonosModalInfo.detalles);
+            const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, detallesModalConMagico);
             if (detalleStr) {
                 partes.push(`<span style="font-size: 0.8rem; color: var(--text-muted); padding: 2px 6px;">${detalleStr}</span>`);
+            }
+
+            // Curación extra por rasgo (ej: Disciple of Life, Blessed Healer): se muestra como
+            // badge "+N (Nombre del rasgo)" directo en el modal, antes de siquiera usar el hechizo.
+            if (item.tipoDano === 'curación' && item.efectos) {
+                const nivelBaseSpell = parseInt((item.nivel || '').replace(/[^0-9]/g, '')) || 0;
+                item.efectos
+                    .filter(e => e.tipo === 'autoCuracion' && (!e.rasgoRequerido || tieneRasgo(e.rasgoRequerido)))
+                    .forEach(e => {
+                        const valorExtra = evaluarFormula(e.formula, { nivelHechizo: nivelBaseSpell, nivelPersonaje: nivelPersonajeGlobal });
+                        partes.push(`<span class="skill-mod" style="background-color: #2e7d32; color: white;">+${valorExtra} (${e.descripcion || e.rasgoRequerido})</span>`);
+                    });
             }
         }
 
@@ -1734,7 +2075,10 @@ async function init() {
         // Botón Equipar (solo armaduras, escudos o armas con manos)
         const modalEquipar = document.getElementById('modal-equipar');
         const btnEqModal = document.getElementById('btn-equipar-modal');
-        const esEquipable = item.esArmadura || (item.manos && item.manos > 0);
+        // Equipable si: es armadura/escudo, ocupa manos (arma/vara/varita), tiene efectos numéricos
+        // (capas, etc. que no ocupan manos), o está marcado explícitamente como "equipable"
+        // (accesorios sin efecto numérico, como botas, que igual querés poder marcar como puestas).
+        const esEquipable = item.esArmadura || (item.manos && item.manos > 0) || (item.efectos && item.efectos.length > 0) || item.equipable === true;
 
         if (esEquipable && modalEquipar && btnEqModal) {
             modalEquipar.style.display = 'block';
@@ -1852,6 +2196,8 @@ async function init() {
             recalcularManosUsadas(data.equipo);
             actualizarManosDOM();
             recalcularYActualizarCA();
+            actualizarBonosHeaderDOM();
+            actualizarSalvacionesDOM();
 
             // Refrescar todas las cards de equipo (para badge "Equipado")
             data.equipo.forEach(eqItem => refrescarCardEquipado(eqItem));
@@ -1912,6 +2258,13 @@ async function init() {
         invItemCloseBtn.addEventListener('click', () => invItemModal.style.display = 'none');
     }
     window.addEventListener('click', (e) => { if (e.target === invItemModal) invItemModal.style.display = 'none'; });
+
+    const invItemUsarBtn = document.getElementById('inv-item-usar');
+    if (invItemUsarBtn) {
+        invItemUsarBtn.addEventListener('click', () => {
+            if (itemInventarioActual) usarItemInventario(itemInventarioActual);
+        });
+    }
 
     // Listeners del modal de confirmación
     const invConfirmModal = document.getElementById('inv-confirm-modal');
@@ -2072,34 +2425,50 @@ async function init() {
     }
     window.addEventListener('click', (e) => { if (e.target === actionSurgeModal) actionSurgeModal.style.display = 'none'; });
 
-    // Calcular y mostrar Save DC y Spell Attack Bonus en headers
-    const saveDC = 8 + proficienciaActual + modPrincipal;
-    const spellAttackBonus = formatMod(proficienciaActual + modPrincipal);
+    // Calcular y mostrar Save DC, Spell Attack Bonus y Atk Melee/Finesse en headers
+    // (función reutilizable: se vuelve a llamar cada vez que se equipa/desequipa algo)
+    function actualizarBonosHeaderDOM() {
+        const { bonos, notas } = calcularBonosEquipoActivo();
+        notasEquipoActuales = notas; // Guardado global para mostrarlas al usar un hechizo
 
-    // Calcular Atk Bonus de armas Melee (STR) y Finesse (DEX)
-    const atkMeleeBonus = formatMod(proficienciaActual + modStr);
-    const atkFinesseBonus = formatMod(proficienciaActual + modDexNum);
+        const saveDCActual = 8 + proficienciaActual + modPrincipal + bonos.bonoCDHechizo;
+        const spellAttackBonusActual = formatMod(proficienciaActual + modPrincipal + bonos.bonoAtaqueHechizo);
+        const atkMeleeBonusActual = formatMod(proficienciaActual + modStr + bonos.atkMeleeExtra);
+        const atkFinesseBonusActual = formatMod(proficienciaActual + modDexNum + bonos.atkFinesseExtra);
 
-    // Detectar si el personaje tiene armas de cada tipo
-    const tieneMelee = data.equipo.some(e => e.tipo === 'melee');
-    const tieneFinesse = data.equipo.some(e => e.tipo === 'finesse');
+        const tieneMelee = data.equipo.some(e => e.tipo === 'melee');
+        const tieneFinesse = data.equipo.some(e => e.tipo === 'finesse');
 
-    document.querySelectorAll('.proficient').forEach(span => {
-        const txt = span.textContent;
-        if (txt.includes('Spell Attack Bonus')) {
-            span.textContent = `Spell Attack Bonus: ${spellAttackBonus}`;
-        } else if (txt.includes('Spell Save DC')) {
-            span.textContent = `Spell Save DC: ${saveDC}`;
-        } else if (txt.includes('Save DC')) {
-            span.textContent = `Save DC: ${saveDC}`;
-        } else if (txt.includes('Atk Melee')) {
-            span.textContent = `Atk Melee: ${atkMeleeBonus}`;
-            if (!tieneMelee) span.style.display = 'none';
-        } else if (txt.includes('Atk Finesse')) {
-            span.textContent = `Atk Finesse: ${atkFinesseBonus}`;
-            if (!tieneFinesse) span.style.display = 'none';
-        }
-    });
+        document.querySelectorAll('.proficient').forEach(span => {
+            const txt = span.textContent;
+            if (txt.includes('Spell Attack Bonus')) {
+                span.textContent = `Spell Attack Bonus: ${spellAttackBonusActual}`;
+            } else if (txt.includes('Spell Save DC')) {
+                span.textContent = `Spell Save DC: ${saveDCActual}`;
+            } else if (txt.includes('Save DC')) {
+                span.textContent = `Save DC: ${saveDCActual}`;
+            } else if (txt.includes('Atk Melee')) {
+                span.textContent = `Atk Melee: ${atkMeleeBonusActual}`;
+                if (!tieneMelee) span.style.display = 'none';
+            } else if (txt.includes('Atk Finesse')) {
+                span.textContent = `Atk Finesse: ${atkFinesseBonusActual}`;
+                if (!tieneFinesse) span.style.display = 'none';
+            }
+        });
+    }
+    actualizarBonosHeaderDOM();
+
+    // Recalcula el valor mostrado de cada salvación sumando el bono de equipo activo
+    // (ej: Capa de Protección +1 a todas las salvaciones)
+    function actualizarSalvacionesDOM() {
+        const { bonos } = calcularBonosEquipoActivo();
+        document.querySelectorAll('#saves-grid .skill-btn[data-save-nombre]').forEach(btn => {
+            const base = parseInt(btn.dataset.saveBase, 10) || 0;
+            const mod = btn.querySelector('.skill-mod');
+            if (mod) mod.textContent = formatMod(base + bonos.salvaciones);
+        });
+    }
+    actualizarSalvacionesDOM();
 
     // Habilidades con usos
     if (data.habilidadesUso) {
@@ -2334,6 +2703,51 @@ async function init() {
                     return;
                 }
 
+                // Si la habilidad invoca un compañero fijo (ej: Staff of the Python), no hay que
+                // elegir nada: se activa directo. Pero no se puede usar si el personaje está
+                // actualmente transformado con Wild Shape (no tiene manos para usar el bastón).
+                if (habObj && habObj.familiar) {
+                    const enFormaSalvaje = familiarActivo && familiarDataActual && familiarDataActual.tipo && familiarDataActual.tipo.startsWith('Forma Salvaje');
+                    if (enFormaSalvaje) {
+                        mostrarToast(`No podés usar ${habObj.nombre} mientras estás transformado con Wild Shape`, 'warning');
+                        return;
+                    }
+                    const partesComp = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+                    let actualComp = parseInt(partesComp[0]);
+                    const maxComp = parseInt(partesComp[1]);
+                    if (actualComp <= 0) {
+                        mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+                        return;
+                    }
+                    actualComp -= 1;
+                    habilidadesUsoState[habObj.nombre] = `${actualComp}/${maxComp}`;
+                    guardarHabilidadesUso();
+                    actualizarHabilidadUsoDOM(habObj.nombre);
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const rComp = consumirAccion(tipoAccion);
+                    activarFamiliar(habObj.familiar, `${habObj.familiar.emoji || '🐾'} ¡${habObj.familiar.nombre} invocada! ${rComp.mensaje}`.trim());
+                    return;
+                }
+
+                // Si la habilidad restaura UNA ranura gastada (ej: Pearl of Power)
+                if (habObj && habObj.restaurarRanura) {
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    abrirModalRestaurarRanura(habObj, tipoAccion, habObj.restaurarRanura.maxNivel, null);
+                    return;
+                }
+
+                // Si la habilidad restaura ranuras por presupuesto combinado (ej: Arcane Recovery,
+                // Natural Recovery): presupuesto = mitad del nivel de personaje, redondeado arriba.
+                if (habObj && habObj.recuperacionPresupuesto) {
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const presupuesto = Math.ceil(nivelPersonajeGlobal / 2);
+                    abrirModalRestaurarRanura(habObj, tipoAccion, habObj.recuperacionPresupuesto.maxNivelSlot, presupuesto);
+                    return;
+                }
+
                 usarHabilidad(habilidad);
                 useSpellBtn.dataset.habilidad = '';
                 const r = consumirAccion(tipoAccion);
@@ -2354,7 +2768,8 @@ async function init() {
             if (useSpellBtn.dataset.cantrip === 'true') {
                 modal.style.display = 'none';
                 const r = consumirAccion(tipoAccion);
-                mostrarToast(`¡Cantrip usado! ✨ ${r.mensaje}`.trim());
+                const notasTxt = notasEquipoActuales.length ? ` 🪄 ${notasEquipoActuales.join(' ')}` : '';
+                mostrarToast(`¡Cantrip usado! ✨ ${r.mensaje}${notasTxt}`.trim());
                 useSpellBtn.dataset.cantrip = '';
                 return;
             }
@@ -2409,10 +2824,11 @@ async function init() {
                 actualizarRanuraDOM(nivel);
                 modal.style.display = 'none';
                 const r = consumirAccion(tipoAccion);
+                const notasTxt = notasEquipoActuales.length ? ` 🪄 ${notasEquipoActuales.join(' ')}` : '';
                 if (actual === 0) {
-                    mostrarToast(`¡Hechizo usado! Sin ranuras de ${nivel}. ${r.mensaje}`.trim(), 'warning');
+                    mostrarToast(`¡Hechizo usado! Sin ranuras de ${nivel}. ${r.mensaje}${notasTxt}`.trim(), 'warning');
                 } else {
-                    mostrarToast(`¡Hechizo usado! Quedan ${actual} de ${nivel}. ${r.mensaje}`.trim());
+                    mostrarToast(`¡Hechizo usado! Quedan ${actual} de ${nivel}. ${r.mensaje}${notasTxt}`.trim());
                 }
 
                 // Disparar efectos automáticos del hechizo (Blessed Healer, Disciple of Life, etc.)
@@ -2703,6 +3119,41 @@ async function init() {
         });
     }
     window.addEventListener('click', (e) => { if (e.target === wildshapeModal) wildshapeModal.style.display = 'none'; });
+
+    // Modal de restaurar ranuras (Pearl of Power, Arcane/Natural Recovery): cerrar con la X
+    const restaurarModal = document.getElementById('restaurar-modal');
+    const restaurarCloseBtn = document.querySelector('.close-btn-restaurar');
+    if (restaurarCloseBtn) {
+        restaurarCloseBtn.addEventListener('click', () => restaurarModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === restaurarModal) restaurarModal.style.display = 'none'; });
+
+    // === UI de selección de Land (Circle of the Land, DnD 5.5e) ===
+    const landBadge = document.getElementById('land-badge');
+    const landModal = document.getElementById('land-modal');
+    const landCloseBtn = document.querySelector('.close-btn-land');
+
+    // Guardar en globales para que abrirModalLand() y tomarDescanso() puedan usarlos sin closures
+    circuloDeLaTierraGlobal = data.circuloDeLaTierra || null;
+    landActualGlobal = landActual;
+
+    if (data.circuloDeLaTierra && landBadge) {
+        landBadge.style.display = 'inline-block';
+        landBadge.textContent = landActual
+            ? `${EMOJI_LAND[landActual] || '🌍'} Land: ${landActual}`
+            : '🌍 Land: Esperando selección';
+        landBadge.addEventListener('click', () => abrirModalLand());
+
+        // Si la clase tiene Circle of the Land pero no hay Land elegida (recién cargada la
+        // página, o se reseteó en el último descanso largo), abrir el selector automáticamente.
+        if (!landActual) {
+            setTimeout(() => abrirModalLand(), 400);
+        }
+    }
+    if (landCloseBtn && landModal) {
+        landCloseBtn.addEventListener('click', () => landModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (landModal && e.target === landModal) landModal.style.display = 'none'; });
 
     // Modal de Hit Dice: cerrar
     const hdModal = document.getElementById('hd-modal');

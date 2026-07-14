@@ -1,0 +1,464 @@
+{
+  "personaje": {
+    "nombre": "Orfe",
+    "clase": "Druida",
+    "raza": "Variant Human",
+    "tamano": "estandar",
+    "stats": {
+      "STR": 8,
+      "DEX": 15,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 15,
+      "CHA": 8
+    }
+  },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "DEX",
+            "valor": 1,
+            "motivo": "Variant Human"
+        },
+        {
+            "atributo": "WIS",
+            "valor": 1,
+            "motivo": "Variant Human"
+        }
+    ],
+    "feats": [
+        {
+            "nivel": 1,
+            "nombre": "Observant",
+            "atributos": {
+                "WIS": 1
+            }
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 4,
+            "atributos": {
+                "WIS": 2
+            }
+        }
+    ]
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "52/52" },
+    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "22" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": true },
+    { "nombre": "Conoc. Arcano", "proficiente": false },
+    { "nombre": "Engaño", "proficiente": false },
+    { "nombre": "Historia", "proficiente": false },
+    { "nombre": "Interpretación", "proficiente": false },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": true },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": true },
+    { "nombre": "Persuasión", "proficiente": false },
+    { "nombre": "Perspicacia", "proficiente": false },
+    { "nombre": "Religión", "proficiente": false },
+    { "nombre": "Sigilo", "proficiente": false },
+    { "nombre": "Supervivencia", "proficiente": true },
+    { "nombre": "Trato animal", "proficiente": true }
+  ],
+  "background": {
+    "nombre": "Outlander",
+    "habilidades": [
+      {
+        "nombre": "Wanderer",
+        "desc": "Tenés una memoria excelente para mapas y geografía. Siempre recordás el terreno y podés encontrar comida y agua suficiente para vos y hasta cinco personas cada día, siempre que el entorno lo permita."
+      }
+    ]
+  },
+  "rasgos": [
+    {
+      "nombre": "Idiomas",
+      "desc": "Podés hablar los idiomas Common, druidic, Halfling, Gnomish."
+    },
+    {
+      "nombre": "Wild Shape",
+      "desc": "Podés transformarte dos veces por descanso en una bestia CR 1/2 o menor que hayas visto, sin velocidad de vuelo. La transformación dura hasta 3 horas."
+    },
+    {
+      "nombre": "Circle of the Land",
+      "desc": "Pertenecés al Círculo de la Tierra y obtenés rasgos adicionales relacionados con la naturaleza."
+    },
+    {
+      "nombre": "Natural Recovery",
+      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado igual a la mitad de tu nivel de druida (redondeado hacia arriba), sin poder recuperar ranuras de nivel 6 o mayor."
+    },
+    {
+      "nombre": "Land's Stride",
+      "desc": "Ignorás terreno difícil no mágico y atravesás plantas no mágicas sin ser ralentizado ni recibir daño."
+    },
+    {
+      "nombre": "Observant",
+      "desc": "Podés leer labios de criaturas cuyo idioma entendés y obtenés +5 a Percepción Pasiva e Investigación Pasiva."
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Natural Recovery",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Especial",
+      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado igual a la mitad de tu nivel de druida (redondeado hacia arriba), sin poder recuperar ranuras de nivel 6 o mayor.",
+      "recuperacionPresupuesto": {
+        "formula": "mitadNivelArriba",
+        "maxNivelSlot": 6
+      }
+    },
+    {
+      "nombre": "Wild Shape",
+      "usos": "2/2",
+      "recupera": "corto",
+      "accion": "Acción",
+      "desc": "Te transformás en una bestia que hayas visto de CR 1/2 o menor durante un máximo de 3 horas. Al usarla, elegís a qué animal transformarte.",
+      "formasSalvajes": [
+        {
+          "id": "wildshape-orfe-ape",
+          "nombre": "Ape",
+          "tipo": "Forma Salvaje (CR 1/2)",
+          "emoji": "🦍",
+          "vidaMaxima": 19,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Multiataque: 2 Puñetazos por turno (repetí el ataque de abajo dos veces).",
+          "ataques": [
+            { "nombre": "Puñetazo (Fist)", "dano": "1d6+3", "desc": "+5 al ataque. Contundente." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-brown-bear",
+          "nombre": "Brown Bear",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐻",
+          "vidaMaxima": 34,
+          "ca": 11,
+          "mod": "STR +4 / DEX +0 / CON +3",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+4", "desc": "+6 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claws)", "dano": "2d6+4", "desc": "+6 al ataque. Cortante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-dire-wolf",
+          "nombre": "Dire Wolf",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐺",
+          "vidaMaxima": 37,
+          "ca": 14,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Si el mordisco impacta a una criatura mediana o menor, hace tirada de salvación de FUE (DC 13) o cae Derribada.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "2d6+3", "desc": "+5 al ataque. Perforante. DC 13 STR o Derribado." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-giant-hyena",
+          "nombre": "Giant Hyena",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐆",
+          "vidaMaxima": 45,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Ventaja en ataques contra criaturas que ya estén heridas (con HP actual menor al máximo).",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+4 al ataque. Perforante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-giant-spider",
+          "nombre": "Giant Spider",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🕷️",
+          "vidaMaxima": 26,
+          "ca": 14,
+          "mod": "STR +2 / DEX +3 / CON +1",
+          "notas": "Puede trepar y caminar por telarañas sin dificultad. También puede disparar Telaraña (60ft, restringe) en vez de morder.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+5 al ataque. Perforante + 3d6 veneno (DC 11 CON, mitad si pasa)." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-lion",
+          "nombre": "Lion",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🦁",
+          "vidaMaxima": 26,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +1",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno. Ventaja al ataque si un aliado está adyacente al objetivo.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+5 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claw)", "dano": "1d6+3", "desc": "+5 al ataque. Cortante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-tiger",
+          "nombre": "Tiger",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐅",
+          "vidaMaxima": 37,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d10+3", "desc": "+5 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claw)", "dano": "1d8+3", "desc": "+5 al ataque. Cortante." }
+          ]
+        }
+      ]
+    },
+    {
+      "nombre": "Staff of the Python",
+      "usos": "1/1",
+      "recupera": "ninguno",
+      "accion": "Acción",
+      "desc": "El bastón se transforma en una Pitón Gigante amistosa bajo tu control. Puede combatir junto al druida. Si la pitón muere, el bastón queda destruido. Solo podés usarlo si no estás transformado con Wild Shape.",
+      "familiar": {
+        "id": "staff-python-orfe",
+        "nombre": "Pitón Gigante (Staff of the Python)",
+        "tipo": "Compañero invocado",
+        "emoji": "🐍",
+        "vidaMaxima": 60,
+        "ca": 12,
+        "mod": "STR +4 / DEX +2 / CON +1",
+        "notas": "Si llega a 0 HP, el bastón queda destruido PARA SIEMPRE (no se recupera con descansos). Constrict: si el mordisco agarra al objetivo, en el próximo turno puede usar Constrict en vez de Morder.",
+        "ataques": [
+          { "nombre": "Mordisco (Bite)", "dano": "2d6+4", "desc": "+7 al ataque. Perforante." },
+          { "nombre": "Constricción (Constrict)", "dano": "2d8+4", "desc": "+7 al ataque. Contundente + el objetivo queda Agarrado (DC 16 para escapar) y Restringido mientras dure el agarre." }
+        ]
+      }
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Hide Armor +1",
+      "esArmadura": true,
+      "tipoArmadura": "media",
+      "armaduraBase": 13,
+      "manos": 0,
+      "peso": 12,
+      "valor": 500,
+      "magico": true,
+      "desc": "Armadura de cuero endurecido mágica. CA: 14 + Modificador de Destreza (máximo +2)."
+    },
+    {
+      "nombre": "Shield",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 2,
+      "manos": 1,
+      "peso": 6,
+      "valor": 10,
+      "desc": "Escudo. Otorga +2 a la Clase de Armadura mientras se empuña."
+    },
+    {
+      "nombre": "Moon Scimitar +1",
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 1000,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "desc": "Hoz mágica. Otorga +1 a las tiradas de ataque y daño con esta arma. También otorga +1 a las tiradas de ataque con hechizos y +1 a la CD de los conjuros. Cuando curás con un hechizo, una criatura afectada recupera 1d4 puntos de vida adicionales.",
+      "efectos": [
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoCDHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoAtaqueMelee",
+          "valor": 1
+        },
+        {
+          "tipo": "curacionExtra",
+          "valor": "1d4"
+        }
+      ]
+    },
+    {
+      "nombre": "Boots of Elvenkind",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 250,
+      "magico": true,
+      "desc": "Botas mágicas. Tus pasos no producen sonido. Las criaturas tienen desventaja en pruebas para escucharte cuando te movés."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Guidance",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "El objetivo suma 1d4 a una tirada de habilidad antes de que termine el hechizo."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Magic Stone",
+        "accion": "Acción Bonus",
+        "distancia": "Toque",
+        "desc": "Encantás hasta tres piedras. Cada una puede lanzarse para causar 1d6 + Sabiduría de daño contundente."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Produce Flame",
+        "dano": "1d8",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "desc": "Creás una llama en tu mano que ilumina y puede lanzarse contra un enemigo."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Shillelagh",
+        "accion": "Acción Bonus",
+        "distancia": "Toque",
+        "duracion": "1 minuto",
+        "desc": "Un bastón o garrote mágico usa Sabiduría para atacar y hace 1d8 de daño."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Faerie Fire",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Los objetivos en un cubo de 20 pies realizan una salvación de Destreza. Quienes fallen quedan iluminados y los ataques contra ellos tienen ventaja."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Healing Word",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Una criatura recupera 1d4 + modificador de Sabiduría puntos de vida."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Ice Knife",
+        "dano": "1d10",
+        "tipoDano": "perforante",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Lanzás una daga de hielo. Si impacta hace daño perforante y luego explota causando 2d6 de daño de frío en un radio de 5 pies."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Speak with Animals",
+        "accion": "Acción",
+        "duracion": "10 minutos",
+        "desc": "Podés comunicarte verbalmente con bestias durante la duración del hechizo."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Flame Blade",
+        "dano": "3d6",
+        "tipoDano": "fuego",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Invocás una espada de fuego que realiza ataques cuerpo a cuerpo usando tu modificador de conjuro."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Invisibility",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Una criatura se vuelve invisible hasta que ataque, lance un conjuro o el hechizo termine."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Pass without Trace",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Vos y los aliados cercanos obtienen +10 a las tiradas de Sigilo y no dejan rastros."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Daylight",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "1 hora",
+        "desc": "Creás una esfera de luz brillante de 60 pies que disipa oscuridad mágica de nivel bajo."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Haste",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Una criatura duplica su velocidad, obtiene +2 CA, ventaja en salvaciones de Destreza y una acción adicional limitada cada turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Blight",
+        "dano": "8d8",
+        "tipoDano": "necrótico",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "desc": "Una criatura que puedas ver en rango se marchita por magia necromántica. Hace tirada de salvación de Constitución: 8d8 de daño necrótico si falla, mitad si pasa. Una planta que no sea una criatura (sin dueño) falla automáticamente la salvación y recibe el daño máximo. Una criatura tipo planta tiene desventaja en esta salvación. Cada slot superior al 4 suma 1d8.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "4": "8d8"
+          }
+        }
+      }
+    ]
+  },
+  "inventario": [
+    {
+      "nombre": "Leña",
+      "peso": 1,
+      "cantidad": 2,
+      "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 50,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Scroll of Protection from Energy",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Protection from Energy una única vez. Luego de usarlo, el pergamino se destruye.\n\nProtection from Energy: Durante hasta 1 hora (requiere concentración), una criatura que toques obtiene resistencia a un tipo de daño elegido: ácido, frío, fuego, relámpago o trueno."
+    }
+  ]
+}

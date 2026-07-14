@@ -87,7 +87,6 @@
   ],
   "habilidadesUso": [
     { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
-    { "nombre": "Burning Hands", "usos": "1/1", "recupera": "largo", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 5d6 de daño de fuego si fallan, si aciertan la mitad." },
     { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." },
     {
       "nombre": "Eldritch Invocation: Grasp of Hadar",
@@ -118,12 +117,17 @@
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
-      "armaduraBase": 1,
+      "equipable": true,
+      "manos": 0,
       "peso": 1,
       "valor": 2000,
       "magico": true,
       "desc": "Capa mágica. Mientras esté equipada obtenés +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
       "efectos": [
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
         {
           "tipo": "salvaciones",
           "valor": 1
@@ -135,7 +139,17 @@
       "manos": 1, 
       "peso": 5,
       "valor": 1000,
-      "desc": "Mientras sostengas esta vara mágica, obtenés +1 a las tiradas de ataque con hechizos de brujo y +1 a la CD de salvación de tus hechizos de brujo."
+      "desc": "Mientras sostengas esta vara mágica, obtenés +1 a las tiradas de ataque con hechizos de brujo y +1 a la CD de salvación de tus hechizos de brujo.",
+      "efectos": [
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoCDHechizo",
+          "valor": 1
+        }
+      ]
     },
     {
       "nombre": "Ballesta Ligera", 
@@ -176,6 +190,17 @@
           { "nivel": "CANTRIPS", "nombre": "Eldritch Blast", "dano": "1d10", "ataques": 1, "escalaAtaques": { "5": 2, "11": 3, "17": 4 }, "tipoDano": "fuerza", "accion": "Acción", "distancia": "120 ft", "desc": "Lanza un rayo de energía. Hacé tirada de ataque por cada rayo. A nivel 5+ son 2 rayos, nivel 11+ son 3, nivel 17+ son 4. Cada rayo hace 1d10 + bono de Agonizing Blast (CHA) si lo tenés." },
           { "nivel": "CANTRIPS", "nombre": "Mage Hand", "accion": "Acción", "distancia": "30 ft", "duracion": "1 minuto", "desc": "Crea una mano espectral que dura hasta 1 minuto y desaparece si se aleja más de 30ft del usuario. Puede manipular objetos no mágicos ni cargar más de 10 pounds." },
           { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "escala": { "5": "2d6", "11": "3d6", "17": "4d6" }, "tipoDano": "psíquico", "accion": "Acción", "distancia": "60 ft", "duracion": "1 ronda", "desc": "Dispara un pico de energía psíquica. El objetivo hace salvación de INT o recibe daño psíquico y resta 1d4 a su próxima tirada de salvación antes del final de tu próximo turno." },
+          { "nivel": "NIVEL 4", "nombre": "Burning Hands (Nivel real 1)", "dano": "3d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 2d6 + 1d6 por nivel de la ranura usada de daño de fuego si fallan (mínimo 3d6 a nivel 1), o la mitad si aciertan la salvación.",
+            "escalaSlot": {
+              "danoPorNivel": {
+                "1": "3d6",
+                "2": "4d6",
+                "3": "5d6",
+                "4": "6d6",
+                "5": "7d6"
+              }
+            }
+          },
           { "nivel": "NIVEL 4", "nombre": "Find Familiar (Nivel real 1)", "accion": "Acción", "distancia": "10 ft", "duracion": "1 hora", "desc": "Puede invocar un familiar animal o especial y se comunican telepáticamente.",
             "familiar": {
               "_nota": "Confirmado por el usuario: Imp, 10 HP, 13 CA. Ataque tomado del stat block estándar del Imp.",

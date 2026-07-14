@@ -85,7 +85,7 @@
     { "nombre": "Fey Ancestry", "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir." },
     { "nombre": "Elf Weapon Training", "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
     { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." },
-    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. <br>Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate. <br>(Si se hace un descanso corto y es de 4 horas, cuenta como descanso largo)."}
+    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."}
   ],
   "habilidadesUso": [
     {
@@ -94,14 +94,21 @@
       "recupera": "largo",
       "accion": "Especial",
       "distancia": "Propio",
-      "desc": "Una vez por día, después de terminar un descanso corto, podés recuperar ranuras de hechizo gastadas. Las ranuras pueden tener un nivel total combinado igual o menor a la mitad de tu nivel de mago (redondeado hacia arriba), y ninguna ranura individual puede ser de nivel 6 o superior. A nivel 6 podés recuperar 3 niveles totales (ej: 1 ranura de Nivel 3, o 1 de Nivel 2 + 1 de Nivel 1)."
+      "desc": "Una vez por día, después de terminar un descanso corto, podés recuperar ranuras de hechizo gastadas. Las ranuras pueden tener un nivel total combinado igual o menor a la mitad de tu nivel de mago (redondeado hacia arriba), y ninguna ranura individual puede ser de nivel 6 o superior. A nivel 6 podés recuperar 3 niveles totales (ej: 1 ranura de Nivel 3, o 1 de Nivel 2 + 1 de Nivel 1).",
+      "recuperacionPresupuesto": {
+        "formula": "mitadNivelArriba",
+        "maxNivelSlot": 5
+      }
     },
     {
       "nombre": "Perla de poder (Pearl of Power)",
       "usos": "1/1",
       "recupera": "largo",
       "accion": "Acción",
-      "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor."
+      "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor.",
+      "restaurarRanura": {
+        "maxNivel": 3
+      }
     },
     {
       "nombre": "Sombrero del disfraz (Hat of Disguise)",
@@ -113,6 +120,8 @@
   "equipo": [
     {
       "nombre": "Capa de protección (Cloak of Protection)",
+      "equipable": true,
+      "manos": 0,
       "peso": 1,
       "valor": 2000,
       "magico": true,

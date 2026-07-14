@@ -98,7 +98,7 @@
     },
     {
       "nombre": "Natural Recovery",
-      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado de la mitad de tu nivel redondeado para arriba, no podes recuperar slots mayores a nivel 6"
+      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado igual a la mitad de tu nivel de druida (redondeado hacia arriba), sin poder recuperar ranuras de nivel 6 o mayor."
     },
     {
       "nombre": "Land's Stride",
@@ -110,6 +110,17 @@
     }
   ],
   "habilidadesUso": [
+    {
+      "nombre": "Natural Recovery",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Especial",
+      "desc": "Durante un descanso corto recuperás espacios de conjuro con un nivel combinado igual a la mitad de tu nivel de druida (redondeado hacia arriba), sin poder recuperar ranuras de nivel 6 o mayor.",
+      "recuperacionPresupuesto": {
+        "formula": "mitadNivelArriba",
+        "maxNivelSlot": 6
+      }
+    },
     {
       "nombre": "Wild Shape",
       "usos": "2/2",
@@ -218,7 +229,21 @@
       "usos": "1/1",
       "recupera": "ninguno",
       "accion": "Acción",
-      "desc": "El bastón se transforma en una Pitón Gigante amistosa bajo tu control. Puede combatir junto al druida. Si la pitón muere, el bastón queda destruido."
+      "desc": "El bastón se transforma en una Pitón Gigante amistosa bajo tu control. Puede combatir junto al druida. Si la pitón muere, el bastón queda destruido. Solo podés usarlo si no estás transformado con Wild Shape.",
+      "familiar": {
+        "id": "staff-python-orfe",
+        "nombre": "Pitón Gigante (Staff of the Python)",
+        "tipo": "Compañero invocado",
+        "emoji": "🐍",
+        "vidaMaxima": 60,
+        "ca": 12,
+        "mod": "STR +4 / DEX +2 / CON +1",
+        "notas": "Si llega a 0 HP, el bastón queda destruido PARA SIEMPRE (no se recupera con descansos). Constrict: si el mordisco agarra al objetivo, en el próximo turno puede usar Constrict en vez de Morder.",
+        "ataques": [
+          { "nombre": "Mordisco (Bite)", "dano": "2d6+4", "desc": "+7 al ataque. Perforante." },
+          { "nombre": "Constricción (Constrict)", "dano": "2d8+4", "desc": "+7 al ataque. Contundente + el objetivo queda Agarrado (DC 16 para escapar) y Restringido mientras dure el agarre." }
+        ]
+      }
     }
   ],
   "equipo": [
@@ -267,6 +292,10 @@
           "valor": 1
         },
         {
+          "tipo": "bonoAtaqueMelee",
+          "valor": 1
+        },
+        {
           "tipo": "curacionExtra",
           "valor": "1d4"
         }
@@ -274,8 +303,7 @@
     },
     {
       "nombre": "Boots of Elvenkind",
-      "esArmadura": true,
-      "tipoArmadura": "botas",
+      "equipable": true,
       "manos": 0,
       "peso": 1,
       "valor": 250,
@@ -283,6 +311,68 @@
       "desc": "Botas mágicas. Tus pasos no producen sonido. Las criaturas tienen desventaja en pruebas para escucharte cuando te movés."
     }
   ],
+  "circuloDeLaTierra": {
+    "landActual": null,
+    "opciones": {
+      "Arid": {
+        "descCorta": "Desierto: fuego e ilusión (Fire Bolt, Burning Hands, Blur → Fireball → Blight → Wall of Stone).",
+        "spells": [
+          { "nivelDruidaRequerido": 3, "nivel": "CANTRIPS", "nombre": "Fire Bolt (Arid)", "dano": "1d10", "escala": { "5": "2d10", "11": "3d10", "17": "4d10" }, "tipoDano": "fuego", "accion": "Acción", "distancia": "120 ft", "desc": "Lanzás un dardo de fuego. Ataque de conjuro a distancia." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 1", "nombre": "Burning Hands (Arid)", "dano": "3d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en el cono hace salvación de DEX o recibe daño de fuego (mitad si pasa)." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Blur (Arid)", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 1 minuto", "desc": "Tu figura se vuelve borrosa. Los ataques contra vos tienen desventaja mientras dure." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Fireball (Arid)", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Radio de 20 ft, salvación de DEX, daño de fuego (mitad si pasa).", "escalaSlot": { "danoPorNivel": { "3": "8d6", "4": "9d6" } } },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Blight (Arid)", "dano": "8d8", "tipoDano": "necrótico", "accion": "Acción", "distancia": "30 ft", "desc": "Una criatura se marchita por magia necromántica. Salvación de CON, daño necrótico (mitad si pasa)." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Wall of Stone (Arid)", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 10 minutos", "desc": "Creás una pared de piedra sólida de hasta 10 paneles de 10x10 ft." }
+        ]
+      },
+      "Polar": {
+        "descCorta": "Hielo y control: frío y parálisis (Ray of Frost, Fog Cloud, Hold Person → Sleet Storm → Ice Storm → Cone of Cold).",
+        "spells": [
+          { "nivelDruidaRequerido": 3, "nivel": "CANTRIPS", "nombre": "Ray of Frost (Polar)", "dano": "1d8", "escala": { "5": "2d8", "11": "3d8", "17": "4d8" }, "tipoDano": "frío", "accion": "Acción", "distancia": "60 ft", "desc": "Rayo de frío helado. Ataque de conjuro a distancia; si impacta, reduce 10 ft la velocidad del objetivo hasta tu próximo turno." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 1", "nombre": "Fog Cloud (Polar)", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 hora", "desc": "Creás una niebla que oscurece un área de 20 ft de radio." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Hold Person (Polar)", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 minuto", "desc": "Un humanoide hace salvación de WIS o queda paralizado. Repite la salvación cada turno." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Sleet Storm (Polar)", "accion": "Acción", "distancia": "150 ft", "duracion": "Concentración, 1 minuto", "desc": "Área de 40 ft con hielo y niebla: terreno difícil, criaturas hacen salvación de DEX o caen Derribadas." },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Ice Storm (Polar)", "dano": "2d8+4d6", "tipoDano": "contundente/frío", "accion": "Acción", "distancia": "300 ft", "desc": "Radio de 20 ft, salvación de DEX, daño contundente + frío (mitad si pasa). El área queda con hielo, terreno difícil." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Cone of Cold (Polar)", "dano": "8d8", "tipoDano": "frío", "accion": "Acción", "distancia": "Cono 60 ft", "desc": "Cono de 60 ft, salvación de CON, daño de frío (mitad si pasa)." }
+        ]
+      },
+      "Temperate": {
+        "descCorta": "Versátil: electricidad y movilidad (Shocking Grasp, Sleep, Misty Step → Lightning Bolt → Freedom of Movement → Tree Stride).",
+        "spells": [
+          { "nivelDruidaRequerido": 3, "nivel": "CANTRIPS", "nombre": "Shocking Grasp (Temperate)", "dano": "1d8", "escala": { "5": "2d8", "11": "3d8", "17": "4d8" }, "tipoDano": "relámpago", "accion": "Acción", "distancia": "Toque", "desc": "Toque eléctrico. Ventaja si el objetivo lleva armadura metálica; no puede usar reacciones hasta su próximo turno." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 1", "nombre": "Sleep (Temperate)", "dano": "5d8", "accion": "Acción", "distancia": "90 ft", "desc": "Hasta 5d8 HP de criaturas en un radio de 20 ft caen dormidas, empezando por las de menos HP actual." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Misty Step (Temperate)", "accion": "Acción Bonus", "distancia": "Propio", "desc": "Teletransporte hasta 30 ft a un lugar que puedas ver." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Lightning Bolt (Temperate)", "dano": "8d6", "tipoDano": "relámpago", "accion": "Acción", "distancia": "Línea 100 ft", "desc": "Línea de 100x5 ft, salvación de DEX, daño de relámpago (mitad si pasa)." },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Freedom of Movement (Temperate)", "accion": "Acción", "distancia": "Toque", "duracion": "1 hora", "desc": "La criatura tocada ignora terreno difícil y no puede ser paralizada ni agarrada mientras dure." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Tree Stride (Temperate)", "accion": "Acción", "distancia": "Propio", "duracion": "Concentración, 1 minuto", "desc": "Te fusionás con un árbol y podés teletransportarte a otro árbol de la misma especie a hasta 500 ft, una vez por turno." }
+        ]
+      },
+      "Tropical": {
+        "descCorta": "Veneno y transformación: ácido y control (Acid Splash, Ray of Sickness, Web → Stinking Cloud → Polymorph → Insect Plague).",
+        "spells": [
+          { "nivelDruidaRequerido": 3, "nivel": "CANTRIPS", "nombre": "Acid Splash (Tropical)", "dano": "1d6", "escala": { "5": "2d6", "11": "3d6", "17": "4d6" }, "tipoDano": "ácido", "accion": "Acción", "distancia": "60 ft", "desc": "Burbuja ácida. Salvación de DEX, daño ácido a hasta 2 objetivos adyacentes entre sí." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 1", "nombre": "Ray of Sickness (Tropical)", "dano": "2d8", "tipoDano": "veneno", "accion": "Acción", "distancia": "60 ft", "desc": "Ataque de conjuro a distancia. Si impacta, además salvación de CON o el objetivo queda Envenenado hasta tu próximo turno." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Web (Tropical)", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 hora", "desc": "Llenás un área de 20 ft con telarañas espesas. Salvación de DEX o queda Restringido." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Stinking Cloud (Tropical)", "accion": "Acción", "distancia": "90 ft", "duracion": "Concentración, 1 minuto", "desc": "Nube de gas nauseabundo en 20 ft. Salvación de CON o queda Envenenada y pierde su acción si sigue dentro." },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Polymorph (Tropical)", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 hora", "desc": "Una criatura se transforma en una bestia que elijas (salvación de WIS si no consiente)." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Insect Plague (Tropical)", "dano": "4d10", "tipoDano": "perforante", "accion": "Acción", "distancia": "300 ft", "desc": "Esfera de insectos de 20 ft de radio. Salvación de CON, daño perforante (mitad si pasa)." }
+        ]
+      },
+      "Underdark": {
+        "descCorta": "[Homebrew] Subterráneo: veneno y sigilo (Spider Climb, Web → Gaseous Form, Stinking Cloud → Greater Invisibility, Stone Shape → Cloudkill, Insect Plague).",
+        "spells": [
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Spider Climb (Underdark)", "accion": "Acción Bonus", "distancia": "Toque", "duracion": "Concentración, 1 hora", "desc": "La criatura tocada puede moverse por superficies verticales y techos sin necesidad de tirada." },
+          { "nivelDruidaRequerido": 3, "nivel": "NIVEL 2", "nombre": "Web (Underdark)", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 hora", "desc": "Llenás un área de 20 ft con telarañas espesas. Salvación de DEX o queda Restringido." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Gaseous Form (Underdark)", "accion": "Acción", "distancia": "Toque", "duracion": "Concentración, 1 hora", "desc": "Una criatura voluntaria se transforma en nube gaseosa, inmune a daño no mágico y puede colarse por rendijas." },
+          { "nivelDruidaRequerido": 5, "nivel": "NIVEL 3", "nombre": "Stinking Cloud (Underdark)", "accion": "Acción", "distancia": "90 ft", "duracion": "Concentración, 1 minuto", "desc": "Nube de gas nauseabundo en 20 ft. Salvación de CON o queda Envenenada y pierde su acción si sigue dentro." },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Greater Invisibility (Underdark)", "accion": "Acción", "distancia": "Toque", "duracion": "Concentración, 1 minuto", "desc": "Vos o una criatura que toques se vuelve invisible, incluso al atacar o lanzar hechizos." },
+          { "nivelDruidaRequerido": 7, "nivel": "NIVEL 4", "nombre": "Stone Shape (Underdark)", "accion": "Acción", "distancia": "Toque", "desc": "Moldeás piedra, madera o hielo tocado a una forma diferente." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Cloudkill (Underdark)", "dano": "5d8", "tipoDano": "veneno", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 10 minutos", "desc": "Nube venenosa de 20 ft que se aleja de vos cada turno. Salvación de CON, daño de veneno (mitad si pasa)." },
+          { "nivelDruidaRequerido": 9, "nivel": "NIVEL 5", "nombre": "Insect Plague (Underdark)", "dano": "4d10", "tipoDano": "perforante", "accion": "Acción", "distancia": "300 ft", "desc": "Esfera de insectos de 20 ft de radio. Salvación de CON, daño perforante (mitad si pasa)." }
+        ]
+      }
+    }
+  },
   "hechizos": {
     "ranuras": [
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
@@ -363,38 +453,6 @@
         "distancia": "Propio",
         "duracion": "Concentración, 10 minutos",
         "desc": "Invocás una espada de fuego que realiza ataques cuerpo a cuerpo usando tu modificador de conjuro."
-      },
-      {
-        "nivel": "NIVEL 2",
-        "nombre": "Invisibility",
-        "accion": "Acción",
-        "distancia": "Toque",
-        "duracion": "Concentración, 1 hora",
-        "desc": "Una criatura se vuelve invisible hasta que ataque, lance un conjuro o el hechizo termine."
-      },
-      {
-        "nivel": "NIVEL 2",
-        "nombre": "Pass without Trace",
-        "accion": "Acción",
-        "distancia": "Propio",
-        "duracion": "Concentración, 1 hora",
-        "desc": "Vos y los aliados cercanos obtienen +10 a las tiradas de Sigilo y no dejan rastros."
-      },
-      {
-        "nivel": "NIVEL 3",
-        "nombre": "Daylight",
-        "accion": "Acción",
-        "distancia": "60 ft",
-        "duracion": "1 hora",
-        "desc": "Creás una esfera de luz brillante de 60 pies que disipa oscuridad mágica de nivel bajo."
-      },
-      {
-        "nivel": "NIVEL 3",
-        "nombre": "Haste",
-        "accion": "Acción",
-        "distancia": "30 ft",
-        "duracion": "Concentración, 1 minuto",
-        "desc": "Una criatura duplica su velocidad, obtiene +2 CA, ventaja en salvaciones de Destreza y una acción adicional limitada cada turno."
       },
       {
         "nivel": "NIVEL 4",

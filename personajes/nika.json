@@ -187,7 +187,7 @@
     },
         {
         "nombre": "Lanza (Spear) +1",
-        "dano": "1d6+1",
+        "dano": "1d6",
         "tipoDano": "cortante",
         "tipo": "melee",
         "manos": 1,
@@ -202,6 +202,8 @@
     },
     {
         "nombre": "Capa de protección (Cloak of Protection)",
+        "equipable": true,
+        "manos": 0,
         "peso": 1,
         "valor": 2000,
         "magico": true,
@@ -221,6 +223,7 @@
         "nombre": "Escudo centinela (Sentinel Shield)",
         "esArmadura": true,
         "tipoArmadura": "escudo",
+        "armaduraBase": 0,
         "manos": 1,
         "peso": 4,
         "valor": 500,
