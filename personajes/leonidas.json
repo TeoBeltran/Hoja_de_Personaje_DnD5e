@@ -290,7 +290,15 @@
         "tipoDano": "radiante",
         "accion": "Acción",
         "distancia": "120 ft",
-        "desc": "Hacé un ataque mágico a distancia. Si golpea, hace 4d6 radiante y el próximo ataque contra el objetivo antes de tu próximo turno tiene ventaja. Cada slot superior al 1 suma 1d6."
+        "desc": "Hacé un ataque mágico a distancia. Si golpea, hace 4d6 radiante y el próximo ataque contra el objetivo antes de tu próximo turno tiene ventaja. Cada slot superior al 1 suma 1d6.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "4d6",
+            "2": "5d6",
+            "3": "6d6",
+            "4": "7d6"
+          }
+        }
       },
       {
         "nivel": "NIVEL 1",

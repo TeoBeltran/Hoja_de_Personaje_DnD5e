@@ -90,6 +90,7 @@ let mageArmorBase = 13; // CA base cuando Mage Armor está activo
 let familiarDataActual = null; // { id, nombre, tipo, emoji, ca, mod, vidaMaxima, ataques: [{nombre, dano, desc}] }
 let familiarVidaActual = 0;
 let familiarActivo = false; // true mientras esté vivo y no haya sido despedido. NO se resetea con descansos.
+let nivelPersonajeGlobal = 1; // Nivel del personaje, usado por funciones fuera de init() (ej: abrirModalEscalaSlot)
 
 // === FUNCIONES DE GUARDADO
 function guardarRanuras() {
@@ -263,8 +264,13 @@ function procesarEfectos(item, contexto) {
 // === Divine Smite ===
 let smiteData = null; // Guarda el objeto smite del JSON si la clase lo tiene
 
-// Mapea nivel de hechizo a ranura. Si es Brujo, TODO va a Nivel 3.
+// Mapea nivel de hechizo a ranura.
 // Genérico: soporta cualquier "NIVEL n" (1-9), no solo hasta el 4.
+// Nota: ya NO fuerza a los Brujos a usar siempre "Nivel 3". El nivel real de
+// la ranura de Pact Magic depende del nivel del personaje (nivel 3 hasta
+// personaje nivel 6, nivel 4 desde personaje nivel 7, etc.), así que cada
+// hechizo del JSON debe tener puesto directamente el "nivel" real de su ranura
+// (ej: "NIVEL 4" si el personaje ya tiene ranuras de nivel 4).
 function mapNivelHechizoARanura(nivelHechizo) {
     if (nivelHechizo === "CANTRIPS") return null; // Cantrips nunca consumen
     const match = /^NIVEL (\d+)$/.exec(nivelHechizo || '');
@@ -413,8 +419,9 @@ function renderFamiliarModal() {
     }
 }
 
-// Se llama cuando se usa un hechizo que trae un campo "familiar" en su JSON (Find Familiar, Find Steed, etc.)
-function activarFamiliar(datosFamiliar) {
+// Se llama cuando se usa un hechizo que trae un campo "familiar" (Find Familiar, Find Steed),
+// o cuando se elige una forma en el selector de Wild Shape. mensajeToast es opcional.
+function activarFamiliar(datosFamiliar, mensajeToast) {
     if (!datosFamiliar || !datosFamiliar.id) return;
     familiarDataActual = datosFamiliar;
     familiarVidaActual = datosFamiliar.vidaMaxima;
@@ -422,7 +429,7 @@ function activarFamiliar(datosFamiliar) {
     guardarFamiliar();
     actualizarFamiliarFabVisibilidad();
     renderFamiliarModal();
-    mostrarToast(`${datosFamiliar.emoji || '🐾'} ¡${datosFamiliar.nombre} fue invocado!`);
+    mostrarToast(mensajeToast || `${datosFamiliar.emoji || '🐾'} ¡${datosFamiliar.nombre} fue invocado!`);
 }
 
 // Despedir/matar al familiar: cierra el modal, oculta el botón flotante y borra el guardado.
@@ -446,7 +453,7 @@ function modificarVidaFamiliar(cantidad) {
         mostrarToast(`${familiarDataActual.nombre} se curó ${cantidad} HP`);
     }
     if (familiarVidaActual === 0) {
-        mostrarToast(`💀 ${familiarDataActual.nombre} cayó a 0 HP y desaparece`, 'warning');
+        mostrarToast(`💀 ${familiarDataActual.nombre} llegó a 0 HP`, 'warning');
         setTimeout(() => desactivarFamiliar(), 700);
     }
 }
@@ -893,6 +900,101 @@ function abrirModalSmite() {
     smiteModal.style.display = 'flex';
 }
 
+// === Selector de ranura para hechizos que escalan al subirlos de nivel ===
+// (ej: Fireball, Guiding Bolt). Funciona igual que el modal de Divine Smite:
+// el hechizo trae en su JSON un campo "escalaSlot.danoPorNivel" con el daño
+// correspondiente a cada nivel de ranura posible, y acá se muestra un botón
+// por cada nivel, deshabilitado si no hay ranuras disponibles de ese nivel.
+function abrirModalEscalaSlot(item, tipoAccion) {
+    const escalaModal = document.getElementById('escala-modal');
+    const cont = document.getElementById('escala-opciones');
+    const titulo = document.getElementById('escala-modal-titulo');
+    const desc = document.getElementById('escala-modal-desc');
+    if (!escalaModal || !cont || !item || !item.escalaSlot) return;
+
+    if (titulo) titulo.textContent = `${item.nombre}: elegí la ranura`;
+    if (desc) desc.textContent = 'Cuanto más alta la ranura que uses, más fuerte sale el hechizo.';
+
+    cont.innerHTML = '';
+    const danoPorNivel = item.escalaSlot.danoPorNivel || {};
+    Object.keys(danoPorNivel)
+        .map(n => parseInt(n))
+        .sort((a, b) => a - b)
+        .forEach(nivelNum => {
+            const nivelKey = `Nivel ${nivelNum}`;
+            const disponibles = parseInt(ranurasState[nivelKey] || 0);
+            const dano = danoPorNivel[String(nivelNum)];
+
+            const btn = document.createElement('button');
+            btn.className = 'hp-btn';
+            btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${disponibles <= 0 ? 'background-color: #999; cursor: not-allowed;' : 'background-color: #6a1b9a; color: white;'}`;
+            btn.disabled = disponibles <= 0;
+            btn.innerHTML = `Slot Nivel ${nivelNum} → ${dano}${item.tipoDano ? ' ' + item.tipoDano : ''} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${disponibles} disponibles)</span>`;
+
+            btn.onclick = () => {
+                if (disponibles <= 0) return;
+                ranurasState[nivelKey] = String(disponibles - 1);
+                guardarRanuras();
+                actualizarRanuraDOM(nivelKey);
+                escalaModal.style.display = 'none';
+                const r = consumirAccion(tipoAccion);
+                mostrarToast(`✨ ¡${item.nombre} usado! ${dano}${item.tipoDano ? ' ' + item.tipoDano : ''} (ranura Nivel ${nivelNum}). ${r.mensaje}`.trim());
+
+                // Disparar efectos automáticos y familiar igual que un hechizo normal
+                if (item.efectos) {
+                    setTimeout(() => {
+                        procesarEfectos(item, { nivelHechizo: nivelNum, nivelPersonaje: nivelPersonajeGlobal });
+                    }, 400);
+                }
+                if (item.familiar) {
+                    setTimeout(() => activarFamiliar(item.familiar), item.efectos ? 900 : 400);
+                }
+            };
+            cont.appendChild(btn);
+        });
+
+    escalaModal.style.display = 'flex';
+}
+
+// === Selector de animal para Wild Shape (o cualquier habilidad con "formasSalvajes") ===
+// Al elegir un animal: gasta 1 uso de la habilidad y activa el panel de "familiar"
+// (mismo botón flotante y modal) con las stats de esa forma.
+function abrirModalFormaSalvaje(habObj, tipoAccion) {
+    const wsModal = document.getElementById('wildshape-modal');
+    const cont = document.getElementById('wildshape-opciones');
+    if (!wsModal || !cont || !habObj || !habObj.formasSalvajes) return;
+
+    cont.innerHTML = '';
+    habObj.formasSalvajes.forEach(forma => {
+        const btn = document.createElement('button');
+        btn.className = 'skill-btn';
+        btn.style.textAlign = 'left';
+        btn.innerHTML = `<span>${forma.emoji || '🐾'} ${forma.nombre}</span><span class="skill-mod">CA ${forma.ca} · ${forma.vidaMaxima} HP</span>`;
+
+        btn.onclick = () => {
+            // Gastar 1 uso de la habilidad (ej: Wild Shape 2/2 → 1/2)
+            const partes = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+            let actual = parseInt(partes[0]);
+            const max = parseInt(partes[1]);
+            if (actual <= 0) {
+                mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+                return;
+            }
+            actual -= 1;
+            habilidadesUsoState[habObj.nombre] = `${actual}/${max}`;
+            guardarHabilidadesUso();
+            actualizarHabilidadUsoDOM(habObj.nombre);
+
+            wsModal.style.display = 'none';
+            const r = consumirAccion(tipoAccion);
+            activarFamiliar(forma, `${forma.emoji || '🐾'} ¡Te transformaste en ${forma.nombre}! ${r.mensaje}`.trim());
+        };
+        cont.appendChild(btn);
+    });
+
+    wsModal.style.display = 'flex';
+}
+
 function actualizarHdCantidadDOM() {
     const span = document.getElementById('hd-cantidad');
     if (span) span.textContent = hdCantidadAUsar;
@@ -1127,9 +1229,21 @@ async function init() {
         try {
             const saved = JSON.parse(familiarGuardado);
             if (saved && saved.activo && saved.id) {
+                let datosEncontrados = null;
                 const spellConFamiliar = (data.hechizos.lista || []).find(h => h.familiar && h.familiar.id === saved.id);
                 if (spellConFamiliar) {
-                    familiarDataActual = spellConFamiliar.familiar;
+                    datosEncontrados = spellConFamiliar.familiar;
+                } else {
+                    // Buscar también entre las formas salvajes de habilidadesUso (Wild Shape, etc.)
+                    (data.habilidadesUso || []).forEach(h => {
+                        if (h.formasSalvajes) {
+                            const encontrada = h.formasSalvajes.find(f => f.id === saved.id);
+                            if (encontrada) datosEncontrados = encontrada;
+                        }
+                    });
+                }
+                if (datosEncontrados) {
+                    familiarDataActual = datosEncontrados;
                     familiarVidaActual = Math.max(0, Math.min(saved.vidaActual, familiarDataActual.vidaMaxima));
                     familiarActivo = true;
                 }
@@ -1164,6 +1278,7 @@ async function init() {
 
     // Calcular valores automáticos antes de renderizar
     const nivelPersonaje = nivelTmp;
+    nivelPersonajeGlobal = nivelTmp;
     const modDex = formatMod(obtenerMod(data.modificadores, "DEX"));
     proficienciaActual = profBonusTmp;
 
@@ -2075,7 +2190,10 @@ async function init() {
 
     // Renderizar Ranuras
     const ranurasG = document.getElementById('ranuras-grid');
-    data.hechizos.ranuras.forEach(i => {
+    // Si la cantidad MÁXIMA original de un nivel es 0 (el personaje nunca tiene ranuras de
+    // ese nivel a su nivel actual, ej: Nika con Nivel 3/4 en 0), ni se muestra el botón.
+    // Si en cambio son 0 porque ya se gastaron todas, sí se sigue mostrando (uso normal).
+    data.hechizos.ranuras.filter(i => parseInt(i.cantidad) > 0).forEach(i => {
         const btn = document.createElement('button');
         btn.className = 'skill-btn';
         btn.id = `ranura-${i.nivel.replace(' ', '-')}`;
@@ -2205,13 +2323,23 @@ async function init() {
             // Caso 1: habilidad con usos
             const habilidad = useSpellBtn.dataset.habilidad;
             if (habilidad) {
+                const habObj = data.habilidadesUso ? data.habilidadesUso.find(h => h.nombre === habilidad) : null;
+
+                // Si la habilidad tiene formas salvajes (Wild Shape), abrir el selector de animal
+                // en vez de gastar el uso automáticamente; el uso se gasta al elegir el animal.
+                if (habObj && habObj.formasSalvajes) {
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    abrirModalFormaSalvaje(habObj, tipoAccion);
+                    return;
+                }
+
                 usarHabilidad(habilidad);
                 useSpellBtn.dataset.habilidad = '';
                 const r = consumirAccion(tipoAccion);
                 if (r.mensaje) mostrarToast(r.mensaje);
 
                 // Procesar efectos de la habilidad (Second Wind, etc.)
-                const habObj = data.habilidadesUso ? data.habilidadesUso.find(h => h.nombre === habilidad) : null;
                 if (habObj && habObj.efectos) {
                     setTimeout(() => {
                         procesarEfectos(habObj, {
@@ -2263,6 +2391,16 @@ async function init() {
             // Caso 4: hechizo con ranura
             const nivel = useSpellBtn.dataset.nivel;
             if (!nivel) return;
+
+            // Si el hechizo permite elegir con qué ranura lanzarlo (ej: Fireball, Guiding Bolt),
+            // abrir el selector de ranura en vez de consumir automáticamente la ranura base.
+            const hechizoConEscala = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
+            if (hechizoConEscala && hechizoConEscala.escalaSlot) {
+                modal.style.display = 'none';
+                abrirModalEscalaSlot(hechizoConEscala, tipoAccion);
+                return;
+            }
+
             let actual = parseInt(ranurasState[nivel]);
             if (actual > 0) {
                 actual -= 1;
@@ -2535,6 +2673,36 @@ async function init() {
         });
     }
     window.addEventListener('click', (e) => { if (e.target === smiteModal) smiteModal.style.display = 'none'; });
+
+    // Modal de escala de ranura (Fireball, Guiding Bolt, etc.): cerrar/cancelar
+    const escalaModal = document.getElementById('escala-modal');
+    const escalaCloseBtn = document.querySelector('.close-btn-escala');
+    const escalaCancelar = document.getElementById('escala-cancelar');
+    if (escalaCloseBtn) {
+        escalaCloseBtn.addEventListener('click', () => escalaModal.style.display = 'none');
+    }
+    if (escalaCancelar) {
+        escalaCancelar.addEventListener('click', () => {
+            escalaModal.style.display = 'none';
+            mostrarToast('Hechizo no usado');
+        });
+    }
+    window.addEventListener('click', (e) => { if (e.target === escalaModal) escalaModal.style.display = 'none'; });
+
+    // Modal de Wild Shape (selector de animal): cerrar/cancelar
+    const wildshapeModal = document.getElementById('wildshape-modal');
+    const wildshapeCloseBtn = document.querySelector('.close-btn-wildshape');
+    const wildshapeCancelar = document.getElementById('wildshape-cancelar');
+    if (wildshapeCloseBtn) {
+        wildshapeCloseBtn.addEventListener('click', () => wildshapeModal.style.display = 'none');
+    }
+    if (wildshapeCancelar) {
+        wildshapeCancelar.addEventListener('click', () => {
+            wildshapeModal.style.display = 'none';
+            mostrarToast('Wild Shape no usado');
+        });
+    }
+    window.addEventListener('click', (e) => { if (e.target === wildshapeModal) wildshapeModal.style.display = 'none'; });
 
     // Modal de Hit Dice: cerrar
     const hdModal = document.getElementById('hd-modal');

@@ -343,7 +343,13 @@
         "tipoDano": "fuego",
         "accion": "Acción",
         "distancia": "150 ft",
-        "desc": "Una bola brillante de fuego explota en un radio de 20 ft. Todas las criaturas en el área hacen salvación de DEX o reciben 8d6 fuego (mitad si pasan). El fuego se propaga por las esquinas. Objetos no llevados se prenden fuego. Cada slot superior al 3 suma 1d6."
+        "desc": "Una bola brillante de fuego explota en un radio de 20 ft. Todas las criaturas en el área hacen salvación de DEX o reciben 8d6 fuego (mitad si pasan). El fuego se propaga por las esquinas. Objetos no llevados se prenden fuego. Cada slot superior al 3 suma 1d6.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "3": "8d6",
+            "4": "9d6"
+          }
+        }
       },
       {
         "nivel": "NIVEL 3",

@@ -82,8 +82,11 @@
     { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
     { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." },
-    {"nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
-    {"nombre": "Polearm Master", "desc": "Cuando atacás con la acción de Ataque usando solo un glaive, halberd, quarterstaff o spear, podés usar una acción bonus para hacer un ataque adicional con el extremo opuesto del arma (1d4+STR contundente). Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."}
+    { "nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
+    { "nombre": "Aura del Gran Panal",
+      "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+1 (máximo 4) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo."
+    },
+    { "nombre": "Polearm Master", "desc": "Cuando atacás con la acción de Ataque usando solo un glaive, halberd, quarterstaff o spear, podés usar una acción bonus para hacer un ataque adicional con el extremo opuesto del arma (1d4+STR contundente). Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."}
   ],
   "habilidadesUso": [
     {
@@ -145,6 +148,23 @@
         "accion": "Acción",
         "duracion": "1 minuto",
         "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Una vez por turno hacés daño radiante extra igual a tu nivel al usar un ataque o spell. Se apaga con Acción Bonus."
+    },
+    {
+        "nombre": "Honey Smite",
+        "usos": "1/1",
+        "recupera": "largo",
+        "accion": "Sin acción",
+        "distancia": "Melee",
+        "desc": "Cuando golpeás con un ataque cuerpo a cuerpo y decidís no usar Divine Smite, podés activar Honey Smite sin consumir ninguna acción. <br>Cae un rayo de miel sobre el objetivo, recibiendo 1d6 de daño radiante y quedando Enmielado."
+    },
+    {
+        "nombre": "Consagración del Panal",
+        "usos": "1/1",
+        "recupera": "largo",
+        "accion": "Acción",
+        "distancia": "15 ft",
+        "duracion": "1 minuto",
+        "desc": "Crea un área  de miel de 30 ft de radio en un punto que puedas ver hasta 15 ft de distancia. <br>Al aparecer al área, todas las criaturas dentro quedan Enmieladas (incluyendo aliados). <br>Cualquier criatura que entre por primera vez al área durante la duración del hechizo también queda Enmielada. <br>La condición Enmielado permanece aunque la criatura abandone el área."
     }
   ],
   "equipo": [
@@ -225,7 +245,7 @@
   "hechizos": {
         "ranuras": [
             { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "2", "recupera": "largo" },
+            { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
             { "nivel": "Nivel 3", "cantidad": "0", "recupera": "largo" },
             { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
         ],

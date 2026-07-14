@@ -115,7 +115,103 @@
       "usos": "2/2",
       "recupera": "corto",
       "accion": "Acción",
-      "desc": "Te transformás en una bestia que hayas visto de CR 1/2 o menor durante un máximo de 3 horas."
+      "desc": "Te transformás en una bestia que hayas visto de CR 1/2 o menor durante un máximo de 3 horas. Al usarla, elegís a qué animal transformarte.",
+      "formasSalvajes": [
+        {
+          "id": "wildshape-orfe-ape",
+          "nombre": "Ape",
+          "tipo": "Forma Salvaje (CR 1/2)",
+          "emoji": "🦍",
+          "vidaMaxima": 19,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Multiataque: 2 Puñetazos por turno (repetí el ataque de abajo dos veces).",
+          "ataques": [
+            { "nombre": "Puñetazo (Fist)", "dano": "1d6+3", "desc": "+5 al ataque. Contundente." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-brown-bear",
+          "nombre": "Brown Bear",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐻",
+          "vidaMaxima": 34,
+          "ca": 11,
+          "mod": "STR +4 / DEX +0 / CON +3",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+4", "desc": "+6 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claws)", "dano": "2d6+4", "desc": "+6 al ataque. Cortante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-dire-wolf",
+          "nombre": "Dire Wolf",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐺",
+          "vidaMaxima": 37,
+          "ca": 14,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Si el mordisco impacta a una criatura mediana o menor, hace tirada de salvación de FUE (DC 13) o cae Derribada.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "2d6+3", "desc": "+5 al ataque. Perforante. DC 13 STR o Derribado." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-giant-hyena",
+          "nombre": "Giant Hyena",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐆",
+          "vidaMaxima": 45,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Ventaja en ataques contra criaturas que ya estén heridas (con HP actual menor al máximo).",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+4 al ataque. Perforante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-giant-spider",
+          "nombre": "Giant Spider",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🕷️",
+          "vidaMaxima": 26,
+          "ca": 14,
+          "mod": "STR +2 / DEX +3 / CON +1",
+          "notas": "Puede trepar y caminar por telarañas sin dificultad. También puede disparar Telaraña (60ft, restringe) en vez de morder.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+5 al ataque. Perforante + 3d6 veneno (DC 11 CON, mitad si pasa)." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-lion",
+          "nombre": "Lion",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🦁",
+          "vidaMaxima": 26,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +1",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno. Ventaja al ataque si un aliado está adyacente al objetivo.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d8+3", "desc": "+5 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claw)", "dano": "1d6+3", "desc": "+5 al ataque. Cortante." }
+          ]
+        },
+        {
+          "id": "wildshape-orfe-tiger",
+          "nombre": "Tiger",
+          "tipo": "Forma Salvaje (CR 1)",
+          "emoji": "🐅",
+          "vidaMaxima": 37,
+          "ca": 12,
+          "mod": "STR +3 / DEX +2 / CON +2",
+          "notas": "Multiataque: 1 Mordisco + 1 Zarpazo por turno.",
+          "ataques": [
+            { "nombre": "Mordisco (Bite)", "dano": "1d10+3", "desc": "+5 al ataque. Perforante." },
+            { "nombre": "Zarpazo (Claw)", "dano": "1d8+3", "desc": "+5 al ataque. Cortante." }
+          ]
+        }
+      ]
     },
     {
       "nombre": "Staff of the Python",
@@ -302,11 +398,17 @@
       },
       {
         "nivel": "NIVEL 4",
-        "nombre": "REVISAR",
-        "accion": "REVISAR",
-        "distancia": "REVISAR",
-        "duracion": "REVISAR",
-        "desc": "REVISAR"
+        "nombre": "Blight",
+        "dano": "8d8",
+        "tipoDano": "necrótico",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "desc": "Una criatura que puedas ver en rango se marchita por magia necromántica. Hace tirada de salvación de Constitución: 8d8 de daño necrótico si falla, mitad si pasa. Una planta que no sea una criatura (sin dueño) falla automáticamente la salvación y recibe el daño máximo. Una criatura tipo planta tiene desventaja en esta salvación. Cada slot superior al 4 suma 1d8.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "4": "8d8"
+          }
+        }
       }
     ]
   },

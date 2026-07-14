@@ -197,7 +197,15 @@
           { "nivel": "NIVEL 4", "nombre": "Scorching Ray (Nivel real 2)", "dano": "2d6", "ataques": 3, "tipoDano": "fuego", "accion": "Acción", "distancia": "120 ft", "desc": "Crea 3 rayos de fuego y los gira hacia enemigos en rango, pueden ser enemigos distintos. Cada rayo acierta o falla por separado. Si aciertan, hacen 2d6 de daño de fuego. Cada nivel por encima del nivel 2 que se use es 1d6 extra de daño." },
           { "nivel": "NIVEL 4", "nombre": "Counterspell (Nivel real 3)", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
           { "nivel": "NIVEL 4", "nombre": "Fear (Nivel real 3)", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal, cada criatura a 30ft del cono tienen que pasar una tirada de Sabiduría o soltar lo que tengan y pasan a estar Frightened. Mientras estén así, usan su acción para correr hacia la ruta mas segura. Si perdes visión de la criatura, puede hacer una tirada de salvación de Sabiduría." },
-          { "nivel": "NIVEL 4", "nombre": "Fireball (Nivel real 3)", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
+          { "nivel": "NIVEL 4", "nombre": "Fireball (Nivel real 3)", "dano": "8d6", "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada.",
+            "escalaSlot": {
+              "danoPorNivel": {
+                "3": "8d6",
+                "4": "9d6",
+                "5": "10d6"
+              }
+            }
+          },
           { "nivel": "NIVEL 4", "nombre": "Banishment (Nivel real 4)", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." }
         ]
   },

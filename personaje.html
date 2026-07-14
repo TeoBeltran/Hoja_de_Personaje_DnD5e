@@ -224,6 +224,28 @@
         </div>
     </div>
 
+    <!-- Modal de selección de ranura (hechizos que escalan al subirlos: Fireball, Guiding Bolt, etc.) -->
+    <div id="escala-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-escala">&times;</span>
+            <h3 id="escala-modal-titulo" style="color: var(--accent-color); margin-top: 0;"></h3>
+            <p id="escala-modal-desc" style="line-height: 1.5; margin: 10px 0;"></p>
+            <div id="escala-opciones" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin: 15px 0;"></div>
+            <button id="escala-cancelar" class="hp-btn" style="width: 100%; background-color: var(--text-muted); color: white;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal de selección de animal para Wild Shape -->
+    <div id="wildshape-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-wildshape">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">🐾 ¿En qué te transformás?</h3>
+            <p style="line-height: 1.5; margin: 10px 0;">Elegí la forma salvaje. Se gasta 1 uso de Wild Shape.</p>
+            <div id="wildshape-opciones" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin: 15px 0; max-height: 50vh; overflow-y: auto;"></div>
+            <button id="wildshape-cancelar" class="hp-btn" style="width: 100%; background-color: var(--text-muted); color: white;">Cancelar</button>
+        </div>
+    </div>
+
     <div id="skill-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn">&times;</span>
@@ -304,7 +326,7 @@
 
     <!-- Botón flotante de Familiar/Steed (oculto hasta que se invoque uno) -->
     <div id="familiar-fab" style="position: fixed; bottom: 30px; right: 170px; z-index: 90; display: none;">
-        <button id="familiar-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: #6a1b9a; color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Familiar">🐾</button>
+        <button id="familiar-toggle" style="width: 60px; height: 60px; border-radius: 50%; background-color: var(--accent-color); color: white; border: none; cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); transition: all 0.3s ease;" title="Familiar">🐾</button>
     </div>
 
     <!-- Menú flotante de turno -->
@@ -393,7 +415,7 @@
             <h4 style="margin: 15px 0 8px 0; color: var(--accent-color); border-bottom: 1px solid var(--text-muted); padding-bottom: 4px;">Ataques</h4>
             <div id="familiar-ataques-lista" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 15px;"></div>
 
-            <button id="familiar-despedir" class="hp-btn hp-damage" style="width: 100%; padding: 10px; font-weight: bold;">👋 Despedir familiar</button>
+            <button id="familiar-despedir" class="hp-btn hp-damage" style="width: 100%; padding: 10px; font-weight: bold;">👋 Despedir / Revertir forma</button>
         </div>
     </div>
 
