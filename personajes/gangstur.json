@@ -76,10 +76,10 @@
   },
   "rasgos": [
     { "nombre": "Pact Magic", "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos." },
-    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.", "bonoDano": "CHA", "aplicaA": "hechizo:Eldritch Blast" },
-    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta." },
+    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.", "bonoDano": "CHA", "aplicaA": "hechizo:Eldritch Blast", "disparadores": { "hechizo": "Eldritch Blast" } },
+    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta.", "disparadores": { "hechizo": "Eldritch Blast" } },
     { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
-    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel)." },
+    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel).", "disparadores": { "arma": true, "hechizo": true } },
     { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
     { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
@@ -92,17 +92,20 @@
     {
       "nombre": "Eldritch Invocation: Grasp of Hadar",
       "requisito": "Eldritch Blast cantrip",
-      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, podés moverla en línea recta 10 ft hacia vos."
+      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, podés moverla en línea recta 10 ft hacia vos.",
+      "disparadores": { "hechizo": "Eldritch Blast" }
     },
     {
       "nombre": "Eldritch Invocation: Lance of Lethargy",
       "requisito": "Eldritch Blast cantrip",
-      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, reducís su velocidad en 10 ft hasta el final de tu próximo turno."
+      "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, reducís su velocidad en 10 ft hasta el final de tu próximo turno.",
+      "disparadores": { "hechizo": "Eldritch Blast" }
     },
     {
       "nombre": "Eldritch Invocation: Repelling Blast",
       "requisito": "Eldritch Blast cantrip",
-      "desc": "Cuando golpeás a una criatura con Eldritch Blast, la empujás 10 ft lejos de vos."
+      "desc": "Cuando golpeás a una criatura con Eldritch Blast, la empujás 10 ft lejos de vos.",
+      "disparadores": { "hechizo": "Eldritch Blast" }
     }
   ],
   "equipo": [

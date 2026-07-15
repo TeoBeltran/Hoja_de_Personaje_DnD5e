@@ -87,16 +87,17 @@ const SKILL_DESC = {
 };
 
 // Propiedades de Weapon Mastery (DnD 5.5e / 2024). Cada arma tiene UNA de estas asignada
-// según su tipo (ver campo "maestriaArma" en el JSON del arma).
+// según su tipo (ver campo "maestriaArma" en el JSON del arma, con la clave en inglés como
+// identificador estable). "nombre" es lo que se muestra en pantalla, en español.
 const MAESTRIA_ARMA_INFO = {
-    'Cleave': { emoji: '🪓', desc: 'Si golpeás con el ataque, podés hacer un ataque extra (sin bono de característica al daño) contra otra criatura a 5 ft de la primera y dentro de tu alcance.' },
-    'Graze': { emoji: '🩸', desc: 'Si tu tirada de ataque FALLA, igual hacés daño igual a tu modificador de característica (sin dados) al objetivo.' },
-    'Nick': { emoji: '🔪', desc: 'Al atacar con esta arma y otra arma liviana, podés hacer el ataque extra de Liviana como parte de la misma Acción (no como Acción Bonus), pero solo una vez por turno.' },
-    'Push': { emoji: '👊', desc: 'Si golpeás con el ataque, podés empujar al objetivo hasta 10 ft lejos tuyo, si es de tamaño Grande o menor.' },
-    'Sap': { emoji: '😵', desc: 'Si golpeás con el ataque, el objetivo tiene DESVENTAJA en su próxima tirada de ataque antes de tu próximo turno.' },
-    'Slow': { emoji: '🐌', desc: 'Si golpeás con el ataque, podés reducir 10 ft la velocidad del objetivo hasta el inicio de tu próximo turno (una vez por turno).' },
-    'Topple': { emoji: '💥', desc: 'Si golpeás con el ataque, podés forzar una salvación de CON; si falla, el objetivo cae Derribado.' },
-    'Vex': { emoji: '🎯', desc: 'Si golpeás con el ataque, tenés VENTAJA en tu próxima tirada de ataque contra ese mismo objetivo antes de que termine tu próximo turno.' }
+    'Cleave': { nombre: 'Tajo', emoji: '🪓', desc: 'Si golpeás con el ataque, podés hacer un ataque extra (sin bono de característica al daño) contra otra criatura a 5 ft de la primera y dentro de tu alcance.' },
+    'Graze': { nombre: 'Rozar', emoji: '🩸', desc: 'Si tu tirada de ataque FALLA, igual hacés daño igual a tu modificador de característica (sin dados) al objetivo.' },
+    'Nick': { nombre: 'Golpe Doble', emoji: '🔪', desc: 'Al atacar con esta arma y otra arma liviana, podés hacer el ataque extra de Liviana como parte de la misma Acción (no como Acción Bonus), pero solo una vez por turno.' },
+    'Push': { nombre: 'Empujar', emoji: '👊', desc: 'Si golpeás con el ataque, podés empujar al objetivo hasta 10 ft lejos tuyo, si es de tamaño Grande o menor.' },
+    'Sap': { nombre: 'Debilitar', emoji: '😵', desc: 'Si golpeás con el ataque, el objetivo tiene DESVENTAJA en su próxima tirada de ataque antes de tu próximo turno.' },
+    'Slow': { nombre: 'Ralentizar', emoji: '🐌', desc: 'Si golpeás con el ataque, podés reducir 10 ft la velocidad del objetivo hasta el inicio de tu próximo turno (una vez por turno).' },
+    'Topple': { nombre: 'Derribar', emoji: '💥', desc: 'Si golpeás con el ataque, podés forzar una salvación de CON; si falla, el objetivo cae Derribado.' },
+    'Vex': { nombre: 'Hostigar', emoji: '🎯', desc: 'Si golpeás con el ataque, tenés VENTAJA en tu próxima tirada de ataque contra ese mismo objetivo antes de que termine tu próximo turno.' }
 };
 
 export {

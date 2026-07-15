@@ -76,15 +76,21 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.", "bonoDano": 2, "aplicaA": "duelingMelee" },
+    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.", "bonoDano": 2, "aplicaA": "duelingMelee", "disparadores": { "arma": { "tipo": "melee", "manos": 1 } } },
     { "nombre": "Aura of Protection", "desc": "Vos y cualquier criatura aliada dentro de 10 ft tuyos suman tu modificador de CHA (mínimo +1) a sus tiradas de salvación. Necesitás estar consciente para que el aura funcione." },
     { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
-    { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno." },
+    { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno.", "disparadores": { "arma": true } },
     { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
     { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." },
     { "nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
     { "nombre": "Aura del Gran Panal",
-      "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+1 (máximo 4) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo. <br><br> Las criaturas salvajes tienen 1d4+1 (máximo 4) de daño extra al atacar objetivos Enmielados. <br> Si la criatura es un Oso, tiene ventaja en la tirada de ataque."
+      "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+3 (máximo 7) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo. <br><br> Las criaturas salvajes tienen 1d4+3 (máximo 7) de daño extra al atacar objetivos Enmielados. <br> Si la criatura es un Oso, tiene ventaja en la tirada de ataque."
+    },
+    { "nombre": "Aura del Gran Panal (daño)",
+      "desc": "Si el objetivo está Enmielado: +1d4+3 (máx. 7) de daño Radiante extra.",
+      "oculto": true,
+      "colorCard": "#6a1b9a",
+      "disparadores": { "arma": true, "hechizo": true }
     },
     { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"},
     { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
@@ -151,9 +157,11 @@
         "nombre": "Radiant Soul",
         "usos": "1/1",
         "recupera": "largo",
-        "accion": "Acción",
+        "accion": "Acción Bonus",
         "duracion": "1 minuto",
-        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Una vez por turno hacés daño radiante extra igual a tu nivel al usar un ataque o spell. Se apaga con Acción Bonus."
+        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Mientras esté activo, hacés daño radiante extra igual a tu nivel al usar un ataque o hechizo. Se activa y desactiva como Acción Bonus (el botón cambia solo).",
+        "toggleBonoDano": { "formula": "nivelPersonaje", "tipoDano": "radiante" },
+        "disparadoresSiActivo": { "arma": true, "hechizo": true }
     },
     {
         "nombre": "Polearm Master",
@@ -164,11 +172,12 @@
     },
     {
         "nombre": "Honey Smite",
-        "usos": "1/1",
-        "recupera": "largo",
+        "tipo": "smite",
+        "tipoDano": "radiante",
+        "danoPorNivel": { "1": "1d6" },
         "accion": "Sin acción",
         "distancia": "Melee",
-        "desc": "Cuando golpeás con un ataque cuerpo a cuerpo y decidís no usar Divine Smite, podés activar Honey Smite sin consumir ninguna acción. <br>Cae un rayo de miel sobre el objetivo, recibiendo 1d6 de daño radiante y quedando Enmielado."
+        "desc": "Cuando golpeás con un ataque cuerpo a cuerpo y decidís no usar Divine Smite, podés activar Honey Smite sin consumir ninguna acción. Gasta una ranura de hechizo de Nivel 1 (siempre Nivel 1, no escala). Cae un rayo de miel sobre el objetivo: 1d6 de daño radiante y queda Enmielado."
     },
     {
         "nombre": "Consagración del Panal",

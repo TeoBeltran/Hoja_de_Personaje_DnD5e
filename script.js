@@ -47,6 +47,7 @@ let vidaMaximaOriginal = 0;
 let caActual = 0;
 let caOriginal = 0;
 let habilidadesUsoState = {};
+let togglesActivos = {}; // { "Radiant Soul": true, ... } - habilidades tipo interruptor (se activan y desactivan, no se "gastan" al apagarlas)
 let habilidadesUsoOriginales = {};
 let hitDiceActual = 0;
 let hitDiceMaximo = 0;
@@ -63,6 +64,7 @@ let escudoEquipadoId = null;
 let escudoEquipadoBase = 0;
 let armasEquipadas = [];   // array de nombres de armas equipadas
 let notasEquipoActuales = []; // notas de items equipados a mostrar al lanzar hechizos (ej: "ignora cobertura")
+let ultimoDanoMostrado = ''; // último "Xd6 fuego" calculado, para repetirlo en el modal de Efectos Activados
 
 // === Circle of the Land (DnD 5.5e) ===
 let circuloDeLaTierraGlobal = null; // { landActual, opciones } del JSON, si la clase lo tiene
@@ -127,7 +129,7 @@ let pesoMaximo = 0;
 let tamanoPersonaje = 'estandar';
 
 // === Sistema de turno ===
-let turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 };
+let turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1, golpesRestantes: 0 };
 let extraAttacks = 1; // 2 si tiene "Extra Attack", 3 si tiene "Extra Attack (2)", etc.
 let actionSurgeActivo = false; // Flag: cuando se usa Action Surge, el próximo "Terminé mi turno" no termina sino que reinicia
 let mageArmorActivo = false; // Flag: si Mage Armor está activo, la CA se calcula con armaduraMagicaBase + DEX
@@ -179,6 +181,24 @@ function guardarHitDice() {
 
 function guardarHabilidadesUso() {
     localStorage.setItem(STORAGE_PREFIX + 'habilidadesUso', JSON.stringify(habilidadesUsoState));
+}
+
+function guardarToggles() {
+    localStorage.setItem(STORAGE_PREFIX + 'togglesActivos', JSON.stringify(togglesActivos));
+}
+
+// Suma el daño extra de cualquier habilidad tipo "interruptor" (toggleBonoDano) que esté
+// activa (ej: Radiant Soul: +nivel de daño radiante mientras esté prendida). Devuelve una
+// lista de {nombre, valor} para mezclar con los demás bonos de daño de un arma.
+function bonoDanoDeTogglesActivos() {
+    const detalles = [];
+    (window._habilidadesUsoData || []).forEach(h => {
+        if (h.toggleBonoDano && togglesActivos[h.nombre]) {
+            const valor = evaluarFormula(h.toggleBonoDano.formula, { nivelPersonaje: nivelPersonajeGlobal });
+            if (valor) detalles.push({ nombre: h.nombre, valor });
+        }
+    });
+    return detalles;
 }
 
 function guardarInventario() {
@@ -244,11 +264,77 @@ let abrirModalVidaTrasEfectos = false;
 // calcularBonosEquipoActivo) y NUNCA deben disparar el modal de notificaciones de procesarEfectos.
 const TIPOS_EFECTO_PASIVO_EQUIPO = ['CA', 'salvaciones', 'bonoAtaqueHechizo', 'bonoCDHechizo', 'bonoAtaqueMelee', 'ignorarCobertura', 'curacionExtra'];
 
-// Procesa los efectos de un item y muestra el modal si hay alguno aplicable
-function procesarEfectos(item, contexto) {
-    if (!item || !item.efectos || !Array.isArray(item.efectos)) return;
+// Chequea si un rasgo (con campo "disparadores") aplica al contexto actual.
+// disparadores = { arma: true, hechizo: true, curacion: {tipoDano:'curación'}, habilidad: "Second Wind" }
+// - true            → aplica siempre que ese tipo de contexto esté activo
+// - string          → aplica solo si item.nombre coincide exactamente (ej: una habilidad puntual)
+// - objeto {a:b}    → aplica solo si item[a] === b para TODAS las claves (ej: {manos:2, tipo:'melee'})
+function rasgoAplicaAContexto(rasgo, tiposContexto, item) {
+    if (!rasgo.disparadores) return false;
+    return tiposContexto.some(tipo => {
+        const cond = rasgo.disparadores[tipo];
+        if (!cond) return false;
+        if (cond === true) return true;
+        if (typeof cond === 'string') return !!item && item.nombre === cond;
+        if (typeof cond === 'object') return !!item && Object.keys(cond).every(k => item[k] === cond[k]);
+        return false;
+    });
+}
 
-    const efectosAplicables = item.efectos.filter(e => {
+// Procesa los efectos de un item y muestra el modal si hay alguno aplicable.
+// contexto.tipos = array de etiquetas del disparo actual, ej: ['arma'], ['hechizo'], ['habilidad'].
+// contexto.danoTexto = si se pasa, se muestra como recap arriba de todo (ej: "9d6 fuego").
+function procesarEfectos(item, contexto) {
+    if (!item) return;
+    contexto = contexto || {};
+    const tiposContexto = contexto.tipos || [];
+
+    // Armar la lista de efectos a evaluar. Si el item es un arma con maestriaArma asignada
+    // y el personaje tiene el rasgo "Weapon Mastery", se agrega automáticamente una notificación
+    // con esa propiedad (Tajo, Rozar, etc.) sin tener que declararla a mano en cada arma.
+    let listaEfectos = Array.isArray(item.efectos) ? [...item.efectos] : [];
+    if (item.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[item.maestriaArma]) {
+        const m = MAESTRIA_ARMA_INFO[item.maestriaArma];
+        listaEfectos.unshift({
+            tipo: 'notificacion',
+            descripcion: `${m.emoji} Maestría: ${m.nombre}`,
+            mensaje: m.desc
+        });
+    }
+
+    // Rasgos "globales" del personaje con disparadores que matcheen este contexto (ej: Improved
+    // Critical o Remarkable Athlete en CUALQUIER arma, sin tener que copiarlo en cada una).
+    (rasgosGlobal || []).forEach(rasgo => {
+        if (rasgoAplicaAContexto(rasgo, tiposContexto, item)) {
+            const yaEstaba = listaEfectos.some(e => e.rasgoRequerido === rasgo.nombre || e.descripcion === rasgo.nombre);
+            if (!yaEstaba) {
+                listaEfectos.push({ tipo: 'notificacion', descripcion: rasgo.nombre, mensaje: rasgo.desc, colorCard: rasgo.colorCard, colorCardFondo: rasgo.colorCardFondo });
+            }
+        }
+    });
+
+    // Habilidades (no rasgos) con disparadores propios. Dos casos:
+    // - "disparadores" directo: siempre activo (ej: Eldritch Invocation: Grasp of Hadar,
+    //   que no se "usa" con botón, es un recordatorio pasivo atado a Eldritch Blast).
+    // - "disparadoresSiActivo" + "toggleBonoDano": solo si está prendida (ej: Radiant Soul).
+    (window._habilidadesUsoData || []).forEach(hab => {
+        const yaEstaba = () => listaEfectos.some(e => e.descripcion === hab.nombre);
+        if (hab.disparadores && rasgoAplicaAContexto(hab, tiposContexto, item) && !yaEstaba()) {
+            listaEfectos.push({ tipo: 'notificacion', descripcion: hab.nombre, mensaje: hab.desc });
+        } else if (hab.toggleBonoDano && togglesActivos[hab.nombre] && hab.disparadoresSiActivo
+            && rasgoAplicaAContexto({ disparadores: hab.disparadoresSiActivo }, tiposContexto, item) && !yaEstaba()) {
+            const valor = evaluarFormula(hab.toggleBonoDano.formula, { nivelPersonaje: nivelPersonajeGlobal });
+            listaEfectos.push({
+                tipo: 'notificacion',
+                descripcion: `⚡ ${hab.nombre} (activo)`,
+                mensaje: `Sumás +${valor} de daño${hab.toggleBonoDano.tipoDano ? ' ' + hab.toggleBonoDano.tipoDano : ''} extra a este ataque. Se apaga desde el botón de ${hab.nombre}.`
+            });
+        }
+    });
+
+    if (listaEfectos.length === 0 && !contexto.danoTexto) return;
+
+    const efectosAplicables = listaEfectos.filter(e => {
         // Los efectos pasivos de equipo no van en este modal, se aplican solos
         if (TIPOS_EFECTO_PASIVO_EQUIPO.includes(e.tipo)) return false;
         // Si requiere un rasgo, validar que el personaje lo tenga
@@ -256,7 +342,7 @@ function procesarEfectos(item, contexto) {
         return true;
     });
 
-    if (efectosAplicables.length === 0) return;
+    if (efectosAplicables.length === 0 && !contexto.danoTexto) return;
 
     // Si hay un efecto de tipo "notificacionYAbreVida", marcar para abrir modal de vida al cerrar
     abrirModalVidaTrasEfectos = efectosAplicables.some(e => e.tipo === 'notificacionYAbreVida');
@@ -266,9 +352,19 @@ function procesarEfectos(item, contexto) {
     if (!lista) return;
     lista.innerHTML = '';
 
+    // Recap del daño (ej: para Fireball elegido en Nivel 4, repetir "9d6 fuego" acá arriba)
+    if (contexto.danoTexto) {
+        const divDano = document.createElement('div');
+        divDano.style.cssText = 'padding: 12px; background-color: #f3e5f5; border: 2px solid #6a1b9a; border-radius: var(--border-radius); text-align: center;';
+        divDano.innerHTML = `<span style="font-size: 1.3rem; font-weight: bold; color: #6a1b9a;">💥 ${contexto.danoTexto}</span>`;
+        lista.appendChild(divDano);
+    }
+
     efectosAplicables.forEach(efecto => {
         const div = document.createElement('div');
-        div.style.cssText = 'padding: 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-left: 4px solid var(--accent-color); border-radius: var(--border-radius);';
+        const colorBorde = efecto.colorCard || 'var(--accent-color)';
+        const colorFondo = efecto.colorCard ? (efecto.colorCardFondo || '#f3e5f5') : '#fbf9f4';
+        div.style.cssText = `padding: 12px; background-color: ${colorFondo}; border: 1px solid var(--border-color); border-left: 4px solid ${colorBorde}; border-radius: var(--border-radius);`;
 
         let mensaje = '';
         if (efecto.tipo === 'autoCuracion') {
@@ -305,8 +401,8 @@ function procesarEfectos(item, contexto) {
         }
 
         div.innerHTML = `
-            <div style="font-weight: bold; color: var(--accent-color); margin-bottom: 4px;">${efecto.descripcion}</div>
-            <div style="font-size: 0.95rem;">${mensaje}</div>
+            <div style="font-weight: bold; color: ${colorBorde}; margin-bottom: 4px;">${efecto.descripcion}</div>
+            <div style="font-size: 0.95rem; color: ${efecto.colorCard ? colorBorde : 'var(--text-color)'};">${mensaje}</div>
         `;
         lista.appendChild(div);
     });
@@ -315,7 +411,7 @@ function procesarEfectos(item, contexto) {
 }
 
 // === Divine Smite ===
-let smiteData = null; // Guarda el objeto smite del JSON si la clase lo tiene
+let smitesData = []; // Guarda TODOS los objetos "smite" del JSON (Divine Smite, Honey Smite, etc.)
 
 // Mapea nivel de hechizo a ranura.
 // Genérico: soporta cualquier "NIVEL n" (1-9), no solo hasta el 4.
@@ -532,6 +628,21 @@ function modificarVida(cantidad) {
 // que no sea la armadura/escudo principal). También suma el bono de ataque intrínseco
 // de un arma mágica (item.bonoAtaque) al header de Atk Melee/Finesse correspondiente,
 // solo si esa arma está efectivamente equipada.
+// Algunas armas tienen el bono mágico horneado directo en el string de daño (ej: "2d6+2")
+// en vez de en el campo separado "bonoDano". Esto lo separa para poder mostrarlo etiquetado
+// igual que cualquier otro bono ("Arma mágica"), en vez de quedar pegado sin explicación.
+// Pone mayúscula la primera letra (ej: "radiante" → "Radiante")
+function capitalizar(str) {
+    if (!str) return str;
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function extraerBonusHorneado(danoStr) {
+    const match = /^(\d+d\d+)\+(\d+)$/.exec(danoStr || '');
+    if (match) return { base: match[1], bonus: parseInt(match[2]) };
+    return { base: danoStr, bonus: 0 };
+}
+
 function calcularBonosEquipoActivo() {
     const bonos = { CA: 0, salvaciones: 0, bonoAtaqueHechizo: 0, bonoCDHechizo: 0, atkMeleeExtra: 0, atkFinesseExtra: 0 };
     const notas = [];
@@ -943,9 +1054,10 @@ function cargarTurnoEstado() {
     if (guardado) {
         try {
             turnoEstado = JSON.parse(guardado);
-            // Compatibilidad con turnos guardados antes de que existiera "objeto"
+            // Compatibilidad con turnos guardados antes de que existieran estos campos
             if (turnoEstado.objeto === undefined) turnoEstado.objeto = 1;
-        } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 }; }
+            if (turnoEstado.golpesRestantes === undefined) turnoEstado.golpesRestantes = 0;
+        } catch(e) { turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1, golpesRestantes: 0 }; }
     }
 }
 
@@ -1018,16 +1130,16 @@ function consumirAccion(tipoAccion) {
 }
 
 function resetearTurno() {
-    turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1 };
+    turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1, golpesRestantes: 0 };
     guardarTurnoEstado();
     actualizarTurnoDOM();
 }
 
-// === Divine Smite ===
+// === Divine Smite (y cualquier otro "smite", ej: Honey Smite) ===
 
-// Verifica si el arma usada califica para Smite (debe ser melee)
+// Verifica si el arma usada califica para algún Smite disponible (debe ser melee)
 function armaPuedeGatillarSmite(nombreArma, equipoData) {
-    if (!smiteData) return false;
+    if (!smitesData || smitesData.length === 0) return false;
     const arma = equipoData.find(e => e.nombre === nombreArma);
     if (!arma) return false;
     // Smite solo aplica a ataques melee (no a ranged como ballestas)
@@ -1035,36 +1147,56 @@ function armaPuedeGatillarSmite(nombreArma, equipoData) {
     return arma.tipo === 'melee' || arma.tipo === 'finesse';
 }
 
-// Abre el modal de Smite con los niveles disponibles
+// Abre el modal de Smite combinando las opciones de TODOS los smites que tenga el personaje
+// (ej: Divine Smite con varios niveles de ranura + Honey Smite con su propio uso fijo Nivel 1).
 function abrirModalSmite() {
     const smiteModal = document.getElementById('smite-modal');
     const cont = document.getElementById('smite-opciones');
-    if (!smiteModal || !cont || !smiteData) return;
+    if (!smiteModal || !cont || !smitesData || smitesData.length === 0) return;
 
     cont.innerHTML = '';
 
-    // Recorrer ranuras y mostrar solo las disponibles con daño correspondiente
-    Object.keys(smiteData.danoPorNivel).forEach(nivelNum => {
-        const nivelKey = `Nivel ${nivelNum}`;
-        const disponibles = parseInt(ranurasState[nivelKey] || 0);
-        const dano = smiteData.danoPorNivel[nivelNum];
+    smitesData.forEach(smite => {
+        // Header con el nombre del smite, solo si hay más de uno (para no ensuciar si es solo Divine Smite)
+        if (smitesData.length > 1) {
+            const header = document.createElement('div');
+            header.style.cssText = 'font-weight: bold; color: var(--accent-color); margin-top: 8px;';
+            header.textContent = smite.nombre;
+            cont.appendChild(header);
+        }
 
-        const btn = document.createElement('button');
-        btn.className = 'hp-btn';
-        btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${disponibles <= 0 ? 'background-color: #999; cursor: not-allowed;' : 'background-color: #6a1b9a; color: white;'}`;
-        btn.disabled = disponibles <= 0;
-        btn.innerHTML = `Slot Nivel ${nivelNum} → ${dano} ${smiteData.tipoDano} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${disponibles} disponibles)</span>`;
+        Object.keys(smite.danoPorNivel).forEach(nivelNum => {
+            const nivelKey = `Nivel ${nivelNum}`;
+            const disponibles = parseInt(ranurasState[nivelKey] || 0);
+            const dano = smite.danoPorNivel[nivelNum];
 
-        btn.onclick = () => {
-            if (disponibles <= 0) return;
-            // Consumir la ranura
-            ranurasState[nivelKey] = String(disponibles - 1);
-            guardarRanuras();
-            actualizarRanuraDOM(nivelKey);
-            smiteModal.style.display = 'none';
-            mostrarToast(`⚔️ ¡Divine Smite! +${dano} ${smiteData.tipoDano}`);
-        };
-        cont.appendChild(btn);
+            const btn = document.createElement('button');
+            btn.className = 'hp-btn';
+            btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${disponibles <= 0 ? 'background-color: #999; cursor: not-allowed;' : 'background-color: #6a1b9a; color: white;'}`;
+            btn.disabled = disponibles <= 0;
+            btn.innerHTML = `Slot Nivel ${nivelNum} → ${dano} ${smite.tipoDano} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${disponibles} disponibles)</span>`;
+
+            btn.onclick = () => {
+                if (disponibles <= 0) return;
+                ranurasState[nivelKey] = String(disponibles - 1);
+                guardarRanuras();
+                actualizarRanuraDOM(nivelKey);
+                smiteModal.style.display = 'none';
+                mostrarToast(`⚔️ ¡${smite.nombre}! +${dano} ${smite.tipoDano}`);
+
+                // Abrir el modal de Efectos Activados con el recap del daño del smite,
+                // y cualquier rasgo/habilidad que corresponda a este contexto (tag 'smite').
+                setTimeout(() => {
+                    procesarEfectos(smite, {
+                        nivelHechizo: parseInt(nivelNum),
+                        nivelPersonaje: nivelPersonajeGlobal,
+                        tipos: ['smite'],
+                        danoTexto: `${dano} ${smite.tipoDano}`
+                    });
+                }, 300);
+            };
+            cont.appendChild(btn);
+        });
     });
 
     smiteModal.style.display = 'flex';
@@ -1111,14 +1243,17 @@ function abrirModalEscalaSlot(item, tipoAccion) {
                 const notasTxt = notasEquipoActuales.length ? ` 🪄 ${notasEquipoActuales.join(' ')}` : '';
                 mostrarToast(`✨ ¡${item.nombre} usado! ${dano}${item.tipoDano ? ' ' + item.tipoDano : ''} (ranura Nivel ${nivelNum}). ${r.mensaje}${notasTxt}`.trim());
 
-                // Disparar efectos automáticos y familiar igual que un hechizo normal
-                if (item.efectos) {
-                    setTimeout(() => {
-                        procesarEfectos(item, { nivelHechizo: nivelNum, nivelPersonaje: nivelPersonajeGlobal });
-                    }, 400);
-                }
+                // Disparar efectos automáticos (rasgos de hechizo, etc.) y familiar
+                setTimeout(() => {
+                    procesarEfectos(item, {
+                        nivelHechizo: nivelNum,
+                        nivelPersonaje: nivelPersonajeGlobal,
+                        tipos: ['hechizo'],
+                        danoTexto: `${dano}${item.tipoDano ? ' ' + item.tipoDano : ''}`
+                    });
+                }, 400);
                 if (item.familiar) {
-                    setTimeout(() => activarFamiliar(item.familiar), item.efectos ? 900 : 400);
+                    setTimeout(() => activarFamiliar(item.familiar), 900);
                 }
             };
             cont.appendChild(btn);
@@ -1373,6 +1508,19 @@ function tomarDescanso(tipo) {
         }
     });
     guardarHabilidadesUso();
+
+    // Cualquier habilidad tipo interruptor (Radiant Soul, etc.) se apaga sola en CUALQUIER
+    // descanso: su efecto real dura 1 minuto, así que para cuando termina un descanso corto
+    // o largo ya se cortó solo. Si no la apagamos acá, el botón se queda trabado en
+    // "Desactivar X" y tapa el hecho de que el uso ya se recargó.
+    let huboToggleApagado = false;
+    Object.keys(togglesActivos).forEach(nombre => {
+        if (togglesActivos[nombre]) {
+            togglesActivos[nombre] = false;
+            huboToggleApagado = true;
+        }
+    });
+    if (huboToggleApagado) guardarToggles();
 
     // Si es descanso largo, restaurar vida y Hit Dice al máximo
     if (tipo === 'largo') {
@@ -1657,6 +1805,13 @@ async function init() {
     // calcularCA()/calcularBonosEquipoActivo() que corren ANTES de llegar al bloque
     // original donde esto se seteaba (línea de más abajo, ahora redundante pero inofensiva).
     window._equipoData = data.equipo;
+    window._habilidadesUsoData = data.habilidadesUso || [];
+
+    // Cargar toggles activos guardados (ej: Radiant Soul activado en una sesión anterior)
+    const togglesGuardados = localStorage.getItem(STORAGE_PREFIX + 'togglesActivos');
+    if (togglesGuardados) {
+        try { togglesActivos = JSON.parse(togglesGuardados); } catch (e) { togglesActivos = {}; }
+    }
 
     if (impG && data.improvements) {
         const agregar = (titulo, texto) => {
@@ -1790,6 +1945,10 @@ async function init() {
     aplicarBackground(data.background, data.equipo);
 
     rasgosGlobal.forEach(i => {
+        // Rasgos marcados "oculto" no se muestran en la lista (pero rasgosGlobal los sigue
+        // teniendo, así que procesarEfectos igual los usa para el popup de "Efectos Activados").
+        if (i.oculto) return;
+
         const btn = document.createElement('button');
         btn.className = 'skill-btn';
         btn.style.flexDirection = 'column';
@@ -1854,23 +2013,33 @@ async function init() {
         btn.style.height = 'auto';
 
         let danoFinal = i.dano || '';
+        let detalleDanoHTML = '';
         if (i.dano && i.tipo) {
             const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
             const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
             const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
-            const detallesConMagico = i.bonoDano
-                ? [...bonosInfo.detalles, { nombre: 'Arma mágica', valor: i.bonoDano }]
-                : bonosInfo.detalles;
-            danoFinal = formatearDanoConBonos(i.dano, modUsado, detallesConMagico);
+            const { base: danoBaseLimpio, bonus: bonusHorneado } = extraerBonusHorneado(i.dano);
+            const detallesConMagico = [...bonosInfo.detalles];
+            if (i.bonoDano) detallesConMagico.push({ nombre: 'Arma mágica', valor: i.bonoDano });
+            if (bonusHorneado) detallesConMagico.push({ nombre: 'Arma mágica', valor: bonusHorneado });
+            detallesConMagico.push(...bonoDanoDeTogglesActivos());
+            danoFinal = formatearDanoConBonos(danoBaseLimpio, modUsado, detallesConMagico);
+
+            // Mostrar de dónde sale cada "+N" (STR/DEX, Fighting Style, arma mágica, etc.)
+            // para que no quede como una suma rara sin explicación (ej: "1d6+2+2+1").
+            const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, detallesConMagico);
+            if (detalleStr) {
+                detalleDanoHTML = `<span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px;">${detalleStr}</span>`;
+            }
         }
         if (i.ataques && i.ataques > 1 && danoFinal) {
             danoFinal = `${danoFinal} ×${i.ataques}`;
         }
 
         const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
-        const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${i.tipoDano}</span>` : '';
+        const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee; margin-left: 6px;">${capitalizar(i.tipoDano)}</span>` : '';
         const maestriaHTML = (i.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[i.maestriaArma])
-            ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-left: 6px;">${MAESTRIA_ARMA_INFO[i.maestriaArma].emoji} ${i.maestriaArma}</span>`
+            ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5; margin-left: 6px;">${MAESTRIA_ARMA_INFO[i.maestriaArma].emoji} ${MAESTRIA_ARMA_INFO[i.maestriaArma].nombre}</span>`
             : '';
 
         let armaduraHTML = '';
@@ -1878,12 +2047,12 @@ async function init() {
             const esEscudo = (i.tipoArmadura === 'escudo');
             const labelBadge = esEscudo ? `+${i.armaduraBase} CA` : `CA: ${i.armaduraBase}`;
             const tipoLabel = i.tipoArmadura ? ` (${i.tipoArmadura})` : '';
-            armaduraHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-right: 6px;">${labelBadge}${tipoLabel}</span>`;
+            armaduraHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5; margin-right: 6px;">${labelBadge}${tipoLabel}</span>`;
         }
 
         let manosHTML = '';
         if (i.manos && i.manos > 0) {
-            manosHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-right: 6px;">${i.manos === 2 ? '2 manos' : '1 mano'}</span>`;
+            manosHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); background-color: #ede0d0; margin-right: 6px;">${i.manos === 2 ? '2 manos' : '1 mano'}</span>`;
         }
 
         const eq = estaEquipado(i);
@@ -1911,6 +2080,7 @@ async function init() {
                     ${maestriaHTML}
                 </div>
             </div>
+            ${detalleDanoHTML}
             ${infoLineaHTML}
             <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${i.desc.replace(/\n/g, '<br>')}</span>
             ${equipadoBadgeHTML}
@@ -1928,6 +2098,7 @@ async function init() {
         const cont = document.getElementById('modal-badges');
         if (!cont) return;
         cont.innerHTML = '';
+        ultimoDanoMostrado = '';
 
         const partes = [];
 
@@ -1944,11 +2115,21 @@ async function init() {
             }
             const bonosModalInfo = calcularBonosDano(item, esHechizoItem, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
             const ataquesItem = esHechizoItem ? resolverAtaques(item, nivelPersonaje) : (item.ataques || 1);
-            const detallesModalConMagico = (!esHechizoItem && item.bonoDano)
-                ? [...bonosModalInfo.detalles, { nombre: 'Arma mágica', valor: item.bonoDano }]
-                : bonosModalInfo.detalles;
-            danoTexto = formatearDanoConBonos(danoBase, modUsado, detallesModalConMagico);
+            let danoBaseFinal = danoBase;
+            const detallesModalConMagico = [...bonosModalInfo.detalles];
+            if (!esHechizoItem) {
+                if (item.bonoDano) detallesModalConMagico.push({ nombre: 'Arma mágica', valor: item.bonoDano });
+                const { base: baseSinHornear, bonus: bonusHorneado } = extraerBonusHorneado(danoBase);
+                if (bonusHorneado) {
+                    danoBaseFinal = baseSinHornear;
+                    detallesModalConMagico.push({ nombre: 'Arma mágica', valor: bonusHorneado });
+                }
+            }
+            // Toggles activos (ej: Radiant Soul) suman daño extra tanto a armas como a hechizos
+            detallesModalConMagico.push(...bonoDanoDeTogglesActivos());
+            danoTexto = formatearDanoConBonos(danoBaseFinal, modUsado, detallesModalConMagico);
             if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
+            ultimoDanoMostrado = item.tipoDano ? `${danoTexto} ${item.tipoDano}` : danoTexto;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
 
             // Tooltip con detalle de bonos
@@ -1972,13 +2153,13 @@ async function init() {
 
         // Tipo de daño
         if (item.tipoDano) {
-            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${item.tipoDano}</span>`);
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee;">${capitalizar(item.tipoDano)}</span>`);
         }
 
         // Weapon Mastery (badge compacto; la descripción completa va debajo, en modalDesc)
         if (item.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[item.maestriaArma]) {
             const m = MAESTRIA_ARMA_INFO[item.maestriaArma];
-            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">${m.emoji} ${item.maestriaArma}</span>`);
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">${m.emoji} ${m.nombre}</span>`);
         }
 
         // Manos
@@ -2076,14 +2257,21 @@ async function init() {
             } else {
                 useSpellBtn.dataset.habilidad = item.nombre;
                 useSpellBtn.dataset.smite = '';
-                // Si el item consume el pool de OTRA habilidad (ej: Harness Divine Power usa
-                // el contador compartido de "Channel Divinity"), mostrar y chequear ESE pool.
-                const nombreControl = item.consumeUsoDe || item.nombre;
-                const dispActuales = parseInt((habilidadesUsoState[nombreControl] || '0/0').split('/')[0]);
-                useSpellBtn.disabled = dispActuales <= 0;
-                useSpellBtn.textContent = dispActuales > 0
-                    ? `Usar Habilidad (${habilidadesUsoState[nombreControl]})`
-                    : 'Sin usos disponibles';
+
+                if (item.toggleBonoDano && togglesActivos[item.nombre]) {
+                    // Ya está activa: el botón pasa a ser "Desactivar", no gasta usos
+                    useSpellBtn.disabled = false;
+                    useSpellBtn.textContent = `Desactivar ${item.nombre}`;
+                } else {
+                    // Si el item consume el pool de OTRA habilidad (ej: Harness Divine Power usa
+                    // el contador compartido de "Channel Divinity"), mostrar y chequear ESE pool.
+                    const nombreControl = item.consumeUsoDe || item.nombre;
+                    const dispActuales = parseInt((habilidadesUsoState[nombreControl] || '0/0').split('/')[0]);
+                    useSpellBtn.disabled = dispActuales <= 0;
+                    useSpellBtn.textContent = dispActuales > 0
+                        ? `Usar Habilidad (${habilidadesUsoState[nombreControl]})`
+                        : 'Sin usos disponibles';
+                }
             }
         } else {
             modalActions.style.display = 'none';
@@ -2101,7 +2289,7 @@ async function init() {
         // personaje tiene el rasgo "Weapon Mastery", mostrar qué hace esa propiedad.
         if (item.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[item.maestriaArma]) {
             const m = MAESTRIA_ARMA_INFO[item.maestriaArma];
-            modalDesc.innerHTML += `<br><br><strong style="color:#6a1b9a;">${m.emoji} Maestría: ${item.maestriaArma}</strong><br>${m.desc}`;
+            modalDesc.innerHTML += `<br><br><strong style="color:#6a1b9a;">${m.emoji} Maestría: ${m.nombre}</strong><br>${m.desc}`;
         }
 
         // Llenar badges (mini cards) y línea celeste
@@ -2270,7 +2458,7 @@ async function init() {
 
     // Detectar Divine Smite (si la clase tiene una habilidad con tipo "smite")
     if (data.habilidadesUso) {
-        smiteData = data.habilidadesUso.find(h => h.tipo === 'smite') || null;
+        smitesData = (data.habilidadesUso || []).filter(h => h.tipo === 'smite');
     }
 
     // === Listeners del inventario ===
@@ -2410,23 +2598,13 @@ async function init() {
         });
     }
 
-    // Click en cada contador → solo permite RESTAURAR (no gastar manualmente)
-    // Acción Adicional y Reacción NO se pueden restaurar a mano (solo al terminar turno).
-    // Acción solo se puede restaurar si tiene Extra Attack (max > 1).
+    // Click en cada contador → ya no se restaura nada manualmente acá. Extra Attack ahora se
+    // maneja automático y preciso con turnoEstado.golpesRestantes (ver Caso 3 del listener de
+    // useSpellBtn): el primer golpe con un arma gasta la Acción real, y los golpes extra que
+    // corresponden por Extra Attack salen solos sin volver a pedir la Acción.
     document.querySelectorAll('.turno-item').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            const tipo = btn.dataset.tipo;
-            // Bonus y Reacción no se restauran manualmente
-            if (tipo !== 'accion') return;
-            // Solo restaurar Acción si tiene Extra Attack
-            if (extraAttacks <= 1) return;
-            if (turnoEstado[tipo] === 0) {
-                turnoEstado[tipo] = 1;
-                guardarTurnoEstado();
-                actualizarTurnoDOM();
-                mostrarToast('Acción restaurada');
-            }
         });
     });
 
@@ -2578,7 +2756,7 @@ async function init() {
 
             // Si es Smite, mostrar badge especial con tipo de daño
             const smiteBadgeHTML = h.tipo === 'smite' && h.tipoDano
-                ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${h.tipoDano}</span>`
+                ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee;">${capitalizar(h.tipoDano)}</span>`
                 : '';
 
             btn.innerHTML = `
@@ -2671,7 +2849,7 @@ async function init() {
                 if (ataquesSpell > 1) danoTextoSpell = `${danoTextoSpell} ×${ataquesSpell}`;
             }
             const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTextoSpell}</span>` : '';
-            const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${h.tipoDano}</span>` : '';
+            const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee; margin-left: 6px;">${capitalizar(h.tipoDano)}</span>` : '';
 
             // Línea celeste de info
             const partesInfoSpell = [];
@@ -2720,8 +2898,11 @@ async function init() {
             const item = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
             const tipoAccion = item ? item.accion : '';
 
-            // Validar que tenga acciones disponibles ANTES de consumir
-            if (tipoAccion) {
+            // Validar que tenga acciones disponibles ANTES de consumir.
+            // Excepción: si esto va a DESACTIVAR una habilidad tipo interruptor (ej: Radiant
+            // Soul ya prendida), es gratis y no depende de que te queden acciones este turno.
+            const esDesactivarToggle = item && item.toggleBonoDano && togglesActivos[item.nombre];
+            if (tipoAccion && !esDesactivarToggle) {
                 const t = tipoAccion.toLowerCase();
                 if (t.includes('bonus') || t.includes('adicional')) {
                     if (turnoEstado.bonus === 0 && turnoEstado.accion === 0) {
@@ -2734,7 +2915,11 @@ async function init() {
                         return;
                     }
                 } else if (t.includes('acción') || t.includes('accion')) {
-                    if (turnoEstado.accion === 0) {
+                    // Si es un ataque de arma y todavía le quedan golpes extra de Extra Attack,
+                    // dejarlo pasar aunque la Acción ya esté gastada (no vuelve a consumirla).
+                    const esAtaqueDeArma = itemContextoActual && itemContextoActual.tipo === 'equipo' && !!item.dano;
+                    const tieneGolpeExtraDisponible = esAtaqueDeArma && turnoEstado.golpesRestantes > 0;
+                    if (turnoEstado.accion === 0 && !tieneGolpeExtraDisponible) {
                         mostrarToast('Ya usaste tu Acción este turno', 'warning');
                         return;
                     }
@@ -2753,6 +2938,38 @@ async function init() {
             const habilidad = useSpellBtn.dataset.habilidad;
             if (habilidad) {
                 const habObj = data.habilidadesUso ? data.habilidadesUso.find(h => h.nombre === habilidad) : null;
+
+                // Si es una habilidad tipo interruptor (ej: Radiant Soul), este click puede ser
+                // para ACTIVARLA (gasta 1 uso, como cualquier habilidad) o para DESACTIVARLA
+                // (no gasta nada, simplemente apaga el bono mientras estaba prendida).
+                if (habObj && habObj.toggleBonoDano) {
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+
+                    if (togglesActivos[habObj.nombre]) {
+                        // Desactivar: no cuesta acción ni uso
+                        togglesActivos[habObj.nombre] = false;
+                        guardarToggles();
+                        mostrarToast(`${habObj.nombre} desactivado`);
+                    } else {
+                        const partesTog = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+                        let actualTog = parseInt(partesTog[0]);
+                        const maxTog = parseInt(partesTog[1]);
+                        if (actualTog <= 0) {
+                            mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+                            return;
+                        }
+                        actualTog -= 1;
+                        habilidadesUsoState[habObj.nombre] = `${actualTog}/${maxTog}`;
+                        guardarHabilidadesUso();
+                        actualizarHabilidadUsoDOM(habObj.nombre);
+                        togglesActivos[habObj.nombre] = true;
+                        guardarToggles();
+                        const rTog = consumirAccion(tipoAccion);
+                        mostrarToast(`✨ ¡${habObj.nombre} activado! ${rTog.mensaje}`.trim());
+                    }
+                    return;
+                }
 
                 // Si la habilidad tiene formas salvajes (Wild Shape), abrir el selector de animal
                 // en vez de gastar el uso automáticamente; el uso se gasta al elegir el animal.
@@ -2897,11 +3114,12 @@ async function init() {
                     if (r.mensaje) mostrarToast(r.mensaje);
                 }
 
-                // Procesar efectos de la habilidad (Second Wind, etc.)
-                if (habObj && habObj.efectos) {
+                // Procesar efectos de la habilidad (Second Wind, Tactical Shift, etc.)
+                if (habObj) {
                     setTimeout(() => {
                         procesarEfectos(habObj, {
-                            nivelPersonaje: nivelPersonaje
+                            nivelPersonaje: nivelPersonaje,
+                            tipos: ['habilidad']
                         });
                     }, 400);
                 }
@@ -2915,6 +3133,17 @@ async function init() {
                 const notasTxt = notasEquipoActuales.length ? ` 🪄 ${notasEquipoActuales.join(' ')}` : '';
                 mostrarToast(`¡Cantrip usado! ✨ ${r.mensaje}${notasTxt}`.trim());
                 useSpellBtn.dataset.cantrip = '';
+
+                const cantripUsado = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
+                if (cantripUsado) {
+                    setTimeout(() => {
+                        procesarEfectos(cantripUsado, {
+                            nivelPersonaje: nivelPersonaje,
+                            tipos: ['hechizo', 'cantrip'],
+                            danoTexto: ultimoDanoMostrado
+                        });
+                    }, 400);
+                }
                 return;
             }
 
@@ -2926,22 +3155,47 @@ async function init() {
                     return;
                 }
                 modal.style.display = 'none';
-                const r = consumirAccion(tipoAccion);
-                mostrarToast(`¡${arma} usada! ⚔️ ${r.mensaje}`.trim());
+
+                // Extra Attack: el primer golpe gasta la Acción de verdad. Si el personaje tiene
+                // Extra Attack, ese golpe habilita N-1 golpes más que NO vuelven a gastar la Acción
+                // (se van descontando de turnoEstado.golpesRestantes). Cada vez que se vuelve a
+                // gastar una Acción entera (turno nuevo, o Action Surge), se recarga de nuevo.
+                let mensajeAccion = '';
+                let esGolpeExtra = false;
+                if (turnoEstado.accion > 0) {
+                    const r = consumirAccion(tipoAccion);
+                    mensajeAccion = r.mensaje;
+                    turnoEstado.golpesRestantes = extraAttacks > 1 ? extraAttacks - 1 : 0;
+                    guardarTurnoEstado();
+                } else if (turnoEstado.golpesRestantes > 0) {
+                    esGolpeExtra = true;
+                    turnoEstado.golpesRestantes -= 1;
+                    guardarTurnoEstado();
+                } else {
+                    mostrarToast('Ya usaste tu Acción este turno', 'warning');
+                    return;
+                }
+
+                const restantesTxt = turnoEstado.golpesRestantes > 0
+                    ? ` (te quedan ${turnoEstado.golpesRestantes} golpe${turnoEstado.golpesRestantes > 1 ? 's' : ''} más de Extra Attack)`
+                    : '';
+                mostrarToast(`¡${arma} usada! ⚔️${esGolpeExtra ? ' (golpe extra)' : ''} ${mensajeAccion}${restantesTxt}`.trim());
                 useSpellBtn.dataset.arma = '';
 
-                // Procesar efectos del arma (Great Weapon Fighting, Improved Critical, etc.)
+                // Procesar efectos del arma (Great Weapon Fighting, Improved Critical, Weapon Mastery, etc.)
                 const armaObj = data.equipo.find(e => e.nombre === arma);
-                if (armaObj && armaObj.efectos) {
+                if (armaObj) {
                     setTimeout(() => {
                         procesarEfectos(armaObj, {
-                            nivelPersonaje: nivelPersonaje
+                            nivelPersonaje: nivelPersonaje,
+                            tipos: ['arma'],
+                            danoTexto: ultimoDanoMostrado
                         });
                     }, 400);
                 }
 
                 // Si la clase tiene Smite y el arma califica, abrir modal de Smite
-                if (smiteData && armaPuedeGatillarSmite(arma, data.equipo)) {
+                if (smitesData.length > 0 && armaPuedeGatillarSmite(arma, data.equipo)) {
                     setTimeout(() => abrirModalSmite(), 600);
                 }
                 return;
@@ -2977,19 +3231,21 @@ async function init() {
 
                 // Disparar efectos automáticos del hechizo (Blessed Healer, Disciple of Life, etc.)
                 const hechizoUsado = itemContextoActual && itemContextoActual.item ? itemContextoActual.item : itemContextoActual;
-                if (hechizoUsado && hechizoUsado.efectos) {
+                if (hechizoUsado) {
                     const nivelNumerico = parseInt(nivel.replace(/[^0-9]/g, '')) || 1;
                     setTimeout(() => {
                         procesarEfectos(hechizoUsado, {
                             nivelHechizo: nivelNumerico,
-                            nivelPersonaje: nivelPersonaje
+                            nivelPersonaje: nivelPersonaje,
+                            tipos: ['hechizo'],
+                            danoTexto: ultimoDanoMostrado
                         });
                     }, 400);
                 }
 
                 // Si el hechizo trae datos de familiar (Find Familiar, Find Steed, etc.), invocarlo
                 if (hechizoUsado && hechizoUsado.familiar) {
-                    setTimeout(() => activarFamiliar(hechizoUsado.familiar), hechizoUsado.efectos ? 900 : 400);
+                    setTimeout(() => activarFamiliar(hechizoUsado.familiar), 900);
                 }
             }
         });

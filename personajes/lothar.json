@@ -79,10 +79,11 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos." },
-    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20)." },
-    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."},
-    { "nombre": "Tactical Shift", "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad." },
+    { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos.", "disparadores": { "arma": { "manos": 2, "tipo": "melee" } } },
+    { "nombre": "Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1. El primer golpe con un arma gasta tu Acción; el segundo sale automáticamente sin volver a gastarla." },
+    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20).", "disparadores": { "arma": true } },
+    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "arma": true } },
+    { "nombre": "Tactical Shift", "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "habilidad": "Second Wind" } },
     { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
   ],
   "habilidadesUso": [
@@ -99,12 +100,6 @@
           "tipo": "notificacionYAbreVida",
           "descripcion": "Second Wind",
           "mensaje": "Tirá <strong>1d10 + {nivelPersonaje}</strong> y curate ese total. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
-        },
-        {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Tactical Shift",
-          "descripcion": "Tactical Shift",
-          "mensaje": "Podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
         }
       ]
     },
@@ -128,13 +123,6 @@
           "mensaje": "Tu Acción fue <strong>restaurada</strong>. Podés hacer otra acción este mismo turno. Al terminar el turno aparecerá un modal de confirmación."
         }
       ]
-    },
-    {
-      "nombre": "Extra Attack",
-      "usos": "",
-      "recupera": "",
-      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1.",
-      "oculto": true
     }
   ],
   "equipo": [
@@ -190,24 +178,6 @@
       "desc": "Espada pesada mágica a dos manos, arma pesada. 2d6+STR cortante. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades.",
       "efectos": [
         {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Fighting Style: Great Weapon Fighting",
-          "descripcion": "Great Weapon Fighting",
-          "mensaje": "Si en alguno de los dados de daño sacaste 1 o 2, podés re-tirarlo. Te quedás con el segundo resultado aunque sea peor."
-        },
-        {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Improved Critical",
-          "descripcion": "Improved Critical",
-          "mensaje": "Recordá: hacés crítico con 19 o 20 en el d20 del ataque."
-        },
-        {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Remarkable Athlete",
-          "descripcion": "Remarkable Athlete",
-          "mensaje": "Si ESTE ataque fue un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
-        },
-        {
           "tipo": "bonoAtaqueMelee",
           "valor": 2
         }
@@ -227,15 +197,7 @@
       "maestriaArma": "Slow",
       "bonoAtaque": 1,
       "bonoDano": 1,
-      "desc": "Arco largo mágico. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades.",
-      "efectos": [
-        {
-          "tipo": "notificacion",
-          "rasgoRequerido": "Remarkable Athlete",
-          "descripcion": "Remarkable Athlete",
-          "mensaje": "Si ESTE ataque fue un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
-        }
-      ]
+      "desc": "Arco largo mágico. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
     }
   ],
   "hechizos": {

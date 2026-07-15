@@ -77,8 +77,8 @@
   "rasgos": [
     { "nombre": "Arcane Tradition: School of Evocation", "desc": "Te especializás en Magia de Evocación: hechizos que crean energía mágica destructiva (fuego, rayos, fuerza). Esta tradición desbloquea features adicionales a medida que subís de nivel." },
     { "nombre": "Evocation Savant", "desc": "El oro y el tiempo que debés gastar para copiar un hechizo de Evocación a tu spellbook se reduce a la mitad." },
-    { "nombre": "Sculpt Spells", "desc": "Cuando lanzás un hechizo de Evocación que afecta a otras criaturas, podés proteger a un número de ellas igual a 1 + el nivel del hechizo (mínimo 1). Las criaturas elegidas pasan automáticamente la salvación contra el hechizo y no reciben daño si fallaban." },
-    { "nombre": "Potent Cantrip", "desc": "Cuando una criatura pasa la salvación contra un cantrip tuyo, igual recibe la mitad del daño (sin otros efectos secundarios)." },
+    { "nombre": "Sculpt Spells", "desc": "Cuando lanzás un hechizo de Evocación que afecta a otras criaturas, podés proteger a un número de ellas igual a 1 + el nivel del hechizo (mínimo 1). Las criaturas elegidas pasan automáticamente la salvación contra el hechizo y no reciben daño si fallaban.", "disparadores": { "hechizo": true } },
+    { "nombre": "Potent Cantrip", "desc": "Cuando una criatura pasa la salvación contra un cantrip tuyo, igual recibe la mitad del daño (sin otros efectos secundarios).", "disparadores": { "cantrip": true } },
     { "nombre": "Cantrip Formulas", "desc": "Cuando terminás un descanso largo, podés reemplazar uno de los cantrips de mago que conocés por otro de la lista de cantrips de mago." },
     { "nombre": "Darkvision", "desc": "Acostumbrado a las sombras del bosque, tenés visión superior en condiciones de poca luz. Podés ver en luz tenue dentro de 60 ft como si fuera luz brillante, y en oscuridad como si fuera luz tenue (en oscuridad solo distinguís en grises, no colores)." },
     { "nombre": "Keen Senses", "desc": "Tenés proficiencia en Percepción." },

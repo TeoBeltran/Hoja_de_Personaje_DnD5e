@@ -82,8 +82,6 @@
     { "nombre": "Disciple of Life", "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo." },
     { "nombre": "Blessed Healer", "desc": "Cuando lanzás un hechizo de curación de nivel 1 o mayor sobre otra criatura, vos también recuperás HP igual a 2 + el nivel del hechizo." },
     { "nombre": "Volar", "desc": "Podés moverte 30 ft de distancia mientras volás." },
-    { "nombre": "Healing Word: bono WIS", "desc": "Healing Word suma WIS a la curación.", "bonoDano": "WIS", "aplicaA": "hechizo:Healing Word" },
-    { "nombre": "Mass Healing Word: bono WIS", "desc": "Mass Healing Word suma WIS a la curación.", "bonoDano": "WIS", "aplicaA": "hechizo:Mass Healing Word" },
     { "nombre": "Spiritual Weapon: bono WIS", "desc": "Spiritual Weapon suma WIS al daño.", "bonoDano": "WIS", "aplicaA": "hechizo:Spiritual Weapon" }
   ],
   "habilidadesUso": [
@@ -135,6 +133,7 @@
     },
     {
       "nombre": "Lesser Restoration",
+      "usos": "99/99",
       "nivel": "NIVEL 2",
       "accion": "Acción",
       "distancia": "Toque",
@@ -424,7 +423,7 @@
       },
       {
         "nombre": "Greater Healing Potion",
-        "peso": 0.5,
+        "peso": 0.25,
         "cantidad": 3,
         "accion": "Acción",
         "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
