@@ -86,7 +86,8 @@
     { "nombre": "Aura del Gran Panal",
       "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+1 (máximo 4) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo. <br><br> Las criaturas salvajes tienen 1d4+1 (máximo 4) de daño extra al atacar objetivos Enmielados. <br> Si la criatura es un Oso, tiene ventaja en la tirada de ataque."
     },
-    { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"}
+    { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"},
+    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
   ],
   "habilidadesUso": [
     {
@@ -118,20 +119,25 @@
         "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
     },
     {
-        "nombre": "Channel Divinity: Nature's Wrath",
-        "usos": "1/1",
+        "nombre": "Channel Divinity",
+        "usos": "2/2",
+        "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
         "recupera": "corto",
+        "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Nature's Wrath o Turn the Faithless)."
+    },
+    {
+        "nombre": "Channel Divinity: Nature's Wrath",
+        "consumeUsoDe": "Channel Divinity",
         "accion": "Acción",
         "distancia": "10 ft",
-        "desc": "Crea enredaderas espectrales a un enemigo a 10 ft. El objetivo hace tirada de STR o DEX o queda agarrado. Solo se libera al final de cada turno con la tirada."
+        "desc": "Crea enredaderas espectrales a un enemigo a 10 ft. El objetivo hace tirada de STR o DEX o queda agarrado. Solo se libera al final de cada turno con la tirada. Consume 1 uso de Channel Divinity."
     },
     {
         "nombre": "Channel Divinity: Turn the Faithless",
-        "usos": "1/1",
-        "recupera": "corto",
+        "consumeUsoDe": "Channel Divinity",
         "accion": "Acción",
         "distancia": "30 ft",
-        "desc": "Cada hada o demonio que pueda oírte hace tirada de salvación de WIS. Si falla, durante 1 minuto o hasta que reciba daño queda con miedo hacia vos."
+        "desc": "Cada hada o demonio que pueda oírte hace tirada de salvación de WIS. Si falla, durante 1 minuto o hasta que reciba daño queda con miedo hacia vos. Consume 1 uso de Channel Divinity."
     },
     {
         "nombre": "Healing Hands",
@@ -198,6 +204,7 @@
         "magico": true,
         "bonoAtaque": 1,
         "bonoDano": 1,
+        "maestriaArma": "Sap",
         "desc": "Lanza mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
     },
     {
@@ -253,20 +260,20 @@
     }
   ],
   "hechizos": {
-        "ranuras": [
-            { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-            { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-            { "nivel": "Nivel 3", "cantidad": "0", "recupera": "largo" },
-            { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
-        ],
-        "lista": [
+    "ranuras": [
+        { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+        { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+        { "nivel": "Nivel 3", "cantidad": "0", "recupera": "largo" },
+        { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
+    ],
+    "lista": [
         {
-            "nivel": "CANTRIPS",
-            "nombre": "Light",
-            "accion": "Acción",
-            "distancia": "Toque",
-            "duracion": "1 hora",
-            "desc": "Tocás un objeto de hasta 10 ft. El objeto brilla intensamente en un radio de 20 ft y tenuemente otros 20 ft."
+        "nivel": "CANTRIPS",
+        "nombre": "Light",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "1 hora",
+        "desc": "Tocás un objeto de hasta 10 ft. El objeto brilla intensamente en un radio de 20 ft y tenuemente otros 20 ft."
         },
         {
             "nivel": "NIVEL 1",
@@ -397,9 +404,9 @@
             "duracion": "10 minutos",
             "desc": "Creás una zona mágica de 15 ft de radio. Cuando una criatura entra por primera vez o inicia su turno ahí, hace tirada de CHA. Si falla, no puede mentir conscientemente dentro del radio. Sabe que está afectada y puede evitar preguntas comprometedoras."
         }
-      ]
-    },
-    "inventario": [
+    ]
+  },
+  "inventario": [
         {
             "nombre": "Leña",
             "peso": 1,
@@ -432,5 +439,5 @@
             "cantidad": 35,
             "desc": "Miel congelada dentro del tarro, puede lanzarse a enemigos que esten a 15ft."
         }
-    ]
+  ]
 }

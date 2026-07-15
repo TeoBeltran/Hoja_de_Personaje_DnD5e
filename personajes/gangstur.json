@@ -87,6 +87,7 @@
   ],
   "habilidadesUso": [
     { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
+    { "nombre": "Magical Cunning", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "desc": "Con una ráfaga de energía mágica, recuperás automáticamente TODOS tus espacios de conjuro gastados.", "restaurarTodasLasRanuras": true },
     { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." },
     {
       "nombre": "Eldritch Invocation: Grasp of Hadar",

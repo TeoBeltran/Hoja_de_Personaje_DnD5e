@@ -81,23 +81,38 @@
   "rasgos": [
     { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos." },
     { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20)." },
-    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft."}
+    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."},
+    { "nombre": "Tactical Shift", "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad." },
+    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
   ],
   "habilidadesUso": [
     {
       "nombre": "Second Wind",
-      "usos": "1/1",
+      "usos": "2/2",
       "recupera": "corto",
+      "recuperaCortoCantidad": 1,
       "accion": "Acción Bonus",
       "distancia": "Propio",
-      "desc": "Tenés una reserva limitada de resistencia. En tu turno, podés usar una Acción Bonus para recuperar HP igual a 1d10 + tu nivel de Guerrero.",
+      "desc": "Tenés 2 usos. Cada descanso corto recuperás 1 uso (0/2→1/2, o 1/2→2/2). En descanso largo recuperás los 2. Como Acción Bonus, recuperás HP igual a 1d10 + tu nivel de Guerrero.",
       "efectos": [
         {
           "tipo": "notificacionYAbreVida",
           "descripcion": "Second Wind",
           "mensaje": "Tirá <strong>1d10 + {nivelPersonaje}</strong> y curate ese total. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
+        },
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Tactical Shift",
+          "descripcion": "Tactical Shift",
+          "mensaje": "Podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
         }
       ]
+    },
+    {
+      "nombre": "Segunda Oportunidad (gasta Second Wind)",
+      "consumeUsoDe": "Second Wind",
+      "accion": "Reacción",
+      "desc": "Cuando fallás una prueba de habilidad, podés gastar un uso de Second Wind para sumar 1d10 al resultado."
     },
     {
       "nombre": "Action Surge",
@@ -171,6 +186,7 @@
       "valor": 4000,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
+      "maestriaArma": "Graze",
       "desc": "Espada pesada mágica a dos manos, arma pesada. 2d6+STR cortante. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades.",
       "efectos": [
         {
@@ -184,6 +200,12 @@
           "rasgoRequerido": "Improved Critical",
           "descripcion": "Improved Critical",
           "mensaje": "Recordá: hacés crítico con 19 o 20 en el d20 del ataque."
+        },
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Remarkable Athlete",
+          "descripcion": "Remarkable Athlete",
+          "mensaje": "Si ESTE ataque fue un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
         },
         {
           "tipo": "bonoAtaqueMelee",
@@ -202,9 +224,18 @@
       "accion": "Acción",
       "distancia": "150/600 ft",
       "magico": true,
+      "maestriaArma": "Slow",
       "bonoAtaque": 1,
       "bonoDano": 1,
-      "desc": "Arco largo mágico. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
+      "desc": "Arco largo mágico. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades.",
+      "efectos": [
+        {
+          "tipo": "notificacion",
+          "rasgoRequerido": "Remarkable Athlete",
+          "descripcion": "Remarkable Athlete",
+          "mensaje": "Si ESTE ataque fue un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad."
+        }
+      ]
     }
   ],
   "hechizos": {

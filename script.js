@@ -3,7 +3,8 @@ import {
     PROFICIENCIAS_POR_CLASE,
     NOMBRES_STATS,
     SKILL_STAT,
-    SKILL_DESC
+    SKILL_DESC,
+    MAESTRIA_ARMA_INFO
 } from "./Scripts/Datos/Constantes.js";
 
 import {
@@ -332,6 +333,7 @@ function mapNivelHechizoARanura(nivelHechizo) {
 
 let ranurasInfo = {}; // Guarda qué descanso recupera cada ranura
 let habilidadesInfo = {}; // Guarda qué descanso recupera cada habilidad
+let habilidadesRecuperaCortoCantidad = {}; // Cuántos usos suma un descanso corto (ej: Second Wind: +1, aunque el máximo sea 2)
 
 
 
@@ -1171,7 +1173,7 @@ function abrirModalFormaSalvaje(habObj, tipoAccion) {
 // - Modo "presupuesto combinado" (presupuesto = número): Arcane/Natural Recovery. Podés
 //   restaurar varias ranuras mientras alcance el presupuesto (nivel combinado), sin
 //   superar maxNivel por ranura individual. Se cierra con "Listo".
-function abrirModalRestaurarRanura(habObj, tipoAccion, maxNivel, presupuestoInicial) {
+function abrirModalRestaurarRanura(habObj, tipoAccion, maxNivel, presupuestoInicial, nombreControl) {
     const restModal = document.getElementById('restaurar-modal');
     const cont = document.getElementById('restaurar-opciones');
     const titulo = document.getElementById('restaurar-modal-titulo');
@@ -1179,6 +1181,10 @@ function abrirModalRestaurarRanura(habObj, tipoAccion, maxNivel, presupuestoInic
     const presupuestoEl = document.getElementById('restaurar-presupuesto');
     const listoBtn = document.getElementById('restaurar-listo');
     if (!restModal || !cont || !habObj) return;
+
+    // Si la habilidad consume el pool de OTRA (ej: Harness Divine Power usa "Channel Divinity"),
+    // nombreControl indica qué contador de habilidadesUsoState hay que chequear/gastar.
+    const controlKey = nombreControl || habObj.nombre;
 
     const esBudget = (presupuestoInicial !== null && presupuestoInicial !== undefined);
     let presupuesto = esBudget ? presupuestoInicial : null;
@@ -1191,17 +1197,17 @@ function abrirModalRestaurarRanura(habObj, tipoAccion, maxNivel, presupuestoInic
 
     function consumirUsoSiHaceFalta() {
         if (usoConsumido) return true;
-        const partes = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+        const partes = (habilidadesUsoState[controlKey] || '0/0').split('/');
         let actual = parseInt(partes[0]);
         const max = parseInt(partes[1]);
         if (actual <= 0) {
-            mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+            mostrarToast(`Sin usos restantes de ${controlKey}`, 'warning');
             return false;
         }
         actual -= 1;
-        habilidadesUsoState[habObj.nombre] = `${actual}/${max}`;
+        habilidadesUsoState[controlKey] = `${actual}/${max}`;
         guardarHabilidadesUso();
-        actualizarHabilidadUsoDOM(habObj.nombre);
+        actualizarHabilidadUsoDOM(controlKey);
         usoConsumido = true;
         return true;
     }
@@ -1348,8 +1354,21 @@ function tomarDescanso(tipo) {
     // Recuperar habilidades
     Object.keys(habilidadesUsoState).forEach(nombre => {
         const tipoRecup = habilidadesInfo[nombre];
-        if (tipo === 'largo' || tipoRecup === 'corto') {
+        if (tipo === 'largo') {
             habilidadesUsoState[nombre] = habilidadesUsoOriginales[nombre];
+            actualizarHabilidadUsoDOM(nombre);
+        } else if (tipoRecup === 'corto') {
+            if (habilidadesRecuperaCortoCantidad[nombre] !== undefined) {
+                // El descanso corto SIEMPRE suma esta cantidad de usos (tope al máximo real).
+                // Ej: Second Wind con 0/2 pasa a 1/2; con 1/2 pasa a 2/2; con 2/2 se queda igual.
+                const max = parseInt((habilidadesUsoOriginales[nombre] || '0/0').split('/')[1]);
+                const actual = parseInt((habilidadesUsoState[nombre] || '0/0').split('/')[0]);
+                const ganancia = habilidadesRecuperaCortoCantidad[nombre];
+                const nuevoActual = Math.min(max, actual + ganancia);
+                habilidadesUsoState[nombre] = `${nuevoActual}/${max}`;
+            } else {
+                habilidadesUsoState[nombre] = habilidadesUsoOriginales[nombre];
+            }
             actualizarHabilidadUsoDOM(nombre);
         }
     });
@@ -1850,6 +1869,9 @@ async function init() {
 
         const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
         const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); margin-left: 6px;">${i.tipoDano}</span>` : '';
+        const maestriaHTML = (i.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[i.maestriaArma])
+            ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; margin-left: 6px;">${MAESTRIA_ARMA_INFO[i.maestriaArma].emoji} ${i.maestriaArma}</span>`
+            : '';
 
         let armaduraHTML = '';
         if (i.esArmadura) {
@@ -1886,6 +1908,7 @@ async function init() {
                     ${manosHTML}
                     ${danoHTML}
                     ${tipoDanoHTML}
+                    ${maestriaHTML}
                 </div>
             </div>
             ${infoLineaHTML}
@@ -1952,6 +1975,12 @@ async function init() {
             partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${item.tipoDano}</span>`);
         }
 
+        // Weapon Mastery (badge compacto; la descripción completa va debajo, en modalDesc)
+        if (item.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[item.maestriaArma]) {
+            const m = MAESTRIA_ARMA_INFO[item.maestriaArma];
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">${m.emoji} ${item.maestriaArma}</span>`);
+        }
+
         // Manos
         if (item.manos && item.manos > 0) {
             partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color);">${item.manos === 2 ? '2 manos' : '1 mano'}</span>`);
@@ -2000,7 +2029,7 @@ async function init() {
         useSpellBtn.style.backgroundColor = '#6a1b9a'; // Reset color
 
         const tieneDano = !!item.dano;
-        const esHabilidad = !!item.usos || item.tipo === 'smite';
+        const esHabilidad = !!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe;
         const esHechizoConRanura = (tipo === 'hechizo');
         const esCantrip = (tipo === 'cantrip');
         const esArma = (tipo === 'arma') && tieneDano;
@@ -2047,10 +2076,13 @@ async function init() {
             } else {
                 useSpellBtn.dataset.habilidad = item.nombre;
                 useSpellBtn.dataset.smite = '';
-                const dispActuales = parseInt(habilidadesUsoState[item.nombre].split('/')[0]);
+                // Si el item consume el pool de OTRA habilidad (ej: Harness Divine Power usa
+                // el contador compartido de "Channel Divinity"), mostrar y chequear ESE pool.
+                const nombreControl = item.consumeUsoDe || item.nombre;
+                const dispActuales = parseInt((habilidadesUsoState[nombreControl] || '0/0').split('/')[0]);
                 useSpellBtn.disabled = dispActuales <= 0;
                 useSpellBtn.textContent = dispActuales > 0
-                    ? `Usar Habilidad (${habilidadesUsoState[item.nombre]})`
+                    ? `Usar Habilidad (${habilidadesUsoState[nombreControl]})`
                     : 'Sin usos disponibles';
             }
         } else {
@@ -2064,6 +2096,13 @@ async function init() {
 
         modalTitle.innerHTML = item.nombre;
         modalDesc.innerHTML = item.desc.replace(/\n/g, '<br>');
+
+        // Weapon Mastery (DnD 5.5e / 2024): si el arma tiene una maestría asignada y el
+        // personaje tiene el rasgo "Weapon Mastery", mostrar qué hace esa propiedad.
+        if (item.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[item.maestriaArma]) {
+            const m = MAESTRIA_ARMA_INFO[item.maestriaArma];
+            modalDesc.innerHTML += `<br><br><strong style="color:#6a1b9a;">${m.emoji} Maestría: ${item.maestriaArma}</strong><br>${m.desc}`;
+        }
 
         // Llenar badges (mini cards) y línea celeste
         renderModalBadges(item);
@@ -2474,16 +2513,37 @@ async function init() {
     if (data.habilidadesUso) {
         // Inicializar estado: localStorage > JSON
         data.habilidadesUso.forEach(h => {
+            // Si la habilidad escala su cantidad de usos con el nivel de personaje (ej:
+            // Channel Divinity: 1/1 en nivel 1, 2/2 en nivel 6, 3/3 en nivel 18), calcularlo acá.
+            if (h.usosPorNivel) {
+                let maxCalc = 1;
+                Object.keys(h.usosPorNivel)
+                    .map(k => parseInt(k))
+                    .sort((a, b) => a - b)
+                    .forEach(umbral => {
+                        if (nivelPersonaje >= umbral) maxCalc = h.usosPorNivel[String(umbral)];
+                    });
+                h.usos = `${maxCalc}/${maxCalc}`;
+            }
             if (h.usos) {
                 habilidadesUsoOriginales[h.nombre] = h.usos;
                 habilidadesInfo[h.nombre] = h.recupera || 'largo';
+                if (h.recuperaCortoCantidad !== undefined) habilidadesRecuperaCortoCantidad[h.nombre] = h.recuperaCortoCantidad;
             }
         });
         const guardadasHab = localStorage.getItem(STORAGE_PREFIX + 'habilidadesUso');
         if (guardadasHab) {
             habilidadesUsoState = JSON.parse(guardadasHab);
             data.habilidadesUso.forEach(h => {
-                if (!(h.nombre in habilidadesUsoState)) habilidadesUsoState[h.nombre] = h.usos;
+                if (!(h.nombre in habilidadesUsoState)) {
+                    habilidadesUsoState[h.nombre] = h.usos;
+                } else if (h.usosPorNivel) {
+                    // El máximo pudo haber cambiado (subida de nivel desde el último guardado):
+                    // ajustar sin perder usos ya gastados de más.
+                    const savedActual = parseInt((habilidadesUsoState[h.nombre] || '0/0').split('/')[0]);
+                    const newMax = parseInt(h.usos.split('/')[1]);
+                    habilidadesUsoState[h.nombre] = `${Math.min(savedActual, newMax)}/${newMax}`;
+                }
             });
         } else {
             habilidadesUsoState = { ...habilidadesUsoOriginales };
@@ -2730,11 +2790,16 @@ async function init() {
                     return;
                 }
 
-                // Si la habilidad restaura UNA ranura gastada (ej: Pearl of Power)
+                // Si la habilidad restaura UNA ranura gastada (ej: Pearl of Power, o Harness Divine
+                // Power que comparte el pool de "Channel Divinity" vía consumeUsoDe)
                 if (habObj && habObj.restaurarRanura) {
                     modal.style.display = 'none';
                     useSpellBtn.dataset.habilidad = '';
-                    abrirModalRestaurarRanura(habObj, tipoAccion, habObj.restaurarRanura.maxNivel, null);
+                    let maxNivelCalc = habObj.restaurarRanura.maxNivel;
+                    if (habObj.restaurarRanura.maxNivelFormula === 'mitadProficienciaArriba') {
+                        maxNivelCalc = Math.ceil(proficienciaActual / 2);
+                    }
+                    abrirModalRestaurarRanura(habObj, tipoAccion, maxNivelCalc, null, habObj.consumeUsoDe || null);
                     return;
                 }
 
@@ -2748,10 +2813,89 @@ async function init() {
                     return;
                 }
 
-                usarHabilidad(habilidad);
-                useSpellBtn.dataset.habilidad = '';
-                const r = consumirAccion(tipoAccion);
-                if (r.mensaje) mostrarToast(r.mensaje);
+                // Si la habilidad restaura 1 uso de OTRA habilidad (ej: Amulet of the Devout
+                // recupera 1 de los 2 usos de Channel Divinity)
+                if (habObj && habObj.restaurarUsoDe) {
+                    const partesAmu = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+                    let actualAmu = parseInt(partesAmu[0]);
+                    const maxAmu = parseInt(partesAmu[1]);
+                    if (actualAmu <= 0) {
+                        mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+                        return;
+                    }
+                    actualAmu -= 1;
+                    habilidadesUsoState[habObj.nombre] = `${actualAmu}/${maxAmu}`;
+                    actualizarHabilidadUsoDOM(habObj.nombre);
+
+                    const objetivo = habObj.restaurarUsoDe;
+                    const partesObj = (habilidadesUsoState[objetivo] || '0/0').split('/');
+                    let actualObj = parseInt(partesObj[0]);
+                    const maxObj = parseInt(partesObj[1]);
+                    actualObj = Math.min(maxObj, actualObj + 1);
+                    habilidadesUsoState[objetivo] = `${actualObj}/${maxObj}`;
+                    actualizarHabilidadUsoDOM(objetivo);
+                    guardarHabilidadesUso();
+
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const rAmu = consumirAccion(tipoAccion);
+                    mostrarToast(`✨ ${habObj.nombre}: se restauró 1 uso de ${objetivo} (${habilidadesUsoState[objetivo]}). ${rAmu.mensaje}`.trim());
+                    return;
+                }
+
+                // Si la habilidad restaura TODAS las ranuras de golpe (ej: Magical Cunning)
+                if (habObj && habObj.restaurarTodasLasRanuras) {
+                    const partesMC = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
+                    let actualMC = parseInt(partesMC[0]);
+                    const maxMC = parseInt(partesMC[1]);
+                    if (actualMC <= 0) {
+                        mostrarToast(`Sin usos restantes de ${habObj.nombre}`, 'warning');
+                        return;
+                    }
+                    actualMC -= 1;
+                    habilidadesUsoState[habObj.nombre] = `${actualMC}/${maxMC}`;
+                    actualizarHabilidadUsoDOM(habObj.nombre);
+                    guardarHabilidadesUso();
+
+                    Object.keys(ranurasState).forEach(nivel => {
+                        ranurasState[nivel] = ranurasOriginales[nivel];
+                        actualizarRanuraDOM(nivel);
+                    });
+                    guardarRanuras();
+
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const rMC = consumirAccion(tipoAccion);
+                    mostrarToast(`✨ ${habObj.nombre}: ¡todas tus ranuras de hechizo fueron restauradas! ${rMC.mensaje}`.trim());
+                    return;
+                }
+
+                // Fallback genérico: si consume el pool de OTRA habilidad (ej: las opciones de
+                // Channel Divinity de Nika comparten un único contador), gastar de ESE contador
+                // pero mantener el nombre de la opción específica en el toast.
+                const nombreControlFallback = (habObj && habObj.consumeUsoDe) || habilidad;
+                if (nombreControlFallback !== habilidad) {
+                    const partesCD = (habilidadesUsoState[nombreControlFallback] || '0/0').split('/');
+                    let actualCD = parseInt(partesCD[0]);
+                    const maxCD = parseInt(partesCD[1]);
+                    if (actualCD <= 0) {
+                        mostrarToast(`Sin usos restantes de ${nombreControlFallback}`, 'warning');
+                        return;
+                    }
+                    actualCD -= 1;
+                    habilidadesUsoState[nombreControlFallback] = `${actualCD}/${maxCD}`;
+                    guardarHabilidadesUso();
+                    actualizarHabilidadUsoDOM(nombreControlFallback);
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const rCD = consumirAccion(tipoAccion);
+                    mostrarToast(`¡${habilidad} usada! (${nombreControlFallback}: ${habilidadesUsoState[nombreControlFallback]}) ${rCD.mensaje}`.trim());
+                } else {
+                    usarHabilidad(habilidad);
+                    useSpellBtn.dataset.habilidad = '';
+                    const r = consumirAccion(tipoAccion);
+                    if (r.mensaje) mostrarToast(r.mensaje);
+                }
 
                 // Procesar efectos de la habilidad (Second Wind, etc.)
                 if (habObj && habObj.efectos) {

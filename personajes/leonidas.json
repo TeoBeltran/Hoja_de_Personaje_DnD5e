@@ -90,8 +90,9 @@
     {
       "nombre": "Channel Divinity",
       "usos": "2/2",
+      "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
       "recupera": "corto",
-      "desc": "Tenés 2 usos por descanso corto. Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Turn Undead, Harness Divine Power o Preserve Life)."
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Turn Undead, Harness Divine Power o Preserve Life)."
     },
     {
       "nombre": "Channel Divinity: Turn Undead",
@@ -104,7 +105,9 @@
       "nombre": "Channel Divinity: Harness Divine Power",
       "accion": "Acción Bonus",
       "distancia": "Propio",
-      "desc": "Tocá tu símbolo sagrado (cruz) y recuperás un spell slot. El nivel del slot recuperado no puede ser mayor a la mitad de tu proficiency bonus (redondeado hacia arriba). Consume 1 uso de Channel Divinity."
+      "desc": "Tocá tu símbolo sagrado (cruz) y recuperás un spell slot. El nivel del slot recuperado no puede ser mayor a la mitad de tu proficiency bonus (redondeado hacia arriba). Consume 1 uso de Channel Divinity.",
+      "consumeUsoDe": "Channel Divinity",
+      "restaurarRanura": { "maxNivelFormula": "mitadProficienciaArriba" }
     },
     {
       "nombre": "Channel Divinity: Preserve Life",
@@ -131,15 +134,6 @@
       "desc": "Una criatura u objeto que veas dentro del rango aumenta o disminuye de tamaño. Si elige Enlarge: gana una categoría de tamaño, ventaja en tiradas de STR y +1d4 al daño con armas. Si Reduce: pierde una categoría, desventaja en STR y -1d4 al daño con armas."
     },
     {
-      "nombre": "Cure Wounds",
-      "nivel": "NIVEL 1",
-      "accion": "Acción",
-      "distancia": "Toque",
-      "dano": "1d8",
-      "tipoDano": "curación",
-      "desc": "Tocás a una criatura y recupera 1d8 + modificador de SAB HP. Cada slot superior al nivel 1 aumenta la curación en 1d8."
-    },
-    {
       "nombre": "Lesser Restoration",
       "nivel": "NIVEL 2",
       "accion": "Acción",
@@ -147,11 +141,12 @@
       "desc": "Tocás a una criatura y podés terminar una de las siguientes condiciones: enfermedad, ceguera, sordera o parálisis."
     },
     {
-      "nombre": "Amuleto del Devoto (Amulet of the Devout) +1",
+      "nombre": "Amuleto del Devoto: tocar símbolo sagrado",
       "usos": "1/1",
       "recupera": "largo",
       "accion": "Acción",
-      "desc": "Recupera un uso gastado de Channel Divinity. Además, mientras tengas el amuleto equipado, otorga +1 a las tiradas de ataque con hechizos de clérigo y +1 a la CD de los conjuros de clérigo."
+      "desc": "Una vez por descanso largo, tocá el Amuleto del Devoto y recuperás 1 uso gastado de Channel Divinity.",
+      "restaurarUsoDe": "Channel Divinity"
     },
     {
       "nombre": "Perla de poder (Pearl of Power)",
@@ -214,6 +209,19 @@
       "accion": "Acción",
       "distancia": "Melee 5 ft / Arrojadizo 20/60 ft",
       "desc": "Arrojadizo. Empuñado a una mano: 1d4+STR contundente. Como arma arrojadiza, podés lanzarlo hasta 20 ft (60 ft con desventaja)."
+    },
+    {
+      "nombre": "Amuleto del Devoto (Amulet of the Devout) +1",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 1500,
+      "magico": true,
+      "desc": "Amuleto mágico con tu símbolo sagrado. Mientras esté equipado, otorga +1 a las tiradas de ataque con hechizos de clérigo y +1 a la CD de tus conjuros de clérigo.",
+      "efectos": [
+        { "tipo": "bonoAtaqueHechizo", "valor": 1 },
+        { "tipo": "bonoCDHechizo", "valor": 1 }
+      ]
     }
   ],
   "hechizos": {
@@ -274,6 +282,27 @@
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
         "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cuando hagan una tirada de ataque o salvación antes que termine el hechizo, tiran 1d4 y lo suman al resultado."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Cure Wounds",
+        "dano": "1d8",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y recupera 1d8 + modificador de WIS HP. Cada slot superior al nivel 1 aumenta la curación en 1d8. Si Disciple of Life: cura 2 + nivel del hechizo extra.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "1d8",
+            "2": "2d8",
+            "3": "3d8",
+            "4": "4d8"
+          }
+        },
+        "efectos": [
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" }
+        ]
       },
       {
         "nivel": "NIVEL 1",
