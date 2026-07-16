@@ -179,6 +179,11 @@
       "desc": "Podés usar DEX en vez de STR para tus ataques y daño desarmado o con armas de monje. Tu dado de daño desarmado/monje es 1d6."
     },
     {
+      "nombre": "🤼 Golpe Desarmado: Grapple o Shove (2024)",
+      "desc": "En vez de golpear por daño, podés usar este Unarmed Strike para intentar <strong>Grapple</strong> (Agarrar) o <strong>Shove</strong> (Empujar/Derribar) a la criatura objetivo. Usá tu <strong>mod. de DEX</strong> en vez de STR tanto para la tirada de contienda como para el DC de la salvación.",
+      "disparadores": { "arma": "Golpe Desarmado (Unarmed Strike)" }
+    },
+    {
       "nombre": "Extra Attack",
       "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1."
     },
@@ -213,7 +218,7 @@
       "usosIgualANivel": true,
       "recupera": "corto",
       "accion": "Varía",
-      "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Missiles (atrapar y devolver), Hand of Healing, Hand of Harm y Stunning Strike. Cantidad = tu nivel de monje (se recalcula solo si subís de nivel)."
+      "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Attacks (redirigir el ataque), Hand of Healing, Hand of Harm y Stunning Strike. Cantidad = tu nivel de monje (se recalcula solo si subís de nivel)."
     },
     {
       "nombre": "Martial Arts",
@@ -246,10 +251,10 @@
       "desc": "Gastá 1 punto de Ki para tomar la acción de Disengage (Desconectar) o Dash (Correr) como Acción Bonus, y tu distancia de salto se duplica ese turno."
     },
     {
-      "nombre": "Deflect Missiles: atrapar y devolver",
+      "nombre": "Deflect Attacks: redirigir el ataque",
       "consumeUsoDe": "Puntos de Ki",
       "accion": "Reacción",
-      "desc": "Cuando te golpea un ataque a distancia con arma, reducís el daño en 1d10 + 13 (esto es automático, sin costo). Si lo reducís a 0 y tenés una mano libre, podés atrapar el proyectil y gastar 1 punto de Ki para lanzarlo de vuelta como ataque a distancia con competencia (como si fuera un arma de monje), con alcance 20/60 ft."
+      "desc": "Cuando te golpea un ataque (cuerpo a cuerpo O a distancia) cuyo daño incluye contundente, perforante o cortante, usás tu Reacción para reducir el daño total en 1d10 + tu mod. de DEX + tu nivel de monje (esto es automático, sin costo). Si lo reducís a 0, podés gastar 1 punto de Ki para redirigir parte de la fuerza del golpe: elegís una criatura que puedas ver a 5 ft (si el ataque fue cuerpo a cuerpo) o a 60 ft sin cobertura total (si fue a distancia). Esa criatura tira salvación de DEX o recibe daño igual a 2 tiradas de tu dado de Martial Arts + tu mod. de DEX, del mismo tipo que el ataque original."
     },
     {
       "nombre": "Slow Fall",
@@ -259,16 +264,16 @@
       "desc": "Reducís el daño de caída en 40 (5 × tu nivel de monje). No cuesta Ki. Se recarga automáticamente en cada turno nuevo (va de la mano de tu Reacción)."
     },
     {
-      "nombre": "Stunning Strike",
+      "nombre": "Stunning Strike (2024)",
       "consumeUsoDe": "Puntos de Ki",
       "postGolpe": true,
       "accion": "Sin acción",
-      "desc": "Cuando golpeás a una criatura con un ataque cuerpo a cuerpo, gastá 1 punto de Ki para intentar aturdirla: si falla una salvación de CON (DC 14), queda Aturdida hasta el final de tu próximo turno.",
+      "desc": "Una vez por turno (máximo), cuando golpeás con un Unarmed Strike o un arma de monje, gastá 1 punto de Ki para intentar un Stunning Strike: la criatura tira salvación de CON (DC 14). Si falla, queda Aturdida hasta el INICIO de tu próximo turno (ya no hasta el final). Si la pasa, igual sufre algo: su velocidad se reduce a la mitad hasta el inicio de tu próximo turno, y el próximo ataque que reciba antes de eso tiene Ventaja.",
       "efectos": [
         {
           "tipo": "notificacion",
-          "descripcion": "Stunning Strike",
-          "mensaje": "El objetivo hace salvación de <strong>CON (DC 14)</strong>. Si falla, queda <strong>Aturdido</strong> hasta el final de tu próximo turno."
+          "descripcion": "Stunning Strike (2024)",
+          "mensaje": "El objetivo hace salvación de <strong>CON (DC 14)</strong>. Si <strong>falla</strong>, queda <strong>Aturdido</strong> hasta el INICIO de tu próximo turno. Si <strong>pasa</strong>, su <strong>velocidad se reduce a la mitad</strong> hasta el inicio de tu próximo turno y el próximo ataque contra él/ella tiene <strong>Ventaja</strong>.<br><br><em>Máximo 1 vez por turno.</em>"
         }
       ],
       "soloPostGolpe": true
@@ -365,82 +370,10 @@
   },
   "inventario": [
     {
-      "nombre": "Backpack",
-      "peso": 5,
-      "cantidad": 1,
-      "desc": "Mochila de viaje."
-    },
-    {
-      "nombre": "Bedroll",
-      "peso": 7,
-      "cantidad": 1,
-      "desc": "Saco de dormir."
-    },
-    {
-      "nombre": "Manta (Blanket)",
-      "peso": 3,
-      "cantidad": 1,
-      "desc": "Manta común."
-    },
-    {
-      "nombre": "Estuche de mapas o pergaminos",
-      "peso": 1,
-      "cantidad": 1,
-      "desc": "Estuche cilíndrico para transportar mapas o pergaminos sin arruinarlos."
-    },
-    {
-      "nombre": "Ropa común",
-      "peso": 3,
-      "cantidad": 1,
-      "desc": "Vestimenta sencilla."
-    },
-    {
       "nombre": "Kit de Herbolario (Herbalism Kit)",
       "peso": 3,
       "cantidad": 1,
       "desc": "Set de herramientas para identificar y preparar hierbas medicinales."
-    },
-    {
-      "nombre": "Set de comida (Mess kit)",
-      "peso": 1,
-      "cantidad": 1,
-      "desc": "Plato y utensilios de cocina de viaje."
-    },
-    {
-      "nombre": "Ración (1 día)",
-      "peso": 2,
-      "cantidad": 10,
-      "desc": "Comida no perecedera para un día."
-    },
-    {
-      "nombre": "Cuerda de cáñamo (50 ft)",
-      "peso": 10,
-      "cantidad": 1,
-      "desc": "Cuerda resistente de cáñamo."
-    },
-    {
-      "nombre": "Yesquero (Tinderbox)",
-      "peso": 1,
-      "cantidad": 1,
-      "desc": "Set para encender fuego."
-    },
-    {
-      "nombre": "Antorcha",
-      "peso": 1,
-      "cantidad": 10,
-      "desc": "Ilumina 20 ft durante 1 hora."
-    },
-    {
-      "nombre": "Odre de agua (Waterskin)",
-      "peso": 5,
-      "cantidad": 1,
-      "desc": "Odre para transportar agua u otros líquidos."
-    },
-    {
-      "nombre": "Oro",
-      "peso": 0.02,
-      "cantidad": 0,
-      "desc": "Piezas de Oro."
     }
   ]
 }
