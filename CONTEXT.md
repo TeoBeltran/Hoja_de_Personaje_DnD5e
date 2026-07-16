@@ -1,0 +1,172 @@
+# CONTEXT.md — Hoja de Personaje D&D 5e/5.5e (Web)
+
+> Documento de contexto para retomar el desarrollo de este proyecto en una conversación nueva, sin depender del historial de chat previo. Última actualización: sesión donde se terminó el sistema de post-golpe del Monje (Kael).
+
+## 1. Qué es esto
+
+Aplicación web (HTML/CSS/JS vanilla, sin build ni framework) que funciona como **hoja de personaje interactiva de D&D** para un grupo de mesa. La usa el DM y los jugadores desde el navegador (celular o PC). No hay backend: todo el estado dinámico (vida actual, ranuras gastadas, equipo puesto, etc.) se guarda en `localStorage`, y los datos "fijos" de cada personaje (stats, hechizos, equipo, rasgos) viven en archivos JSON estáticos.
+
+El objetivo del proyecto es reducir la fricción de jugar: en vez de que cada jugador calcule a mano su daño, su CA, cuántas ranuras le quedan, etc., la hoja lo hace sola y further automatiza reglas específicas de cada personaje (Divine Smite, Wild Shape, Extra Attack, etc.) con "scripts" propios por personaje, definidos en el JSON de cada uno.
+
+Hay 6 personajes jugables activos (Gangstur, Lothar, Nika, Lunareth, Leonidas, Orfe) y 3 personajes de respaldo del DM que **no** aparecen en el menú público (Cedric, Aldren, Kael) — accesibles solo por URL directa.
+
+## 2. Estructura de archivos
+
+```
+index.html                     → Menú de selección de personaje (cards con emoji + nombre)
+personaje.html                 → La hoja de personaje en sí (una sola plantilla para todos)
+personajes.json                → Lista de IDs de personajes que aparecen en el menú de index.html
+personajes/<id>.json           → Datos de cada personaje (uno por archivo)
+script.js                      → TODA la lógica de la app (~3900 líneas)
+estilos.css                    → Estilos de personaje.html (tema "pergamino")
+estilos-menu.css               → Estilos de index.html
+Scripts/Datos/Constantes.js    → Diccionarios estáticos (iconos, proficiencias por clase, nombres de stats, descripciones de skills, maestrías de arma)
+Scripts/Core/Estadisticas.js   → Funciones puras de cálculo de stats/skills/salvaciones a partir de los stats base
+Scripts/Core/Util.js           → Funciones puras de cálculo de daño, ataques extra, requisitos de armadura/arma
+```
+
+No hay `package.json` ni bundler: los `<script type="module">` importan directo con rutas relativas. Todo corre abriendo los `.html` tal cual (o sirviéndolos como estáticos).
+
+### Cómo se abre un personaje
+
+`personaje.html?p=<id>` — el query param `p` determina qué archivo `personajes/<id>.json` se carga por `fetch`. Si no hay param, cae a `gangstur` por default (ver `personajeIdParam` en `script.js`).
+
+### Persistencia
+
+Todo el estado mutable usa `localStorage` con el prefijo `pj_<id>_` (constante `STORAGE_PREFIX`), por ejemplo `pj_kael_vidaActual`, `pj_kael_habilidadesUso`, `pj_kael_togglesActivos`. Cada personaje tiene su namespace propio, no se pisan entre sí.
+
+## 3. Cómo interactúan los módulos
+
+1. `index.html` lee `personajes.json` (vía `Constantes.js` para los iconos) y arma las cards del menú.
+2. `personaje.html` es la plantilla visual: todos los modales, badges y contenedores están ahí como HTML fijo, mayormente vacíos, y `script.js` los llena dinámicamente en `init()`.
+3. `script.js` (`init()`) hace `fetch` del JSON del personaje, y con eso:
+   - Aplica mejoras de stats (`aplicarImprovements`, ver §5).
+   - Calcula stats derivados (`Estadisticas.js`).
+   - Renderiza cada sección (stats, skills, rasgos, equipo, hechizos, habilidades, inventario).
+   - Restaura desde `localStorage` todo lo que haya quedado guardado de sesiones anteriores.
+   - Cablea todos los listeners de todos los modales.
+4. `Estadisticas.js` y `Util.js` son librerías de funciones **puras** (sin tocar el DOM ni `localStorage`): reciben datos y devuelven números/strings. `script.js` es quien orquesta todo y toca el DOM.
+5. `Constantes.js` es el único lugar con datos "de reglas generales de D&D" que no cambian por personaje (a qué stat corresponde cada skill, qué clase es proficiente en qué saving throws, qué hace cada maestría de arma, etc.).
+
+## 4. El modelo de datos: todo vive en el JSON del personaje
+
+Esta es la decisión de arquitectura más importante del proyecto: **casi toda la lógica de juego de un personaje se declara como datos en su JSON, no como código nuevo en `script.js`**. `script.js` define un conjunto de "mecanismos genéricos" (ver §6) que cualquier personaje puede activar poniendo los campos correctos en su JSON. Esto permite agregar habilidades nuevas a un personaje sin tocar `script.js` en el 90% de los casos.
+
+Estructura típica de `personajes/<id>.json`:
+
+```
+personaje       → nombre, clase, raza, tamaño, stats BASE (sin mejoras aplicadas)
+improvements    → race / feats / asi: de dónde salen los bonos que se suman a los stats base
+estadisticas    → HP, nivel, CA, iniciativa, velocidad, etc. ("auto" = lo calcula script.js)
+habilidades     → skills, con nombre en ESPAÑOL exacto (ver §7) y proficiente true/false
+background      → nombre + rasgos de trasfondo (se renderizan junto a los rasgos de clase)
+rasgos          → pasivas de clase/raza/feat. Texto + metadatos opcionales (disparadores, colorCard, oculto...)
+habilidadesUso  → cosas con botón "Usar" (limitadas o no). Acá vive casi toda la mecánica interactiva.
+equipo          → armas, armaduras, accesorios mágicos
+hechizos        → { ranuras: [...], lista: [...] }
+inventario      → objetos no-equipo, con cantidad/peso, algunos usables
+circuloDeLaTierra → (solo Orfe) sistema de Land del Druida 5.5e
+```
+
+**Importante:** `personaje.stats` son los stats **base**, no los finales. Los finales los calcula `aplicarImprovements()` sumando `improvements.race` + `improvements.feats` + `improvements.asi` en tiempo de carga. Nunca hardcodear el stat final en el JSON — así subir de nivel es solo agregar una entrada a `asi`.
+
+## 5. Funcionalidades implementadas
+
+### Núcleo de personaje
+- Stats, modificadores, salvaciones, skills — calculados desde stats base + proficiencias de clase (`Estadisticas.js`).
+- CA automática: armadura equipada, escudo, Mage Armor (toggle), **Unarmored Defense** (Monje: 10+DEX+WIS si no hay armadura ni escudo — implementado como caso especial en `calcularCA()`, buscando el rasgo `"Unarmored Defense"` por nombre).
+- Equipar/desequipar armas, armaduras, accesorios — con validación de manos disponibles y de si la clase puede usar esa armadura/arma.
+- Peso cargado y penalización de velocidad por sobrepeso.
+- Vida (con botón +/-, vida máxima editable), Hit Dice, CA (con botón +/- y "restaurar").
+- Sistema de turno: Acción, Acción Bonus, Reacción, Interacción con Objeto — cada uno gasta/recupera independiente, con botón "Terminar turno" que resetea todo.
+- Descansos corto/largo: recuperan ranuras, habilidades y HP según reglas propias por item (ver §6).
+
+### Combate
+- **Ataques con armas**, con cálculo de daño mostrando el desglose de bonos (STR/DEX, Fighting Style, arma mágica, Weapon Mastery, toggles activos) en texto chico debajo del badge de daño — para que nunca sea "un número mágico sin explicación".
+- **Extra Attack**: el primer golpe gasta la Acción real; si el personaje tiene el rasgo "Extra Attack", automáticamente habilita N-1 golpes extra que NO vuelven a gastar Acción (contador `turnoEstado.golpesRestantes`).
+- **Divine Smite y "smites" en general**: sistema genérico, soporta **múltiples smites por personaje** (ej. Nika tiene Divine Smite + Honey Smite simultáneos). Al pegar con arma melee se abre un selector de nivel de ranura a gastar. El botón de un smite en su propia card no se puede usar directo ("Intentar usar" → bloqueado, hay que golpear primero).
+- **Weapon Mastery (D&D 5.5e)**: cada arma puede tener `maestriaArma` (Cleave/Graze/Nick/Push/Sap/Slow/Topple/Vex, traducidos). Si el personaje tiene el rasgo "Weapon Mastery", se auto-inyecta como card en el modal de efectos al atacar con esa arma — sin tener que declararlo a mano en cada arma.
+- **Panel "post-golpe"** (nuevo, hecho para Kael/Monje): tras un golpe cuerpo a cuerpo se abre un modal con las habilidades marcadas `postGolpe: true` (Martial Arts, Flurry of Blows, Stunning Strike, Hand of Harm...). Se puede elegir más de una si no comparten recurso; cada elección re-renderiza el modal reflejando qué queda disponible. Estas habilidades están bloqueadas si se intenta usarlas directo desde su propia card (`soloPostGolpe: true`, mismo patrón que Smite).
+
+### Hechizos
+- Ranuras por nivel, consumo automático al lanzar.
+- Cantrips que escalan por nivel de personaje (`escala`), y hechizos que dejan elegir con qué ranura lanzarlos (`escalaSlot`, ej. Fireball) — abren un selector de nivel antes de tirar el daño.
+- **Familiares/compañeros invocados** (Find Familiar, Find Steed, Wild Shape, Staff of the Python): un solo "slot" de compañero activo por personaje, con botón flotante propio, HP editable, lista de ataques. Sobrevive descansos (no se resetea solo). Wild Shape abre un selector de animal antes de invocar.
+- **Circle of the Land (Orfe, 5.5e)**: selector de "Land" (Arid/Polar/Temperate/Tropical/Underdark homebrew) que mezcla hechizos extra a la lista según nivel de personaje. Se resetea (queda "sin elegir") en cada descanso largo y el selector se abre solo.
+- **Recuperación de ranuras**: Pearl of Power (elegir 1 ranura gastada para restaurar) y Arcane/Natural Recovery (presupuesto = mitad de nivel redondeado arriba, elegís varias mientras alcance) — mismo modal genérico, dos modos.
+- **Efectos automáticos por rasgo** (Disciple of Life, Blessed Healer, etc.): fórmulas simples (`2 + nivelHechizo`) evaluadas y mostradas en el modal de efectos al lanzar el hechizo correspondiente.
+
+### Equipo mágico
+- Accesorios (capas, anillos, amuletos) dan bonos pasivos mientras están equipados: CA, salvaciones, bono de ataque con hechizos, CD de hechizos, bono de ataque melee. No ocupan manos si son accesorios puros (`manos: 0`).
+- El bono "horneado" en el string de daño de un arma (ej. `"2d6+2"`) y el bono en campo separado (`bonoDano`) nunca deben coexistir en el mismo ítem — se estandarizó a uno u otro para no duplicar. `extraerBonusHorneado()` separa el bono horneado y lo etiqueta igual que cualquier otro bono, para que siempre se vea de dónde sale cada número.
+
+### Inventario
+- Ítems con cantidad, se pueden sumar/restar.
+- Ítems con campo `accion` muestran botón "Usar" que gasta 1 unidad y consume el recurso de turno correspondiente (incluye "Interacción con Objeto" como recurso real, no solo decorativo).
+
+### UI / temas visuales
+- Sistema de colores por card en el modal de "Efectos Activados": normalmente marrón, pero un efecto puede declarar `colorCard` (+ opcional `colorCardFondo`) para resaltar en otro color (ej. violeta para Aura del Gran Panal de Nika).
+- Badges de info (Manos, Atk Melee/Finesse, Save DC, Spell Attack Bonus/Save DC, tipo de daño) con fondo clarito a juego con su color de borde. Tipo de daño/curación en gris neutro con mayúscula inicial, separado visualmente del resto (que usa marrón/violeta).
+
+## 6. Mecanismos genéricos reutilizables (lo importante para seguir extendiendo)
+
+Estos son los "verbos" que cualquier personaje puede usar declarando los campos correspondientes en su JSON, sin tocar `script.js`:
+
+| Campo (en rasgo o habilidadUso) | Qué hace |
+|---|---|
+| `disparadores: { arma: true\|objeto\|{condición}, hechizo: true\|"Nombre", cantrip: true, habilidad: "Nombre", smite: true, postgolpe: true }` | Auto-inyecta el rasgo como card en el modal de "Efectos Activados" cuando el contexto matchea. `true` = siempre en ese contexto; string = solo si `item.nombre` coincide; objeto = solo si los campos del item coinciden (ej. `{manos:2, tipo:'melee'}` para Great Weapon Fighting). |
+| `disparadoresSiActivo` (+ `toggleBonoDano`) | Igual que `disparadores` pero solo mientras el toggle está prendido (ver Radiant Soul). |
+| `toggleBonoDano: {formula, tipoDano}` | Habilidad tipo interruptor: botón "Usar" la prende (gasta 1 uso), y mientras esté prendida suma `formula` (evaluada con `evaluarFormula`) como bono de daño etiquetado a CUALQUIER arma/hechizo. El botón pasa a decir "Desactivar" (gratis, no gasta acción ni uso). Se apaga solo en cualquier descanso. |
+| `consumeUsoDe: "Nombre de otro pool"` | La habilidad no tiene contador propio: gasta 1 uso del pool compartido indicado (ej. las 3 opciones de Channel Divinity comparten un solo contador "Channel Divinity"; Harness Divine Power gasta ese mismo pool para restaurar una ranura). |
+| `otorgaGolpes: N` (+ opcional `consumeUsoDe`, `requiereAccionGastada`) | Suma N al contador `golpesRestantes` (el mismo que usa Extra Attack), permitiendo golpear N veces más sin gastar la Acción de nuevo. Usado por Martial Arts (N=1, gratis) y Flurry of Blows (N=2, cuesta 1 Ki). |
+| `postGolpe: true` | La habilidad aparece en el panel que se abre después de un golpe melee (ver §5). |
+| `soloPostGolpe: true` | Bloquea el uso directo desde la propia card (mismo patrón que Smite: "Intentar usar" → aviso de que hace falta golpear primero). |
+| `restaurarRanura: {maxNivel: N}` o `{maxNivelFormula: "mitadProficienciaArriba"}` | Abre el selector para restaurar 1 ranura gastada de nivel ≤ N. |
+| `recuperacionPresupuesto: {formula: "mitadNivelArriba", maxNivelSlot: N}` | Abre el selector de "presupuesto": restaurar varias ranuras mientras alcance `ceil(nivel/2)`, tope de nivel por ranura individual. |
+| `restaurarTodasLasRanuras: true` | Al usarse, restaura TODAS las ranuras de golpe (ej. Magical Cunning). |
+| `restaurarUsoDe: "Nombre de otro pool"` | Al usarse, gasta 1 uso propio y restaura 1 uso al pool indicado (ej. Amulet of the Devout recarga Channel Divinity). |
+| `usosPorNivel: {"1":1, "6":2, "18":3}` | Máximo de usos calculado por umbral de nivel de personaje (ej. Channel Divinity de Clérigo/Paladín). |
+| `usosIgualANivel: true` | Máximo de usos = nivel de personaje exacto, sin escalones (ej. Puntos de Ki del Monje). |
+| `recuperaCortoCantidad: N` | En descanso corto, SUMA N usos (no resetea a full) — ej. Second Wind: +1 en corto, full en largo. |
+| `recupera: "turno"` | Se recarga solo al terminar el turno (botón "Terminar turno"), no con descansos — ej. Slow Fall. |
+| `oculto: true` (en rasgo o habilidadUso) | No se muestra en la lista visible, pero sigue funcionando para todo lo demás (disparadores, cálculos). Sirve para tener una versión "resumen" de un rasgo largo que se muestra en el modal de efectos, sin duplicar el texto completo ahí. |
+| `familiar: {...}` (en un hechizo o habilidadUso) | Al usarse, activa el panel de compañero (familiar/steed/wildshape) con esos datos. |
+| `formasSalvajes: [...]` (en una habilidadUso) | En vez de un solo `familiar`, abre un selector entre varias formas (Wild Shape). |
+| `maestriaArma: "Cleave"` (en un arma) | Asigna la propiedad de Weapon Mastery de esa arma (ver diccionario en `Constantes.js`). |
+| `colorCard`, `colorCardFondo` (en un rasgo) | Personaliza el color de la card en el modal de efectos cuando se auto-inyecta. |
+| `efectos: [...]` (en cualquier item) | Lista de efectos ad-hoc propios de ESE item específico (no reutilizables por otros). Tipos soportados: `notificacion` (texto con placeholders `{nivelPersonaje}`, `{WIS}`, etc.), `notificacionYAbreVida` (además abre el modal de vida al cerrar), `autoCuracion`/`autoDano` (evalúa fórmula y la muestra resaltada), `activarActionSurge`, `toggleArmaduraMagica` (Mage Armor), y los "pasivos de equipo" (`CA`, `salvaciones`, `bonoAtaqueHechizo`, `bonoCDHechizo`, `bonoAtaqueMelee`) que NUNCA disparan el modal, se aplican solos vía `calcularBonosEquipoActivo()`. |
+
+El **modal de "Efectos Activados"** (`procesarEfectos()`) es el punto de entrada común: recibe un item + `contexto.tipos` (array de tags: `arma`, `hechizo`, `cantrip`, `habilidad`, `smite`, `postgolpe`) y arma la lista final combinando: efectos propios del item + rasgos con `disparadores` que matcheen + habilidades con `disparadores`/`disparadoresSiActivo` que matcheen. Si se le pasa `contexto.danoTexto`, se muestra como card de recap arriba de todo (útil para repetir el daño calculado, por ejemplo cuando Flurry of Blows hace que el mismo golpe se repita 2 veces).
+
+## 7. Convenciones importantes (para no romper nada)
+
+- **Nombres de skills en el JSON deben ser exactamente los que usa `SKILL_STAT` en `Constantes.js`** (en español: "Acrobacias", "Atletismo", "Trato animal", etc., NO en inglés). Si no matchean, el skill se calcula como 0 aunque esté marcado proficiente — bug real que ya pasó.
+- Nombres de clase deben matchear exactamente las claves de `PROFICIENCIAS_POR_CLASE` en `Constantes.js` ('Bardo', 'Monje', 'Artífice', 'Paladín', etc.) para que las proficiencias de salvación se calculen bien.
+- `tipoDano` de armas/hechizos: usar minúscula en el JSON (ej. `"radiante"`), la UI lo capitaliza sola.
+- El campo `tipo` de un arma (`melee` / `finesse` / `ranged`) determina qué stat usa para pegar (STR / DEX / — sin header propio para ranged todavía). `finesse` se usa también para Unarmed Strike y armas de monje para que tomen DEX.
+- Cuando un arma tiene bono mágico de daño: usarlo **o** horneado en el string de `dano` (`"2d6+2"`) **o** en el campo `bonoDano` — nunca ambos a la vez (se duplicaría).
+- `window._equipoData` y `window._habilidadesUsoData` se setean bien temprano en `init()` (antes de cualquier cálculo) para que funciones top-level como `calcularCA()` los puedan usar. Si se agrega un cálculo nuevo que dependa del equipo/habilidades fuera de `init()`, hay que asegurarse de leer de ahí y no de un `data` local.
+- **Cuidado con "temporal dead zone"**: cualquier bloque nuevo insertado en `init()` debe ir DESPUÉS de la declaración `const` de las variables que usa (`nivelPersonaje`, etc.). Ya hubo un bug real por esto (Circle of the Land rompía toda la carga de la página).
+- **Cuidado con substrings en `tipoAccion`**: "Interacción con Objeto" contiene "acción", "Sin acción" contiene "acción" — `consumirAccion()` y el pre-check de recursos tienen que revisar esos casos ANTES del check genérico de "acción", si no consumen el recurso equivocado. Patrón ya resuelto, pero tenerlo en cuenta si se agrega un nuevo tipo de acción con nombre parecido.
+- Los toasts (`mostrarToast`) son la confirmación visual estándar de "algo pasó"; el modal de efectos es para "esto es lo que tenés que aplicar/recordar".
+- Colores de la paleta: marrón/pergamino (`var(--accent-color)` = `#5d4037`) para lo "normal", violeta (`#6a1b9a`) para lo mágico/hechizos/smite, verde (`#2e7d32`) para curación, rojo (`#c62828`) para daño/advertencias, gris (`#757575` texto / `#eeeeee` fondo) para tipo de daño.
+
+## 8. Limitaciones conocidas / supuestos
+
+- **No hay tirador de dados**: la app nunca tira dados por el jugador. Todo lo que requiere una tirada (iniciativa con ventaja, ataques, salvaciones) se documenta en texto pero no se simula.
+- **No soporta Expertise** (doble proficiencia): si un personaje tiene Expertise en una skill, hay que aceptar que el número mostrado va a quedar más bajo que el real, o ajustarlo a mano en el JSON sabiendo que no va a ser 100% fiel a la fórmula.
+- **Velocidad no es dinámica**: a diferencia de CA/ataque, la velocidad final es un string fijo en `estadisticas`, no se recalcula desde feats/rasgos. Si un personaje tiene algo que la modifica (Mobile, Unarmored Movement), se documenta en texto/rasgo pero el número hay que dejarlo bien puesto a mano.
+- **Un solo "slot" de compañero invocado por personaje**: no soporta tener familiar + wildshape + steed simultáneos, es una elección de diseño (así era antes de este sistema, y simplifica mucho la UI).
+- **`localStorage` puede quedar desactualizado**: si se cambia una fórmula de cálculo (ej. la de CA), los valores ya guardados en `localStorage` de sesiones viejas no se recalculan solos — hay que usar el botón "Restaurar" correspondiente (CA, vida, etc.) para que tome el nuevo valor. Ya pasó al menos una vez y probablemente vuelva a pasar.
+- Los 3 personajes de respaldo del DM (Cedric, Aldren, Kael) están armados con datos base + rasgos descriptivos, pero **no todos tienen scripts de habilidades armados todavía** — eso se va haciendo personaje por personaje, a pedido.
+- El proyecto no tiene tests automatizados. La validación de cada entrega es: `node --check` sobre `script.js` (sintaxis) + `python3 -c "import json; json.load(...)"` sobre cada JSON tocado.
+- Cuando se entregan cambios, la convención de esta conversación fue: **enviar solo los archivos que cambiaron** (no todo el proyecto) en un `.zip`, para que el usuario los pise manualmente sobre su copia local.
+
+## 9. Tareas pendientes / ideas sueltas mencionadas pero no implementadas
+
+- Terminar los "scripts de habilidades" de Cedric (Bardo) y Aldren (Artífice) — por ahora solo tienen el JSON de datos base, sin las mecánicas interactivas (Bardic Inspiration, Steel Defender, Infuse Item, etc.).
+- Posible duplicado a revisar en Gangstur: "Repelling Blast" existe como rasgo Y como "Eldritch Invocation: Repelling Blast" en habilidadesUso — quedó así a pedido explícito pero puede estar mostrando la card dos veces en el modal de efectos.
+- Evaluar si conviene que Counterspell (u otros hechizos de Reacción) también tengan su propia card "gastada" visual además de consumir el recurso de Reacción compartido (quedó pendiente, no bloqueante).
+- `curacionExtra` de la Moon Scimitar de Orfe (1d4 extra al curar con hechizo mientras está equipada) está declarado en el JSON pero no enganchado a ningún cálculo todavía.
+- Posible mejora: hacer que la velocidad final sí sea dinámica (sumar feats/rasgos automáticamente) en vez de texto fijo.
+- Posible mejora: soporte de Expertise real (doble proficiencia) en el cálculo de skills.

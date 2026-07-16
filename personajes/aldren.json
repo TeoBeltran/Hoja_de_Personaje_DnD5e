@@ -1,0 +1,212 @@
+{
+  "personaje": {
+    "nombre": "Aldren Pike",
+    "clase": "Artífice",
+    "raza": "Human/Turami",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 8,
+        "DEX": 14,
+        "CON": 16,
+        "INT": 20,
+        "WIS": 10,
+        "CHA": 8
+    }
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "67/67" },
+    { "nombre": "Nivel", "valor": "8" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "13" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": false },
+    { "nombre": "Conoc. Arcano", "proficiente": true },
+    { "nombre": "Engaño", "proficiente": false },
+    { "nombre": "Historia", "proficiente": true },
+    { "nombre": "Interpretación", "proficiente": false },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": true },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": true },
+    { "nombre": "Percepción", "proficiente": true },
+    { "nombre": "Persuasión", "proficiente": true },
+    { "nombre": "Perspicacia", "proficiente": false },
+    { "nombre": "Religión", "proficiente": true },
+    { "nombre": "Sigilo", "proficiente": false },
+    { "nombre": "Supervivencia", "proficiente": false },
+    { "nombre": "Trato animal", "proficiente": false }
+  ],
+  "background": {
+    "nombre": "Guild Artisan",
+    "habilidades": [
+      {
+        "nombre": "Guild Membership",
+        "desc": "Sos miembro de un gremio de artesanos. Tus compañeros de gremio te asisten en tus viajes: podés conseguir alojamiento y comida en las sedes del gremio, y contás con el apoyo político y financiero de la organización siempre que no la hayas deshonrado."
+      }
+    ]
+  },
+  "rasgos": [
+    { "nombre": "Magical Tinkering", "desc": "Podés infundir un objeto pequeño y no mágico con uno de varios efectos menores (luz, sonido grabado, sensor, etc.) usando tu herramienta." },
+    { "nombre": "Infuse Item", "desc": "Aprendiste fórmulas de infusión que te permiten convertir objetos comunes en objetos mágicos temporales durante un descanso largo. Podés tener varias infusiones activas a la vez según tu nivel." },
+    { "nombre": "The Right Tool for the Job", "desc": "Con un set de Herramientas de Herrero, podés gastar 1 hora para crear un set de herramientas distinto (que reemplaza al anterior)." },
+    { "nombre": "Tool Expertise", "desc": "Duplicás tu bonificador de competencia en pruebas de habilidad hechas con herramientas en las que sos competente." },
+    { "nombre": "Battle Smith: Battle Ready", "desc": "Sos competente con armas marciales y podés usar INT en vez de STR/DEX para el ataque y daño de armas cuerpo a cuerpo." },
+    { "nombre": "Battle Smith: Steel Defender", "desc": "Como parte de crear tu arma de artesano especial, invocás un Steel Defender: un compañero mecánico que combate a tu lado. Usa tu bonificador de competencia y comparte tu turno." },
+    { "nombre": "Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1." }
+  ],
+  "habilidadesUso": [
+    { "nombre": "Infuse Item", "usos": "4/4", "recupera": "largo", "accion": "Especial", "desc": "Podés tener hasta 4 infusiones activas a la vez (una por fórmula conocida). Se eligen/cambian al terminar un descanso largo." }
+  ],
+  "equipo": [
+    {
+      "nombre": "Cota de Escamas (Scale Mail)",
+      "esArmadura": true,
+      "tipoArmadura": "mediana",
+      "armaduraBase": 14,
+      "manos": 0,
+      "peso": 45,
+      "valor": 50,
+      "desc": "Armadura mediana. CA: 14 + Modificador de Destreza (máximo +2)."
+    },
+    {
+      "nombre": "Ballesta Ligera (Crossbow, light)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "ranged",
+      "manos": 2,
+      "peso": 5,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "80/320 ft",
+      "desc": "Arma a distancia. Munición, Recarga, 2 manos."
+    },
+    {
+      "nombre": "Martillo Liviano (Light Hammer)",
+      "dano": "1d4",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 2,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadizo 20/60 ft",
+      "desc": "Arma liviana y arrojadiza."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Fire Bolt",
+        "dano": "1d10",
+        "escala": { "5": "2d10", "11": "3d10", "17": "4d10" },
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Ataque de conjuro a distancia. Si impacta, hace daño de fuego. Un objeto inflamable no portado se prende fuego."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mending",
+        "accion": "1 minuto",
+        "distancia": "Toque",
+        "desc": "Repara una rotura o rajadura pequeña (hasta 1 ft) en un objeto tocado, sin dejar rastro del daño anterior."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Heroism",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Una criatura tocada es inmune a Asustada y gana HP temporales igual a tu modificador de conjuro al inicio de cada uno de sus turnos."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "+5 a la CA hasta el inicio de tu próximo turno, incluyendo contra el ataque que lo activó, y no recibís daño de Magic Missile."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Absorb Elements",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "Ganás resistencia al tipo de daño que te activó el hechizo hasta tu próximo turno. Tu próximo golpe cuerpo a cuerpo suma 1d6 de ese tipo de daño."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Cure Wounds",
+        "dano": "1d8",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Una criatura tocada recupera 1d8 + modificador de INT de HP."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Faerie Fire",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Los objetos en un cubo de 20 ft quedan iluminados. Las criaturas que fallen salvación de DEX quedan iluminadas: los ataques contra ellas tienen ventaja."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Branding Smite",
+        "dano": "2d6",
+        "tipoDano": "radiante",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "El próximo golpe con arma antes de que termine el hechizo suma daño radiante extra, vuelve visible al objetivo si era invisible, y le hace emitir luz tenue."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Warding Bond",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "1 hora",
+        "desc": "Creás un vínculo místico con una criatura tocada: gana +1 CA y salvaciones y resistencia a todo daño, pero cada vez que reciba daño vos recibís lo mismo."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Aid",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "8 horas",
+        "desc": "Hasta 3 criaturas ganan +5 a su HP máximo y actual mientras dure el hechizo."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Web",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Llenás un cubo de 20 ft con telarañas espesas (terreno difícil). Salvación de DEX o queda Restringido."
+      }
+    ]
+  },
+  "inventario": [
+    { "nombre": "Ropa de viajero", "peso": 4, "cantidad": 1, "desc": "Vestimenta cómoda para viajar." },
+    { "nombre": "Virote de ballesta", "peso": 0.075, "cantidad": 20, "desc": "Munición para ballesta." },
+    { "nombre": "Dungeoneer's Pack", "peso": 0, "cantidad": 1, "desc": "Incluye mochila, barra de hierro, martillo, piolet, linterna sorda, aceite x2, raciones (10 días), odre, cuerda de cáñamo (50 ft)." },
+    { "nombre": "Bolsa (Pouch)", "peso": 1, "cantidad": 1, "desc": "Bolsa pequeña para monedas y objetos menores." },
+    { "nombre": "Herramientas de Herrero (Smith's Tools)", "peso": 8, "cantidad": 1, "desc": "Set de herramientas para trabajar metales." },
+    { "nombre": "Herramientas de Ladrón (Thieves' Tools)", "peso": 1, "cantidad": 1, "desc": "Set de ganzúas y herramientas para forzar cerraduras y desactivar trampas." },
+    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+  ]
+}

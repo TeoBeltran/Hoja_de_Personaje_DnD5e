@@ -7,7 +7,10 @@ const ICONOS_PERSONAJE = {
     'lothar': '🗡️',
     'lunareth': '📖',
     'leonidas': '✨',
-    'orfe': '🌿'
+    'orfe': '🌿',
+    'cedric': '🎻',
+    'aldren': '🔧',
+    'kael': '🙏'
 };
 
 // === Sistema de stats y proficiencias ===

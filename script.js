@@ -113,6 +113,7 @@ function abrirModalLand() {
 let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
 let modDexGlobal = 0;
 let modStrGlobal = 0;
+let modWisGlobal = 0;
 let statsGlobal = {};
 let rasgosGlobal = [];
 
@@ -713,6 +714,11 @@ function calcularCA() {
     } else if (mageArmorActivo) {
         // Mage Armor: 13 + DEX (sin tope)
         ca = mageArmorBase + modDexGlobal;
+    } else if (!escudoEquipadoId && tieneRasgo('Unarmored Defense')) {
+        // Unarmored Defense (Monje): 10 + DEX + WIS, sin armadura NI escudo.
+        // (Si en el futuro se agrega un Bárbaro con Unarmored Defense propio, esto habría
+        // que generalizarlo porque el Bárbaro usa CON en vez de WIS.)
+        ca = 10 + modDexGlobal + modWisGlobal;
     } else {
         // Sin armadura: 10 + DEX
         ca = 10 + modDexGlobal;
@@ -1082,6 +1088,11 @@ function actualizarTurnoDOM() {
 function consumirAccion(tipoAccion) {
     if (!tipoAccion) return { ok: true, mensaje: '' };
     const t = tipoAccion.toLowerCase();
+    // "Sin acción" (ej: Stunning Strike, Hand of Harm) no gasta ningún recurso de turno.
+    // Va primero porque "sin acción" también contiene la palabra "acción" como substring.
+    if (t.includes('sin acción') || t.includes('sin accion') || t === 'ninguna' || t === 'ninguno') {
+        return { ok: true, mensaje: '' };
+    }
     // OJO: este check va primero porque "interacción" contiene la palabra "acción" como substring,
     // así que si no lo revisamos antes, caería en el branch genérico de Acción por error.
     if (t.includes('objeto') || t.includes('interacción') || t.includes('interaccion')) {
@@ -1129,10 +1140,128 @@ function consumirAccion(tipoAccion) {
     return { ok: true, mensaje: '' };
 }
 
+// Descuenta 1 uso de un pool de habilidadesUsoState (ej: "Puntos de Ki"). Devuelve true si pudo.
+function consumirDeUsoPool(nombrePool) {
+    const partes = (habilidadesUsoState[nombrePool] || '0/0').split('/');
+    let actual = parseInt(partes[0]);
+    const max = parseInt(partes[1]);
+    if (actual <= 0) {
+        mostrarToast(`Sin usos restantes de ${nombrePool}`, 'warning');
+        return false;
+    }
+    actual -= 1;
+    habilidadesUsoState[nombrePool] = `${actual}/${max}`;
+    guardarHabilidadesUso();
+    actualizarHabilidadUsoDOM(nombrePool);
+    return true;
+}
+
+// Ejecuta una habilidad que otorga golpes extra (Martial Arts bonus attack, Flurry of Blows).
+// Usa el mismo contador golpesRestantes que Extra Attack, así que el arma/golpe desarmado los
+// deja usar sin volver a pedir la Acción. Devuelve true si se ejecutó.
+function ejecutarOtorgaGolpes(habObj) {
+    if (habObj.requiereAccionGastada && turnoEstado.accion > 0) {
+        mostrarToast(`${habObj.nombre} se usa después de la Acción de Atacar`, 'warning');
+        return false;
+    }
+    if (habObj.consumeUsoDe && !consumirDeUsoPool(habObj.consumeUsoDe)) return false;
+
+    turnoEstado.golpesRestantes = (turnoEstado.golpesRestantes || 0) + habObj.otorgaGolpes;
+    guardarTurnoEstado();
+    const r = consumirAccion(habObj.accion);
+    mostrarToast(`✊ ${habObj.nombre}: +${habObj.otorgaGolpes} golpe(s) disponibles sin gastar Acción. ${r.mensaje}`.trim());
+
+    // Mostrar el panel de Efectos Activados con el daño repetido tantas veces como golpes otorgue
+    // (ej: Flurry of Blows = 2 golpes = el daño del Unarmed Strike aparece 2 veces).
+    if (ultimoDanoMostrado) {
+        const danoRepetido = Array(habObj.otorgaGolpes).fill(ultimoDanoMostrado).join('  +  ');
+        setTimeout(() => {
+            procesarEfectos(habObj, {
+                nivelPersonaje: nivelPersonajeGlobal,
+                tipos: ['postgolpe'],
+                danoTexto: danoRepetido
+            });
+        }, 300);
+    }
+    return true;
+}
+
+// Ejecuta una habilidad simple post-golpe que solo gasta un pool (Stunning Strike, Hand of Harm):
+// no otorga golpes extra, solo abre el panel de efectos con su propio recordatorio.
+function ejecutarHabilidadPostGolpe(habObj) {
+    if (habObj.consumeUsoDe && !consumirDeUsoPool(habObj.consumeUsoDe)) return false;
+    const r = consumirAccion(habObj.accion);
+    mostrarToast(`✨ ¡${habObj.nombre} usada! ${r.mensaje}`.trim());
+    setTimeout(() => {
+        procesarEfectos(habObj, {
+            nivelPersonaje: nivelPersonajeGlobal,
+            tipos: ['postgolpe']
+        });
+    }, 300);
+    return true;
+}
+
+// Chequea si una opción post-golpe (Martial Arts, Flurry of Blows, Stunning Strike, etc.)
+// se puede usar ahora mismo, sin gastarla todavía (para pintar el botón habilitado o no).
+function opcionPostGolpeDisponible(hab) {
+    if (hab.requiereAccionGastada && turnoEstado.accion > 0) return false;
+    if (hab.consumeUsoDe) {
+        const actual = parseInt((habilidadesUsoState[hab.consumeUsoDe] || '0/0').split('/')[0]);
+        if (actual <= 0) return false;
+    }
+    if (hab.otorgaGolpes && turnoEstado.bonus <= 0 && turnoEstado.accion <= 0) return false;
+    return true;
+}
+
+// Abre el panel de opciones post-golpe con todo lo que el personaje tenga marcado postGolpe:true
+// (ej: Martial Arts, Flurry of Blows, Stunning Strike, Hand of Harm). Se puede elegir más de una
+// mientras alcancen los recursos; el panel se re-renderiza después de cada elección.
+function abrirModalPostGolpe() {
+    const modalPG = document.getElementById('post-golpe-modal');
+    const cont = document.getElementById('post-golpe-opciones');
+    if (!modalPG || !cont) return;
+    const opciones = (window._habilidadesUsoData || []).filter(h => h.postGolpe);
+    if (opciones.length === 0) return;
+
+    function render() {
+        cont.innerHTML = '';
+        opciones.forEach(hab => {
+            const disponible = opcionPostGolpeDisponible(hab);
+            const btn = document.createElement('button');
+            btn.className = 'hp-btn';
+            btn.style.cssText = `width: 100%; padding: 12px; text-align: left; font-weight: bold; ${disponible ? 'background-color: #6a1b9a; color: white;' : 'background-color: #999; cursor: not-allowed;'}`;
+            btn.disabled = !disponible;
+            const etiquetaCosto = [];
+            if (hab.consumeUsoDe) etiquetaCosto.push(`1 ${hab.consumeUsoDe}`);
+            if (hab.otorgaGolpes) etiquetaCosto.push('Acción Bonus');
+            btn.innerHTML = `${hab.nombre} <span style="float: right; font-weight: normal; font-size: 0.85rem;">(${etiquetaCosto.join(' + ') || 'gratis'})</span>`;
+            btn.onclick = () => {
+                const ok = hab.otorgaGolpes ? ejecutarOtorgaGolpes(hab) : ejecutarHabilidadPostGolpe(hab);
+                if (ok) render();
+            };
+            cont.appendChild(btn);
+        });
+    }
+    render();
+    modalPG.style.display = 'flex';
+}
+
 function resetearTurno() {
     turnoEstado = { accion: 1, bonus: 1, reaccion: 1, objeto: 1, golpesRestantes: 0 };
     guardarTurnoEstado();
     actualizarTurnoDOM();
+
+    // Habilidades que se recargan cada turno nuevo (ej: Slow Fall, atado a la Reacción
+    // que ya se resetea arriba). No confundir con descansos: esto es SOLO al terminar turno.
+    let huboRecargaDeTurno = false;
+    Object.keys(habilidadesUsoState).forEach(nombre => {
+        if (habilidadesInfo[nombre] === 'turno' && habilidadesUsoOriginales[nombre]) {
+            habilidadesUsoState[nombre] = habilidadesUsoOriginales[nombre];
+            actualizarHabilidadUsoDOM(nombre);
+            huboRecargaDeTurno = true;
+        }
+    });
+    if (huboRecargaDeTurno) guardarHabilidadesUso();
 }
 
 // === Divine Smite (y cualquier otro "smite", ej: Honey Smite) ===
@@ -1764,6 +1893,7 @@ async function init() {
 
     // Pre-cargar armadura, escudo y armas equipadas desde localStorage
     modDexGlobal = obtenerMod(data.modificadores, "DEX");
+    modWisGlobal = obtenerMod(data.modificadores, "WIS");
 
     // Pre-cargar estado de Mage Armor
     const mageArmorGuardado = localStorage.getItem(STORAGE_PREFIX + 'mageArmorActivo');
@@ -2207,10 +2337,11 @@ async function init() {
         useSpellBtn.dataset.habilidad = '';
         useSpellBtn.dataset.arma = '';
         useSpellBtn.dataset.smite = '';
+        useSpellBtn.dataset.postGolpeSolo = '';
         useSpellBtn.style.backgroundColor = '#6a1b9a'; // Reset color
 
         const tieneDano = !!item.dano;
-        const esHabilidad = !!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe;
+        const esHabilidad = !!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe || !!item.otorgaGolpes || !!item.soloPostGolpe;
         const esHechizoConRanura = (tipo === 'hechizo');
         const esCantrip = (tipo === 'cantrip');
         const esArma = (tipo === 'arma') && tieneDano;
@@ -2249,19 +2380,32 @@ async function init() {
         } else if (esHabilidad || item.tipo === 'smite') {
             modalActions.style.display = 'block';
 
-            // Caso especial: Divine Smite no se puede usar directamente
+            // Caso especial: Divine Smite (y similares) no se pueden usar directamente
             if (item.tipo === 'smite') {
                 useSpellBtn.dataset.smite = 'true';
+                useSpellBtn.disabled = false;
+                useSpellBtn.textContent = 'Intentar usar';
+            } else if (item.soloPostGolpe) {
+                // Igual que Smite: solo se pueden usar desde el panel post-golpe, después de
+                // golpear con un arma. Si tocás "Usar" directo desde su propia card, se bloquea.
+                useSpellBtn.dataset.smite = '';
+                useSpellBtn.dataset.postGolpeSolo = 'true';
                 useSpellBtn.disabled = false;
                 useSpellBtn.textContent = 'Intentar usar';
             } else {
                 useSpellBtn.dataset.habilidad = item.nombre;
                 useSpellBtn.dataset.smite = '';
+                useSpellBtn.dataset.postGolpeSolo = '';
 
                 if (item.toggleBonoDano && togglesActivos[item.nombre]) {
                     // Ya está activa: el botón pasa a ser "Desactivar", no gasta usos
                     useSpellBtn.disabled = false;
                     useSpellBtn.textContent = `Desactivar ${item.nombre}`;
+                } else if (item.otorgaGolpes && !item.consumeUsoDe) {
+                    // Otorga golpes gratis (ej: Martial Arts bonus attack): no tiene contador
+                    // propio, solo depende de que tengas la Acción Bonus disponible.
+                    useSpellBtn.disabled = false;
+                    useSpellBtn.textContent = 'Usar Habilidad';
                 } else {
                     // Si el item consume el pool de OTRA habilidad (ej: Harness Divine Power usa
                     // el contador compartido de "Channel Divinity"), mostrar y chequear ESE pool.
@@ -2703,6 +2847,11 @@ async function init() {
                     });
                 h.usos = `${maxCalc}/${maxCalc}`;
             }
+            // Si los usos son directamente iguales al nivel de personaje (ej: Puntos de Ki del
+            // Monje: siempre = nivel de monje, sin escalones).
+            if (h.usosIgualANivel) {
+                h.usos = `${nivelPersonaje}/${nivelPersonaje}`;
+            }
             if (h.usos) {
                 habilidadesUsoOriginales[h.nombre] = h.usos;
                 habilidadesInfo[h.nombre] = h.recupera || 'largo';
@@ -2715,7 +2864,7 @@ async function init() {
             data.habilidadesUso.forEach(h => {
                 if (!(h.nombre in habilidadesUsoState)) {
                     habilidadesUsoState[h.nombre] = h.usos;
-                } else if (h.usosPorNivel) {
+                } else if (h.usosPorNivel || h.usosIgualANivel) {
                     // El máximo pudo haber cambiado (subida de nivel desde el último guardado):
                     // ajustar sin perder usos ya gastados de más.
                     const savedActual = parseInt((habilidadesUsoState[h.nombre] || '0/0').split('/')[0]);
@@ -2904,7 +3053,9 @@ async function init() {
             const esDesactivarToggle = item && item.toggleBonoDano && togglesActivos[item.nombre];
             if (tipoAccion && !esDesactivarToggle) {
                 const t = tipoAccion.toLowerCase();
-                if (t.includes('bonus') || t.includes('adicional')) {
+                if (t.includes('sin acción') || t.includes('sin accion') || t === 'ninguna' || t === 'ninguno') {
+                    // No consume ningún recurso de turno (ej: Stunning Strike, Hand of Harm)
+                } else if (t.includes('bonus') || t.includes('adicional')) {
                     if (turnoEstado.bonus === 0 && turnoEstado.accion === 0) {
                         mostrarToast('No te quedan acciones disponibles este turno', 'warning');
                         return;
@@ -2934,10 +3085,29 @@ async function init() {
                 return;
             }
 
+            // Caso 0b: intento de usar Martial Arts / Flurry / Stunning Strike / Hand of Harm
+            // directamente desde su propia card → bloquear, solo se usan desde el panel post-golpe.
+            if (useSpellBtn.dataset.postGolpeSolo === 'true') {
+                modal.style.display = 'none';
+                mostrarToast('❌ Necesitás golpear con un arma melee primero (elegilo en el panel que se abre después)', 'warning');
+                useSpellBtn.dataset.postGolpeSolo = '';
+                return;
+            }
+
             // Caso 1: habilidad con usos
             const habilidad = useSpellBtn.dataset.habilidad;
             if (habilidad) {
                 const habObj = data.habilidadesUso ? data.habilidadesUso.find(h => h.nombre === habilidad) : null;
+
+                // Si la habilidad otorga golpes extra (ej: Flurry of Blows, Martial Arts bonus
+                // attack): usa el mismo contador golpesRestantes que Extra Attack, así que el
+                // arma/golpe desarmado los deja usar sin volver a pedir la Acción.
+                if (habObj && habObj.otorgaGolpes) {
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    ejecutarOtorgaGolpes(habObj);
+                    return;
+                }
 
                 // Si es una habilidad tipo interruptor (ej: Radiant Soul), este click puede ser
                 // para ACTIVARLA (gasta 1 uso, como cualquier habilidad) o para DESACTIVARLA
@@ -3195,8 +3365,17 @@ async function init() {
                 }
 
                 // Si la clase tiene Smite y el arma califica, abrir modal de Smite
-                if (smitesData.length > 0 && armaPuedeGatillarSmite(arma, data.equipo)) {
+                const haySmite = smitesData.length > 0 && armaPuedeGatillarSmite(arma, data.equipo);
+                if (haySmite) {
                     setTimeout(() => abrirModalSmite(), 600);
+                }
+
+                // Panel de opciones post-golpe (Martial Arts, Flurry of Blows, Stunning Strike,
+                // Hand of Harm, etc.) — solo tiene sentido después de un golpe cuerpo a cuerpo.
+                const esMelee = armaObj && (armaObj.tipo === 'melee' || armaObj.tipo === 'finesse');
+                const tienePostGolpe = (window._habilidadesUsoData || []).some(h => h.postGolpe);
+                if (esMelee && tienePostGolpe) {
+                    setTimeout(() => abrirModalPostGolpe(), haySmite ? 900 : 600);
                 }
                 return;
             }
@@ -3527,6 +3706,19 @@ async function init() {
         restaurarCloseBtn.addEventListener('click', () => restaurarModal.style.display = 'none');
     }
     window.addEventListener('click', (e) => { if (e.target === restaurarModal) restaurarModal.style.display = 'none'; });
+
+    // Modal de opciones post-golpe: cerrar con la X o con "Listo / Ninguna"
+    const postGolpeModal = document.getElementById('post-golpe-modal');
+    const postGolpeCloseBtn = document.querySelector('.close-btn-post-golpe');
+    const postGolpeListoBtn = document.getElementById('post-golpe-listo');
+    if (postGolpeCloseBtn) {
+        postGolpeCloseBtn.addEventListener('click', () => postGolpeModal.style.display = 'none');
+    }
+    if (postGolpeListoBtn) {
+        postGolpeListoBtn.addEventListener('click', () => postGolpeModal.style.display = 'none');
+    }
+    window.addEventListener('click', (e) => { if (e.target === postGolpeModal) postGolpeModal.style.display = 'none'; });
+
 
     // === UI de selección de Land (Circle of the Land, DnD 5.5e) ===
     const landBadge = document.getElementById('land-badge');

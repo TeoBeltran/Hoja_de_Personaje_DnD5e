@@ -1,0 +1,259 @@
+{
+  "personaje": {
+    "nombre": "Cedric Halvain",
+    "clase": "Bardo",
+    "raza": "Human/Calishite",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 8,
+        "DEX": 16,
+        "CON": 15,
+        "INT": 8,
+        "WIS": 8,
+        "CHA": 20
+    }
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "59/59" },
+    { "nombre": "Nivel", "valor": "8" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "15" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": false },
+    { "nombre": "Conoc. Arcano", "proficiente": false },
+    { "nombre": "Engaño", "proficiente": true },
+    { "nombre": "Historia", "proficiente": false },
+    { "nombre": "Interpretación", "proficiente": true },
+    { "nombre": "Intimidación", "proficiente": true },
+    { "nombre": "Investigación", "proficiente": false },
+    { "nombre": "Juego de manos", "proficiente": true },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": true },
+    { "nombre": "Persuasión", "proficiente": true },
+    { "nombre": "Perspicacia", "proficiente": false },
+    { "nombre": "Religión", "proficiente": false },
+    { "nombre": "Sigilo", "proficiente": true },
+    { "nombre": "Supervivencia", "proficiente": false },
+    { "nombre": "Trato animal", "proficiente": false }
+  ],
+  "background": {
+    "nombre": "Charlatan",
+    "habilidades": [
+      {
+        "nombre": "False Identity",
+        "desc": "Tenés una identidad falsa completa con documentación, contactos y disfraces que la respaldan. Además, podés falsificar documentos con la práctica adecuada, incluyendo firmas, si tenés un ejemplo de la letra o firma que copiar."
+      }
+    ]
+  },
+  "rasgos": [
+    { "nombre": "Bardic Inspiration (d8)", "desc": "Como Acción Bonus, le das a otra criatura que puedas ver a 60 ft un Dado de Inspiración (d8). En los próximos 10 minutos, esa criatura puede tirar el dado y sumarlo a una tirada de habilidad, ataque o salvación." },
+    { "nombre": "Font of Inspiration", "desc": "Recuperás todos tus usos de Bardic Inspiration al terminar un descanso corto o largo." },
+    { "nombre": "Jack of All Trades", "desc": "Sumás la mitad de tu bonificador de competencia (redondeado hacia abajo) a cualquier prueba de habilidad que no incluya ya tu bonificador de competencia." },
+    { "nombre": "Song of Rest", "desc": "Durante un descanso corto, si vos u otros miembros del grupo que puedan oírte tocar recuperan HP gastando Hit Dice, cada uno recupera 1d8 HP adicionales." },
+    { "nombre": "Expertise", "desc": "Duplicás tu bonificador de competencia en Persuasión y Sleight of Hand (ya reflejado en sus valores)." },
+    { "nombre": "College of Lore: Bonus Proficiencies", "desc": "Ganaste competencia en 3 habilidades a elección (ya reflejadas en la lista de Habilidades)." },
+    { "nombre": "Cutting Words", "desc": "Reacción. Cuando una criatura a 60 ft hace una tirada de ataque, de habilidad o de daño, podés gastar un uso de Bardic Inspiration para restarle el resultado del dado a esa tirada." },
+    { "nombre": "Additional Magical Secrets", "desc": "Aprendiste 2 hechizos adicionales de cualquier lista de clase (ya incluidos en Hechizos)." }
+  ],
+  "habilidadesUso": [
+    { "nombre": "Bardic Inspiration", "usos": "5/5", "recupera": "corto", "accion": "Acción Bonus", "distancia": "60 ft", "duracion": "10 minutos", "desc": "Le das a una criatura un Dado de Inspiración (d8) para sumar a una tirada de ataque, habilidad o salvación. Usos = modificador de CHA (5)." }
+  ],
+  "equipo": [
+    {
+      "nombre": "Armadura de Cuero (Leather)",
+      "esArmadura": true,
+      "tipoArmadura": "ligera",
+      "armaduraBase": 11,
+      "manos": 0,
+      "peso": 10,
+      "valor": 10,
+      "desc": "Armadura ligera de cuero. CA: 11 + Modificador de Destreza."
+    },
+    {
+      "nombre": "Daga",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 1,
+      "valor": 2,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Arma finesse, liviana y arrojadiza."
+    },
+    {
+      "nombre": "Estoque (Rapier)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 2,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Arma finesse a una mano."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mage Hand",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás una mano espectral que puede manipular objetos livianos (hasta 10 lb) a distancia."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Minor Illusion",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás un sonido o una imagen de un objeto (no más grande que un cubo de 5 ft) dentro del rango."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Vicious Mockery",
+        "dano": "1d4",
+        "escala": { "5": "2d4", "11": "3d4", "17": "4d4" },
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Insultás mágicamente a una criatura que pueda oírte. Salvación de WIS o recibe daño psíquico y tiene desventaja en su próxima tirada de ataque."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Dissonant Whispers",
+        "dano": "3d6",
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Le susurrás una melodía discordante a una criatura. Salvación de WIS o recibe daño psíquico y debe usar su reacción para alejarse de vos."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Faerie Fire",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Los objetos en un cubo de 20 ft quedan iluminados. Las criaturas que fallen salvación de DEX quedan iluminadas: los ataques contra ellas tienen ventaja."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Healing Word",
+        "dano": "1d4",
+        "tipoDano": "curación",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Una criatura recupera 1d4 + modificador de CHA de HP."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "+5 a la CA hasta el inicio de tu próximo turno, incluyendo contra el ataque que lo activó, y no recibís daño de Magic Missile."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Hideous Laughter",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Una criatura percibe todo como graciosísimo. Salvación de WIS o cae Derribada e Incapacitada mientras dure."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Heat Metal",
+        "dano": "2d8",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un objeto metálico se pone al rojo vivo. Cualquier criatura en contacto con él recibe daño de fuego. Podés repetir el daño con Acción Bonus cada turno."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Hold Person",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un humanoide hace salvación de WIS o queda Paralizado mientras dure. Repite la salvación cada turno."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Invisibility",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Una criatura se vuelve invisible hasta que ataque, lance un hechizo o termine el efecto."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Bestow Curse",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Maldecís a una criatura tocada (salvación de WIS). Elegís un efecto: desventaja en pruebas/salvaciones de una característica, desventaja en ataques contra vos, pierde su acción si falla salvación de WIS, o tus ataques y hechizos le hacen 1d8 necrótico extra."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Counterspell",
+        "accion": "Reacción",
+        "distancia": "60 ft",
+        "desc": "Interrumpís a una criatura lanzando un hechizo. Nivel 3 o menor falla automáticamente; nivel 4+ requiere tirada de característica (DC 10 + nivel del hechizo)."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Dispel Magic",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Termina un hechizo de nivel 3 o menor sobre una criatura, objeto o efecto. Nivel 4+ requiere tirada de característica (DC 10 + nivel del hechizo)."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Fear",
+        "accion": "Acción",
+        "distancia": "Cono 30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Cada criatura en el cono hace salvación de WIS o queda Asustada y debe alejarse de vos por la ruta más segura."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Hypnotic Pattern",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un patrón de colores llena un cubo de 30 ft. Cada criatura que lo vea hace salvación de WIS o queda Hechizada e Incapacitada (velocidad 0)."
+      }
+    ]
+  },
+  "inventario": [
+    { "nombre": "Backpack", "peso": 5, "cantidad": 1, "desc": "Mochila de viaje." },
+    { "nombre": "Bedroll", "peso": 7, "cantidad": 1, "desc": "Saco de dormir." },
+    { "nombre": "Vela", "peso": 0, "cantidad": 5, "desc": "Velas comunes." },
+    { "nombre": "Ropa fina", "peso": 6, "cantidad": 1, "desc": "Un juego de ropa elegante, para pasar por alta sociedad." },
+    { "nombre": "Disfraz", "peso": 4, "cantidad": 2, "desc": "Vestimenta pensada para hacerte pasar por otra persona." },
+    { "nombre": "Kit de disfraz (Disguise Kit)", "peso": 3, "cantidad": 1, "desc": "Cosméticos, tinturas y demás herramientas para alterar tu apariencia." },
+    { "nombre": "Bolsa (Pouch)", "peso": 1, "cantidad": 1, "desc": "Bolsa pequeña para monedas y objetos menores." },
+    { "nombre": "Ración (1 día)", "peso": 2, "cantidad": 5, "desc": "Comida no perecedera para un día." },
+    { "nombre": "Viola (Viol)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de cuerda, tu instrumento de Bardo." },
+    { "nombre": "Odre de agua (Waterskin)", "peso": 5, "cantidad": 1, "desc": "Odre para transportar agua u otros líquidos." },
+    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+  ]
+}
