@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hoja de Personaje - DnD 5e</title>
+    <script>
+        // ==========================================================
+        // Guard de acceso para personajes "extra" (detrás del login de
+        // extras.html). Corre síncrono y antes de cualquier otra cosa
+        // para no dejar ver ni un parpadeo de la hoja si no corresponde.
+        //
+        // Para agregar un personaje nuevo a este grupo: sumar su id acá
+        // (mismo string que usás en ?p=...) Y en PERSONAJES_EXTRA de
+        // extras.html (para que aparezca en esa grilla).
+        // ==========================================================
+        (function () {
+            const PERSONAJES_EXTRA = ['varis', 'kael'];
+            const USUARIO_CORRECTO = 'Teo';
+            const CLAVE_CORRECTA = '65iq';
+
+            const params = new URLSearchParams(window.location.search);
+            const personajeActual = params.get('p');
+
+            if (personajeActual && PERSONAJES_EXTRA.includes(personajeActual)) {
+                const autenticado = localStorage.getItem('extras_usuario') === USUARIO_CORRECTO
+                    && localStorage.getItem('extras_clave') === CLAVE_CORRECTA;
+                if (!autenticado) {
+                    window.location.replace('index.html');
+                }
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="estilos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>

@@ -89,3 +89,88 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 1px;
 }
+
+.personaje-card-extras {
+    border-style: dashed;
+    opacity: 0.9;
+}
+
+/* === Login (extras.html) === */
+.login-container {
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+}
+
+.login-form {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.login-form label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.login-form input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.login-form button {
+    padding: 12px;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--accent-color);
+    color: #f5f0e1;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.login-form button:hover {
+    background-color: var(--accent-hover);
+}
+
+.login-error {
+    color: #b71c1c;
+    font-size: 0.9rem;
+    text-align: center;
+    min-height: 1.2em;
+}
+
+.volver-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.volver-link:hover {
+    color: var(--accent-color);
+}

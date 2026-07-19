@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extras - Selección de Personaje - DnD 5e</title>
+    <link rel="stylesheet" href="estilos-menu.css">
+</head>
+<body>
+    <div class="menu-container">
+        <header>
+            <h1 id="titulo-pagina">Extras</h1>
+            <p class="subtitle" id="subtitulo-pagina">Acceso restringido</p>
+        </header>
+
+        <!-- === Formulario de login (se oculta si ya hay sesión guardada) === -->
+        <div class="login-container" id="login-container">
+            <form class="login-form" id="login-form" autocomplete="off">
+                <div>
+                    <label for="login-usuario">Usuario</label>
+                    <input type="text" id="login-usuario" name="usuario" autocomplete="off" required>
+                </div>
+                <div>
+                    <label for="login-clave">Contraseña</label>
+                    <input type="password" id="login-clave" name="clave" autocomplete="off" required>
+                </div>
+                <div class="login-error" id="login-error"></div>
+                <button type="submit">Ingresar</button>
+            </form>
+            <a href="index.html" class="volver-link">← Volver al menú principal</a>
+        </div>
+
+        <!-- === Grid de personajes extra (se muestra solo si el login es correcto) === -->
+        <div class="personajes-grid" id="personajes-grid" style="display: none;"></div>
+    </div>
+
+    <script>
+        // ==========================================================
+        // Lista de personajes "extra" que viven detrás de este login.
+        // Para agregar uno nuevo: sumarlo acá con su ícono/nombre, Y
+        // agregar su id a PERSONAJES_EXTRA en el guard de personaje.html.
+        // ==========================================================
+        const PERSONAJES_EXTRA = [
+            { id: 'varis', nombre: 'Varis', icono: '🏹' },
+            { id: 'kael', nombre: 'Kael', icono: '🙏' }
+        ];
+
+        const USUARIO_CORRECTO = 'Teo';
+        const CLAVE_CORRECTA = '65iq';
+
+        function estaAutenticado() {
+            return localStorage.getItem('extras_usuario') === USUARIO_CORRECTO
+                && localStorage.getItem('extras_clave') === CLAVE_CORRECTA;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('personajes-grid');
+            grid.innerHTML = '';
+            PERSONAJES_EXTRA.forEach(p => {
+                const a = document.createElement('a');
+                a.href = `personaje.html?p=${p.id}`;
+                a.className = 'personaje-card';
+                a.innerHTML = `
+                    <div class="personaje-icon">${p.icono}</div>
+                    <div class="personaje-nombre">${p.nombre}</div>
+                `;
+                grid.appendChild(a);
+            });
+        }
+
+        function mostrarGrid() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('personajes-grid').style.display = 'grid';
+            document.getElementById('subtitulo-pagina').textContent = 'Hoja de Personaje - DnD 5e';
+            renderGrid();
+        }
+
+        function mostrarLogin() {
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('personajes-grid').style.display = 'none';
+            document.getElementById('subtitulo-pagina').textContent = 'Acceso restringido';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const usuario = document.getElementById('login-usuario').value.trim();
+            const clave = document.getElementById('login-clave').value;
+            const errorEl = document.getElementById('login-error');
+
+            if (usuario === USUARIO_CORRECTO && clave === CLAVE_CORRECTA) {
+                localStorage.setItem('extras_usuario', usuario);
+                localStorage.setItem('extras_clave', clave);
+                errorEl.textContent = '';
+                mostrarGrid();
+            } else {
+                errorEl.textContent = 'Usuario o contraseña incorrectos.';
+            }
+        });
+
+        // Al cargar la página: si ya había sesión guardada, saltear el login directo.
+        if (estaAutenticado()) {
+            mostrarGrid();
+        } else {
+            mostrarLogin();
+        }
+    </script>
+</body>
+</html>

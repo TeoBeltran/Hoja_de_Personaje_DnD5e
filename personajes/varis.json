@@ -1,0 +1,261 @@
+{
+  "personaje": {
+    "nombre": "Varis",
+    "clase": "Ranger",
+    "raza": "Variant Human (Chondathan)",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 8,
+        "DEX": 15,
+        "CON": 14,
+        "INT": 10,
+        "WIS": 15,
+        "CHA": 8
+    }
+  },
+  "improvements": {
+    "race": [
+      { "atributo": "DEX", "valor": 1, "motivo": "Variant Human" },
+      { "atributo": "WIS", "valor": 1, "motivo": "Variant Human" }
+    ],
+    "feats": [
+      { "nivel": 1, "nombre": "Sharpshooter", "atributos": {} }
+    ],
+    "asi": [
+      { "nivel": 4, "atributos": { "DEX": 2 } },
+      { "nivel": 8, "atributos": { "DEX": 2 } }
+    ]
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "68/68" },
+    { "nombre": "Nivel", "valor": "8" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "16" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": true },
+    { "nombre": "Conoc. Arcano", "proficiente": false },
+    { "nombre": "Engaño", "proficiente": false },
+    { "nombre": "Historia", "proficiente": false },
+    { "nombre": "Interpretación", "proficiente": false },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": false },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": true },
+    { "nombre": "Persuasión", "proficiente": false },
+    { "nombre": "Perspicacia", "proficiente": true },
+    { "nombre": "Religión", "proficiente": false },
+    { "nombre": "Sigilo", "proficiente": true },
+    { "nombre": "Supervivencia", "proficiente": true },
+    { "nombre": "Trato animal", "proficiente": true }
+  ],
+  "background": {
+    "nombre": "Outlander",
+    "habilidades": [
+      {
+        "nombre": "Wanderer",
+        "desc": "Tenés excelente memoria para mapas y geografía: siempre podés recordar el diseño general del terreno, asentamientos y otros rasgos a tu alrededor.<br><br>Además, podés conseguir comida y agua fresca para vos y hasta 5 personas más cada día, siempre que la zona ofrezca bayas, caza menor, agua, etc."
+      }
+    ]
+  },
+  "rasgos": [
+    {
+      "nombre": "Idiomas",
+      "desc": "Podés hablar los idiomas Common, Elvish y Undercommon."
+    },
+    {
+      "nombre": "Competencia en herramientas",
+      "desc": "Tenés competencia con la Flauta (Flute) como instrumento musical."
+    },
+    {
+      "nombre": "Favored Enemy",
+      "desc": "Tenés Ventaja en pruebas de Supervivencia para rastrear hobgoblins, kobolds, orcos y goblins, y en pruebas de Inteligencia para recordar información sobre ellos."
+    },
+    {
+      "nombre": "Natural Explorer",
+      "desc": "Tus terrenos favorecidos son Bosque (Forest) y Underdark.<br><br>En esos terrenos: duplicás tu bonificador de competencia en cualquier prueba de INT o WIS en la que ya seas competente, el terreno difícil no ralentiza a tu grupo mientras viajan, siempre estás alerta al peligro (no podés ser sorprendido salvo que estés incapacitado), podés moverte sigilosamente a paso normal aunque estés solo, encontrás el doble de comida al forrajear, y mientras rastreás sabés el número exacto, tamaño y hace cuánto pasaron las criaturas que seguís."
+    },
+    {
+      "nombre": "Land's Stride",
+      "desc": "Moverte por terreno difícil no mágico no te cuesta movimiento extra, y podés atravesar plantas no mágicas (zarzas, enredaderas, etc.) sin que te ralenticen ni te hagan daño."
+    },
+    {
+      "nombre": "Umbral Sight",
+      "desc": "Tenés Visión en la Oscuridad (Darkvision) hasta 60 ft.<br><br>Además, mientras estés en oscuridad sos invisible para cualquier criatura que dependa de darkvision para verte en esa oscuridad."
+    },
+    {
+      "nombre": "Dread Ambusher",
+      "desc": "Al inicio del combate, en tu primer turno, tu velocidad aumenta 10 ft hasta el final de ese turno.<br><br>Si en ese turno tomás la acción de Atacar, podés hacer un ataque con arma adicional como parte de esa acción. Si ese ataque golpea, el objetivo recibe 1d8 de daño extra del mismo tipo que el arma.<br><br>Además, al tirar Iniciativa sumás tu modificador de WIS (+3) como bonificador extra (esto NO está calculado en el campo de Iniciativa automático de la ficha — sumalo manualmente al tirar)."
+    },
+    {
+      "nombre": "Dread Ambusher: daño extra",
+      "desc": "Si este es el ataque adicional de tu primer turno de combate y golpea, sumá 1d8 de daño extra del mismo tipo que el arma.",
+      "disparadores": { "arma": true },
+      "oculto": true
+    },
+    {
+      "nombre": "Iron Mind",
+      "desc": "Tenés competencia en tiradas de salvación de Sabiduría (WIS).",
+      "otorgaSalvacionProficiente": "WIS"
+    },
+    {
+      "nombre": "Fighting Style: Archery",
+      "desc": "Sumás +2 a las tiradas de ataque que hacés con armas a distancia."
+    },
+    {
+      "nombre": "Extra Attack",
+      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno.",
+      "disparadores": { "arma": true }
+    },
+    {
+      "nombre": "Sharpshooter (Feat)",
+      "desc": "Atacar a rango largo no te da desventaja en tiradas de ataque con armas a distancia.<br><br>Tus ataques a distancia ignoran media cobertura y tres cuartos de cobertura.<br><br>Antes de atacar con un arma a distancia en la que seas competente, podés elegir tomar -5 a la tirada de ataque. Si golpea, sumás +10 al daño del ataque."
+    },
+    {
+      "nombre": "Sharpshooter: cobertura y -5/+10",
+      "desc": "Este ataque ignora media cobertura y tres cuartos de cobertura.<br><br>Podés elegir -5 a la tirada de ataque para sumar +10 al daño si golpea.",
+      "disparadores": { "arma": "Oathbow" },
+      "oculto": true
+    },
+    {
+      "nombre": "Oathbow: Enemigo Jurado",
+      "desc": "Como parte de un ataque con el Oathbow, podés decir la frase de mando ('Swift death to you who have wronged me') para volver a esa criatura tu Enemigo Jurado hasta que muera o hasta el amanecer 7 días después. Solo podés tener un Enemigo Jurado a la vez.<br><br>Contra tu Enemigo Jurado: tenés Ventaja en la tirada de ataque, el objetivo no se beneficia de cobertura (salvo cobertura total), y no sufrís desventaja por rango largo. Si el ataque golpea, tu Enemigo Jurado recibe 3d6 de daño perforante extra.<br><br>Mientras tu Enemigo Jurado siga vivo, tenés Desventaja en las tiradas de ataque con cualquier otra arma.",
+      "disparadores": { "arma": "Oathbow" }
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Primeval Awareness",
+      "usos": "99/99",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "1 milla (6 millas si estás en Bosque o Underdark)",
+      "duracion": "1 minuto",
+      "desc": "Gastás tu Acción para sentir si hay aberraciones, celestiales, dragones, elementales, feéricos, infernales o no-muertos en el rango, sin conocer su número, ubicación exacta ni tipo específico."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Armadura de Cuero Tachonada +1 (Studded Leather +1)",
+      "esArmadura": true,
+      "tipoArmadura": "ligera",
+      "armaduraBase": 13,
+      "manos": 0,
+      "peso": 13,
+      "valor": 1000,
+      "magico": true,
+      "desc": "Armadura ligera mágica. CA: 13 + Modificador de Destreza (sin tope)."
+    },
+    {
+      "nombre": "Oathbow",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 2,
+      "peso": 3,
+      "valor": 3500,
+      "accion": "Acción",
+      "distancia": "150/600 ft",
+      "magico": true,
+      "bonoAtaque": 2,
+      "bonoDano": 2,
+      "desc": "Arco largo mágico raro (requiere sintonía). Su habilidad especial (Enemigo Jurado) está en Rasgos."
+    },
+    {
+      "nombre": "Bracers of Archery",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 500,
+      "magico": true,
+      "desc": "Brazales mágicos (requiere sintonía). Mientras los llevás puestos, tenés competencia con arco largo y arco corto, y sumás +2 al daño en ataques a distancia hechos con ellos."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Absorb Elements",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "Reacción cuando recibís daño de ácido, frío, fuego, rayo o trueno. Tenés resistencia a ese tipo de daño hasta el inicio de tu próximo turno. Si después hacés un ataque melee antes del final de tu próximo turno, sumás 1d6 del mismo tipo al daño. Cada slot superior al 1 suma 1d6."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Disguise Self",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "1 hora",
+        "desc": "Cambiás tu apariencia (altura ±1 ft, cara, ropa, rasgos faciales) durante la duración. Un examen físico o una prueba de Investigación contra tu Spell Save DC revela el engaño."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Hunter's Mark",
+        "accion": "Acción Bonus",
+        "distancia": "90 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Marcás una criatura que puedas ver. Mientras dure, cada vez que le pegues con un ataque de arma sumás 1d6 de daño extra del mismo tipo, y tenés Ventaja en pruebas de WIS (Percepción) o WIS (Supervivencia) para encontrarla. Si el objetivo muere antes de que termine, podés usar una Acción Bonus en un turno posterior para marcar a otra criatura. Cada slot superior al 1 extiende la duración: nivel 3-4 → 8 horas, nivel 5+ → 24 horas."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Zephyr Strike",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "duracion": "1 minuto",
+        "desc": "Ganás una ráfaga de viento espectral por la duración: tu velocidad aumenta 30 ft, podés hacer Dash como Acción Bonus en turnos posteriores, no sufrís desventaja por moverte antes de un ataque a distancia, y una vez durante la duración un ataque con arma tuyo que golpee suma 1d8 de daño de fuerza extra."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Pass without Trace",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Un velo de sombra y silencio emana de vos. Vos y hasta 5 criaturas aliadas a 30 ft (mientras se mantengan en rango) suman +10 a pruebas de DEX (Sigilo) y no pueden ser rastreadas salvo por medios mágicos."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Rope Trick",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "1 hora",
+        "desc": "Una cuerda tocada se para sola en el aire. Vos y hasta 7 criaturas medianas o menores más pueden subir hasta un espacio extradimensional en el extremo superior, invisible desde afuera, con lugar para 8 criaturas medianas. Si el hechizo termina mientras hay alguien adentro, cae."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Spike Growth",
+        "dano": "2d4",
+        "tipoDano": "perforante",
+        "accion": "Acción",
+        "distancia": "150 ft",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "El terreno en un radio de 20 ft se llena de espinas y púas ocultas. El área se vuelve terreno difícil. Una criatura que entre o se mueva dentro del área recibe 2d4 de daño perforante por cada 5 ft que se mueva ahí. El terreno difícil no es visible salvo que se supere una prueba pasiva de WIS (Percepción) contra tu Spell Save DC."
+      }
+    ]
+  },
+  "inventario": [
+    {
+      "nombre": "Flauta (Flute)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Tu instrumento musical, en el que tenés competencia."
+    },
+    {
+      "nombre": "Carcaj con 20 flechas",
+      "peso": 2,
+      "cantidad": 1,
+      "desc": "Munición para el Oathbow."
+    }
+  ]
+}

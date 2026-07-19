@@ -195,7 +195,11 @@ function bonoDanoDeTogglesActivos() {
     const detalles = [];
     (window._habilidadesUsoData || []).forEach(h => {
         if (h.toggleBonoDano && togglesActivos[h.nombre]) {
-            const valor = evaluarFormula(h.toggleBonoDano.formula, { nivelPersonaje: nivelPersonajeGlobal });
+            const formula = h.toggleBonoDano.formula;
+            // Si la fórmula es notación de dado (ej: "1d6"), no se evalúa como matemática:
+            // se pasa tal cual para mostrarse como "+1d6" en el badge de daño (violeta).
+            const esDado = /^\d+d\d+$/i.test(String(formula).trim());
+            const valor = esDado ? String(formula).trim() : evaluarFormula(formula, { nivelPersonaje: nivelPersonajeGlobal });
             if (valor) detalles.push({ nombre: h.nombre, valor });
         }
     });
@@ -324,11 +328,14 @@ function procesarEfectos(item, contexto) {
             listaEfectos.push({ tipo: 'notificacion', descripcion: hab.nombre, mensaje: hab.desc });
         } else if (hab.toggleBonoDano && togglesActivos[hab.nombre] && hab.disparadoresSiActivo
             && rasgoAplicaAContexto({ disparadores: hab.disparadoresSiActivo }, tiposContexto, item) && !yaEstaba()) {
-            const valor = evaluarFormula(hab.toggleBonoDano.formula, { nivelPersonaje: nivelPersonajeGlobal });
+            const formula = hab.toggleBonoDano.formula;
+            const esDado = /^\d+d\d+$/i.test(String(formula).trim());
+            const valor = esDado ? String(formula).trim() : evaluarFormula(formula, { nivelPersonaje: nivelPersonajeGlobal });
+            const notaExtraTxt = hab.toggleBonoDano.notaExtra ? ` ${hab.toggleBonoDano.notaExtra}` : '';
             listaEfectos.push({
                 tipo: 'notificacion',
                 descripcion: `⚡ ${hab.nombre} (activo)`,
-                mensaje: `Sumás +${valor} de daño${hab.toggleBonoDano.tipoDano ? ' ' + hab.toggleBonoDano.tipoDano : ''} extra a este ataque. Se apaga desde el botón de ${hab.nombre}.`
+                mensaje: `Sumás +${valor} de daño${hab.toggleBonoDano.tipoDano ? ' ' + hab.toggleBonoDano.tipoDano : ''} extra a este ataque.${notaExtraTxt} Se apaga desde el botón de ${hab.nombre}.`
             });
         }
     });
@@ -1786,7 +1793,12 @@ async function init() {
         aplicarASIs(data.habilidadesUso);
 
         data.modificadores = generarModificadores(statsGlobal, data.personaje.clase);
-        data.salvaciones = generarSalvaciones(statsGlobal, data.personaje.clase, profBonusTmp);
+        // Rasgos que otorgan competencia extra en una salvación puntual (ej: Iron Mind → WIS),
+        // sin tocar la tabla de clase (que es compartida por todos los personajes).
+        const salvacionesExtra = (data.rasgos || [])
+            .filter(r => r.otorgaSalvacionProficiente)
+            .map(r => r.otorgaSalvacionProficiente);
+        data.salvaciones = generarSalvaciones(statsGlobal, data.personaje.clase, profBonusTmp, salvacionesExtra);
         data.habilidades = generarHabilidades(data.habilidades, statsGlobal, profBonusTmp);
     }
 

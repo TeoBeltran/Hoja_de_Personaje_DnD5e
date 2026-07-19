@@ -18,8 +18,10 @@ function parseMod(modStr) {
     return parseInt(modStr.replace('+', '')) || 0;
 }
 
-// Formatea un número como "+3", "-1", "+0"
+// Formatea un número como "+3", "-1", "+0". También acepta strings de dados
+// (ej: "1d6") para bonos de daño tipo dado, devolviéndolos como "+1d6".
 function formatMod(num) {
+    if (typeof num === 'string') return '+' + num;
     return (num >= 0 ? '+' : '') + num;
 }
 
@@ -83,11 +85,13 @@ function generarModificadores(stats, clase) {
     });
 }
 
-// Genera el array de salvaciones a partir de stats, clase y proficiencia bonus
-function generarSalvaciones(stats, clase, profBonus) {
+// Genera el array de salvaciones a partir de stats, clase, proficiencia bonus, y una
+// lista opcional de stats con competencia extra otorgada por rasgos (ej: Iron Mind → WIS).
+function generarSalvaciones(stats, clase, profBonus, extraProficientes) {
     const prof = PROFICIENCIAS_POR_CLASE[clase] || { principal: '', savingExtra: '' };
+    const extra = extraProficientes || [];
     return Object.keys(stats).map(key => {
-        const esProficiente = (key === prof.principal || key === prof.savingExtra);
+        const esProficiente = (key === prof.principal || key === prof.savingExtra || extra.includes(key));
         const mod = statAMod(stats[key]);
         const valor = esProficiente ? mod + profBonus : mod;
         return {

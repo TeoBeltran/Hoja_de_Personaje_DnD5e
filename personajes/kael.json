@@ -184,6 +184,11 @@
       "disparadores": { "arma": "Golpe Desarmado (Unarmed Strike)" }
     },
     {
+      "nombre": "🖤 Eldritch Claw Tattoo",
+      "desc": "Mientras tengas el tatuaje en la piel, este Golpe Desarmado cuenta como <strong>mágico</strong> para superar resistencias e inmunidades a daño no mágico, y sumás <strong>+1</strong> a la tirada de ataque y al daño.",
+      "disparadores": { "arma": "Golpe Desarmado (Unarmed Strike)" }
+    },
+    {
       "nombre": "Extra Attack",
       "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1."
     },
@@ -219,6 +224,16 @@
       "recupera": "corto",
       "accion": "Varía",
       "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Attacks (redirigir el ataque), Hand of Healing, Hand of Harm y Stunning Strike. Cantidad = tu nivel de monje (se recalcula solo si subís de nivel)."
+    },
+    {
+      "nombre": "Eldritch Maul (Tattoo)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción Bonus",
+      "duracion": "1 minuto",
+      "desc": "Empoderás el tatuaje durante 1 minuto (se activa y desactiva como Acción Bonus, el botón cambia solo). Mientras esté activo: tus ataques cuerpo a cuerpo (con arma o Golpe Desarmado) pueden alcanzar un objetivo hasta 15 ft de vos, como tentáculos de tinta, y hacen 1d6 de daño de fuerza extra al golpear.",
+      "toggleBonoDano": { "formula": "1d6", "tipoDano": "fuerza", "notaExtra": "También podés alcanzar objetivos hasta 15 ft con este ataque mientras esté activo." },
+      "disparadoresSiActivo": { "arma": true }
     },
     {
       "nombre": "Martial Arts",
@@ -327,6 +342,8 @@
       "valor": 0,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
+      "bonoAtaque": 1,
+      "bonoDano": 1,
       "desc": "Martial Arts (d6): usa DEX para ataque y daño. No ocupa manos, siempre disponible."
     },
     {
@@ -362,6 +379,24 @@
           "valor": 1
         }
       ]
+    },
+    {
+      "nombre": "Eldritch Claw Tattoo",
+      "equipable": true,
+      "manos": 0,
+      "peso": 0,
+      "valor": 300,
+      "magico": true,
+      "desc": "Tatuaje mágico (requiere sintonía). Mientras lo tengas en la piel, tus golpes desarmados cuentan como mágicos para superar resistencias e inmunidades a daño no mágico, y sumás +1 a las tiradas de ataque y de daño con golpes desarmados.<br><br>También tiene una habilidad activa: Eldritch Maul (ver Habilidades de Uso)."
+    },
+    {
+      "nombre": "Cloak of Displacement",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 6000,
+      "magico": true,
+      "desc": "Capa mágica rara (requiere sintonía). Mientras la llevás puesta, proyecta una ilusión que te hace parecer estar de pie en un lugar cercano a tu posición real: cualquier criatura tiene <strong>Desventaja</strong> en tiradas de ataque contra vos.<br><br>Si recibís daño, esta propiedad deja de funcionar hasta el inicio de tu próximo turno. También se suprime si estás incapacitado, restrained, o de algún otro modo no podés moverte.<br><br>(Esto no está automatizado en la ficha — es una desventaja que le imponés manualmente a quien te ataque, mientras no hayas recibido daño ese turno.)"
     }
   ],
   "hechizos": {

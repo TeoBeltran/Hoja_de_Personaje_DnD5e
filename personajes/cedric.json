@@ -6,12 +6,25 @@
     "tamano": "estandar",
     "stats": {
         "STR": 8,
-        "DEX": 16,
+        "DEX": 15,
         "CON": 15,
-        "INT": 8,
+        "INT": 15,
         "WIS": 8,
-        "CHA": 20
+        "CHA": 8
     }
+  },
+  "improvements": {
+    "race": [
+      { "atributo": "DEX", "valor": 1, "motivo": "Variant Human" },
+      { "atributo": "CHA", "valor": 1, "motivo": "Variant Human" }
+    ],
+    "feats": [
+      { "nivel": 1, "nombre": "War Caster", "atributos": {} }
+    ],
+    "asi": [
+      { "nivel": 4, "atributos": { "CHA": 2 } },
+      { "nivel": 8, "atributos": { "CHA": 2 } }
+    ]
   },
   "estadisticas": [
     { "nombre": "Vida", "valor": "59/59" },
@@ -19,7 +32,7 @@
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "15" },
+    { "nombre": "Percepción P.", "valor": "12" },
     { "nombre": "Proficiencia", "valor": "auto" },
     { "nombre": "Hit Dice", "valor": "auto" }
   ],
@@ -53,17 +66,141 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Bardic Inspiration (d8)", "desc": "Como Acción Bonus, le das a otra criatura que puedas ver a 60 ft un Dado de Inspiración (d8). En los próximos 10 minutos, esa criatura puede tirar el dado y sumarlo a una tirada de habilidad, ataque o salvación." },
-    { "nombre": "Font of Inspiration", "desc": "Recuperás todos tus usos de Bardic Inspiration al terminar un descanso corto o largo." },
-    { "nombre": "Jack of All Trades", "desc": "Sumás la mitad de tu bonificador de competencia (redondeado hacia abajo) a cualquier prueba de habilidad que no incluya ya tu bonificador de competencia." },
-    { "nombre": "Song of Rest", "desc": "Durante un descanso corto, si vos u otros miembros del grupo que puedan oírte tocar recuperan HP gastando Hit Dice, cada uno recupera 1d8 HP adicionales." },
-    { "nombre": "Expertise", "desc": "Duplicás tu bonificador de competencia en Persuasión y Sleight of Hand (ya reflejado en sus valores)." },
-    { "nombre": "College of Lore: Bonus Proficiencies", "desc": "Ganaste competencia en 3 habilidades a elección (ya reflejadas en la lista de Habilidades)." },
-    { "nombre": "Cutting Words", "desc": "Reacción. Cuando una criatura a 60 ft hace una tirada de ataque, de habilidad o de daño, podés gastar un uso de Bardic Inspiration para restarle el resultado del dado a esa tirada." },
-    { "nombre": "Additional Magical Secrets", "desc": "Aprendiste 2 hechizos adicionales de cualquier lista de clase (ya incluidos en Hechizos)." }
+    {
+      "nombre": "Bardic Inspiration (d8)",
+      "desc": "Como Acción Bonus, le das a otra criatura que puedas ver a 60 ft un Dado de Inspiración (d8).<br><br>En los próximos 10 minutos, esa criatura puede tirar el dado y sumarlo a una tirada de habilidad, ataque o salvación."
+    },
+    {
+      "nombre": "Countercharm",
+      "desc": "Acción. Mientras tocás o interpretás, vos y las criaturas aliadas a 30 ft que puedan verte u oírte tenés Ventaja en salvaciones contra quedar Asustado o Hechizado.<br><br>Dura hasta el final de tu próximo turno, o hasta que dejes de tocar."
+    },
+    {
+      "nombre": "Cutting Words",
+      "desc": "Reacción. Cuando una criatura a 60 ft que puedas ver hace una tirada de ataque, de habilidad o de daño, podés gastar un uso de Bardic Inspiration para restarle el resultado del dado a esa tirada."
+    },
+    {
+      "nombre": "Font of Inspiration",
+      "desc": "Recuperás todos tus usos de Bardic Inspiration al terminar un descanso corto o largo."
+    },
+    {
+      "nombre": "Jack of All Trades",
+      "desc": "Sumás la mitad de tu bonificador de competencia (redondeado hacia abajo) a cualquier prueba de habilidad que no incluya ya tu bonificador de competencia."
+    },
+    {
+      "nombre": "Song of Rest",
+      "desc": "Durante un descanso corto, si vos u otros miembros del grupo que puedan oírte tocar recuperan HP gastando Hit Dice, cada uno recupera 1d6 HP adicionales.<br><br>(El dado sube a 1d8 en nivel 9, 1d10 en nivel 13 y 1d12 en nivel 17.)"
+    },
+    {
+      "nombre": "Expertise",
+      "desc": "Duplicás tu bonificador de competencia en Persuasión y Sleight of Hand (ya reflejado en sus valores)."
+    },
+    {
+      "nombre": "College of Lore: Bonus Proficiencies",
+      "desc": "Ganaste competencia en 3 habilidades a elección (ya reflejadas en la lista de Habilidades)."
+    },
+    {
+      "nombre": "Additional Magical Secrets",
+      "desc": "Aprendiste 2 hechizos adicionales de cualquier lista de clase (ya incluidos en Hechizos)."
+    },
+    {
+      "nombre": "War Caster (Feat)",
+      "desc": "Tenés Ventaja en las salvaciones de CON para mantener la Concentración en un hechizo cuando recibís daño.<br><br>Podés realizar los componentes somáticos de tus hechizos incluso con armas o un escudo en una o ambas manos.<br><br>Cuando el movimiento de una criatura hostil provoca un ataque de oportunidad tuyo, podés usar tu Reacción para lanzarle un hechizo en vez de atacar (en lugar del ataque de oportunidad normal). El hechizo debe tener un tiempo de lanzamiento de 1 Acción y debe apuntar solo a esa criatura."
+    }
   ],
   "habilidadesUso": [
-    { "nombre": "Bardic Inspiration", "usos": "5/5", "recupera": "corto", "accion": "Acción Bonus", "distancia": "60 ft", "duracion": "10 minutos", "desc": "Le das a una criatura un Dado de Inspiración (d8) para sumar a una tirada de ataque, habilidad o salvación. Usos = modificador de CHA (5)." }
+    {
+      "nombre": "Bardic Inspiration",
+      "usos": "5/5",
+      "recupera": "corto",
+      "accion": "Acción Bonus",
+      "distancia": "60 ft",
+      "duracion": "10 minutos",
+      "desc": "Le das a una criatura un Dado de Inspiración (d8) para sumar a una tirada de ataque, habilidad o salvación.<br><br>Usos = modificador de CHA (5)."
+    },
+    {
+      "nombre": "Countercharm",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Mientras tocás o interpretás, vos y las criaturas aliadas a 30 ft que puedan verte u oírte tenés Ventaja en salvaciones contra Asustado o Hechizado."
+    },
+    {
+      "nombre": "Cutting Words",
+      "consumeUsoDe": "Bardic Inspiration",
+      "accion": "Reacción",
+      "distancia": "60 ft",
+      "desc": "Cuando una criatura a 60 ft que puedas ver hace una tirada de ataque, de habilidad o de daño, gastás 1 uso de Bardic Inspiration para restarle 1d8 al resultado (después de que tire, antes de saber si tuvo éxito)."
+    },
+    {
+      "nombre": "Perla de Poder (Pearl of Power)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "desc": "Recuperás un espacio de conjuro gastado de nivel 3 o menor. (Objeto mágico, requiere sintonía por un lanzador de conjuros.)",
+      "restaurarRanura": { "maxNivel": 3 }
+    },
+    {
+      "nombre": "Doss Lute: Animal Friendship",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "duracion": "24 horas",
+      "desc": "Tocás el laúd y lanzás Animal Friendship (sin gastar ranura, usa tu característica y DC de conjuro). Una bestia con INT 3 o menos que puedas ver hace salvación de WIS o queda convencida de que no representás una amenaza. Se puede repetir 1 vez cada uno hasta el próximo amanecer entre todos los hechizos del Doss Lute."
+    },
+    {
+      "nombre": "Doss Lute: Fly",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "duracion": "Concentración, 10 minutos",
+      "desc": "Tocás el laúd y lanzás Fly sobre una criatura tocada (sin gastar ranura, usa tu característica y DC de conjuro): gana velocidad de vuelo de 60 ft durante la duración."
+    },
+    {
+      "nombre": "Doss Lute: Invisibility",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "duracion": "Concentración, 1 hora",
+      "desc": "Tocás el laúd y lanzás Invisibility sobre una criatura tocada (sin gastar ranura, usa tu característica y DC de conjuro): queda invisible hasta que ataque, lance un hechizo o termine el efecto."
+    },
+    {
+      "nombre": "Doss Lute: Levitate",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "60 ft",
+      "duracion": "Concentración, 10 minutos",
+      "desc": "Tocás el laúd y lanzás Levitate (sin gastar ranura, usa tu característica y DC de conjuro): una criatura (salvación de CON) o un objeto en rango levita hasta 20 ft en el aire durante la duración."
+    },
+    {
+      "nombre": "Doss Lute: Protection from Energy (fuego)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "duracion": "Concentración, 1 hora",
+      "desc": "Tocás el laúd y lanzás Protection from Energy sobre una criatura tocada, limitado a daño de fuego (sin gastar ranura, usa tu característica y DC de conjuro): gana resistencia al daño de fuego durante la duración."
+    },
+    {
+      "nombre": "Doss Lute: Protection from Evil and Good",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "duracion": "Concentración, 10 minutos",
+      "desc": "Tocás el laúd y lanzás Protection from Evil and Good sobre una criatura tocada (sin gastar ranura, usa tu característica y DC de conjuro): contra aberraciones, celestiales, elementales, feéricos, infernales y no-muertos, la criatura no puede ser Hechizada, Asustada ni Poseída por ellos, y esos enemigos tienen desventaja para atacarla."
+    },
+    {
+      "nombre": "Doss Lute: Protection from Poison",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "duracion": "1 hora",
+      "desc": "Tocás el laúd y lanzás Protection from Poison sobre una criatura tocada (sin gastar ranura, usa tu característica y DC de conjuro): neutraliza un veneno en la criatura (elegís cuál si hay varios), y durante la duración tiene Ventaja en salvaciones contra ser envenenada y resistencia a daño de veneno."
+    }
   ],
   "equipo": [
     {
@@ -75,6 +212,28 @@
       "peso": 10,
       "valor": 10,
       "desc": "Armadura ligera de cuero. CA: 11 + Modificador de Destreza."
+    },
+    {
+      "nombre": "Capa de Protección (Cloak of Protection)",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 900,
+      "magico": true,
+      "desc": "Capa mágica (requiere sintonía). Mientras esté equipada, otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        { "tipo": "CA", "valor": 1 },
+        { "tipo": "salvaciones", "valor": 1 }
+      ]
+    },
+    {
+      "nombre": "Instrument of the Bards (Doss Lute)",
+      "equipable": true,
+      "manos": 1,
+      "peso": 2,
+      "valor": 3000,
+      "magico": true,
+      "desc": "Instrumento mágico de bardo, sirve como foco de conjuro (requiere sintonía por un bardo).<br><br>Cuando lo usás para lanzar un hechizo (propio o del instrumento) que hechiza a alguien con salvación fallida, esa criatura tiene Desventaja en esa salvación.<br><br>Podés usar una Acción para tocarlo y lanzar, sin gastar ranura, cualquiera de los hechizos listados como 'Doss Lute: ...' en tus Habilidades de Uso. Cada uno de esos hechizos se puede lanzar así 1 vez, y no de nuevo hasta el próximo amanecer.<br><br>Una criatura que intente tocarlo sin estar sintonizada debe superar una salvación de WIS (DC 15) o recibe 2d4 de daño psíquico."
     },
     {
       "nombre": "Daga",
@@ -244,16 +403,6 @@
     ]
   },
   "inventario": [
-    { "nombre": "Backpack", "peso": 5, "cantidad": 1, "desc": "Mochila de viaje." },
-    { "nombre": "Bedroll", "peso": 7, "cantidad": 1, "desc": "Saco de dormir." },
-    { "nombre": "Vela", "peso": 0, "cantidad": 5, "desc": "Velas comunes." },
-    { "nombre": "Ropa fina", "peso": 6, "cantidad": 1, "desc": "Un juego de ropa elegante, para pasar por alta sociedad." },
-    { "nombre": "Disfraz", "peso": 4, "cantidad": 2, "desc": "Vestimenta pensada para hacerte pasar por otra persona." },
-    { "nombre": "Kit de disfraz (Disguise Kit)", "peso": 3, "cantidad": 1, "desc": "Cosméticos, tinturas y demás herramientas para alterar tu apariencia." },
-    { "nombre": "Bolsa (Pouch)", "peso": 1, "cantidad": 1, "desc": "Bolsa pequeña para monedas y objetos menores." },
-    { "nombre": "Ración (1 día)", "peso": 2, "cantidad": 5, "desc": "Comida no perecedera para un día." },
-    { "nombre": "Viola (Viol)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de cuerda, tu instrumento de Bardo." },
-    { "nombre": "Odre de agua (Waterskin)", "peso": 5, "cantidad": 1, "desc": "Odre para transportar agua u otros líquidos." },
-    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+    { "nombre": "Viola (Viol)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de cuerda, tu instrumento de Bardo." }
   ]
 }
