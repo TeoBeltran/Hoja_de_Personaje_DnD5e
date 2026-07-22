@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rastreador de Combate - DnD 5e</title>
+    <link rel="stylesheet" href="estilos.css">
+    <style>
+        /* ===== Layout propio del rastreador de combate ===== */
+        body { display: block; padding: 20px 12px; }
+
+        .combate-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .combate-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .combate-col-izq {
+            flex: 1.4;
+            min-width: 0;
+        }
+
+        .combate-col-der {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        @media (max-width: 800px) {
+            .combate-layout {
+                flex-direction: column;
+            }
+            .combate-col-der {
+                position: static;
+                width: 100%;
+            }
+        }
+
+        .panel-lateral {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 14px;
+        }
+
+        .panel-titulo {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .panel-turno #ronda-numero {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-align: center;
+        }
+
+        .panel-turno #turno-de {
+            text-align: center;
+            font-size: 1.1rem;
+            margin: 8px 0 14px 0;
+            min-height: 1.4em;
+        }
+
+        .btn-siguiente-turno {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-siguiente-turno:hover { background-color: var(--accent-hover); }
+
+        .historial-lista {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 4px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .historial-item {
+            font-size: 0.85rem;
+            padding: 5px 8px;
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            border-left: 3px solid var(--border-color);
+        }
+
+        .historial-item.dano { border-left-color: #c62828; }
+        .historial-item.cura { border-left-color: #2e7d32; }
+
+        .historial-vacio {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.85rem;
+        }
+
+        .combatiente-card.turno-activo {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+
+        .condiciones-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 0 14px 12px 14px;
+        }
+
+        .condicion-btn {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            opacity: 0.45;
+            transition: all 0.15s ease;
+        }
+
+        .condicion-btn:hover { opacity: 0.8; }
+
+        .condicion-btn.activa {
+            opacity: 1;
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+        }
+
+        .combate-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .combate-header h1 {
+            color: var(--accent-color);
+            margin-bottom: 4px;
+        }
+
+        .combate-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .combate-toolbar button {
+            padding: 10px 16px;
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            background-color: var(--card-bg);
+            color: var(--accent-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .combate-toolbar button:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .combate-toolbar button.btn-borrar {
+            border-color: #c62828;
+            color: #c62828;
+        }
+
+        .combate-toolbar button.btn-borrar:hover {
+            background-color: #c62828;
+            color: white;
+        }
+
+        #lista-combate {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .combate-vacio {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px 10px;
+            font-style: italic;
+        }
+
+        .combatiente-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .combatiente-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+        }
+
+        .combatiente-header:hover {
+            background-color: rgba(0,0,0,0.03);
+        }
+
+        .combatiente-icono {
+            font-size: 1.4rem;
+        }
+
+        .combatiente-nombre {
+            flex: 1;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .combatiente-orden {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .btn-quitar {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .btn-quitar:hover {
+            color: #c62828;
+            background-color: rgba(198, 40, 40, 0.1);
+        }
+
+        .combatiente-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 0 14px 14px 14px;
+        }
+
+        .stat-clickable {
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-color);
+            border-radius: var(--border-radius);
+            padding: 8px 4px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+        }
+
+        .stat-clickable:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .stat-clickable.stat-no-click {
+            cursor: default;
+        }
+
+        .stat-clickable.stat-no-click:hover {
+            border-color: var(--border-color);
+            transform: none;
+        }
+
+        .stat-clickable .stat-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: normal;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .combatiente-familiar {
+            margin-left: 22px;
+            border-style: dashed;
+            opacity: 0.92;
+        }
+
+        .combatiente-familiar .combatiente-icono { font-size: 1.15rem; }
+
+        /* ===== Modal de detalle (mods / salvaciones / ranuras / habilidades) ===== */
+        #detalle-modal .modal-content {
+            max-width: 640px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #detalle-modal-body {
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .expand-titulo {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin: 10px 0 6px 0;
+        }
+
+        .expand-titulo:first-child { margin-top: 0; }
+
+        .expand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 6px;
+        }
+
+        .expand-stat {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 6px 4px;
+            text-align: center;
+        }
+
+        .expand-stat.proficiente {
+            border-color: var(--accent-color);
+            box-shadow: inset 0 0 0 1px var(--accent-color);
+        }
+
+        .expand-stat .es-nombre {
+            display: block;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .expand-stat .es-valor {
+            display: block;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .expand-ataque {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+
+        .ranura-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+        }
+
+        .ranura-row .ranura-nivel {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .ranura-row button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .ranura-row .ranura-mas { background-color: #2e7d32; }
+        .ranura-row .ranura-menos { background-color: #c62828; }
+
+        .ranura-row .ranura-cantidad {
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .sin-datos {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .btn-salir-modal {
+            width: 100%;
+            margin-top: 14px;
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ===== Modal de selección de personajes / enemigo manual ===== */
+        .form-modal label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin: 12px 0 4px 0;
+        }
+
+        .form-modal input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .lista-checks label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: normal;
+            padding: 6px 0;
+            cursor: pointer;
+        }
+
+        .lista-checks input[type="checkbox"] {
+            width: auto;
+        }
+
+        .form-modal .modal-acciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .form-modal .modal-acciones button {
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-cancelar { background-color: var(--text-muted); }
+        .btn-confirmar { background-color: var(--accent-color); }
+
+        .volver-link {
+            display: block;
+            text-align: center;
+            margin-top: 24px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .volver-link:hover { color: var(--accent-color); }
+    </style>
+</head>
+<body>
+    <div class="combate-container">
+        <a href="index.html" class="volver-link" style="margin-top: 0; margin-bottom: 10px;">← Volver al menú principal</a>
+        <div class="combate-header">
+            <h1>⚔️ Rastreador de Combate</h1>
+            <p style="color: var(--text-muted);">Se ordena solo por Iniciativa</p>
+        </div>
+
+        <div class="combate-layout">
+            <div class="combate-col-izq">
+                <div class="combate-toolbar">
+                    <button id="btn-agregar-personaje">➕ Personaje existente</button>
+                    <button id="btn-agregar-enemigo">➕ Enemigo manual</button>
+                    <button id="btn-borrar-combate" class="btn-borrar">🗑️ Nuevo combate</button>
+                </div>
+
+                <div id="lista-combate"></div>
+            </div>
+
+            <div class="combate-col-der">
+                <div class="panel-lateral panel-turno">
+                    <div class="panel-titulo">🔄 Turno</div>
+                    <div id="ronda-numero">Ronda 1</div>
+                    <div id="turno-de">—</div>
+                    <button id="btn-siguiente-turno" class="btn-siguiente-turno">Siguiente turno →</button>
+                </div>
+
+                <div class="panel-lateral panel-historial">
+                    <div class="panel-titulo">📜 Historial de daño/cura</div>
+                    <div id="historial-lista" class="historial-lista"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: agregar personaje existente ===== -->
+    <div id="modal-agregar-personaje" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="modal-agregar-personaje" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Agregar personaje existente</h3>
+            <div id="lista-checks-personajes" class="lista-checks"></div>
+            <div class="modal-acciones">
+                <button class="btn-cancelar" data-close="modal-agregar-personaje">Cancelar</button>
+                <button class="btn-confirmar" id="btn-confirmar-agregar-personajes">Agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal: agregar enemigo manual ===== -->
+    <div id="modal-agregar-enemigo" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="modal-agregar-enemigo" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Agregar enemigo manual</h3>
+            <form id="form-enemigo">
+                <label for="enemigo-nombre">Nombre</label>
+                <input type="text" id="enemigo-nombre" required>
+                <label for="enemigo-vida">Vida</label>
+                <input type="number" id="enemigo-vida" min="0" required>
+                <label for="enemigo-ca">CA</label>
+                <input type="number" id="enemigo-ca" min="0" required>
+                <label for="enemigo-iniciativa">Iniciativa (total ya tirado)</label>
+                <input type="number" id="enemigo-iniciativa" required>
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" data-close="modal-agregar-enemigo">Cancelar</button>
+                    <button type="submit" class="btn-confirmar">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Modal de Vida (mismo estilo/clases que el de cada ficha) ===== -->
+    <div id="hp-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-close="hp-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
+            <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Vida</h3>
+            <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
+            <div id="hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 20px;">
+                <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="hp-btn hp-damage" data-amount="-1">-1 HP</button>
+                <button class="hp-btn hp-heal" data-amount="1">+1 HP</button>
+                <button class="hp-btn hp-damage" data-amount="-5">-5 HP</button>
+                <button class="hp-btn hp-heal" data-amount="5">+5 HP</button>
+                <button class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
+                <button class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal de CA ===== -->
+    <div id="ca-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-close="ca-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
+            <h3 id="ca-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Clase de Armadura</h3>
+            <div id="ca-display" style="text-align: center; font-size: 3rem; font-weight: bold; margin: 20px 0; color: var(--accent-color);"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <button class="hp-btn hp-damage" data-ca-amount="-1">-1</button>
+                <button class="hp-btn hp-heal" data-ca-amount="1">+1</button>
+            </div>
+            <button id="ca-reset" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white;">Restaurar valor original</button>
+        </div>
+    </div>
+
+    <!-- ===== Modal de Detalle: mods, salvaciones, ranuras, habilidades con usos =====
+         A propósito NO se cierra clickeando afuera (solo con X o "Salir"), para que un
+         misclick durante el combate no lo cierre por accidente. -->
+    <div id="detalle-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-close="detalle-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
+            <h3 id="detalle-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Detalle</h3>
+            <div id="detalle-modal-body"></div>
+            <button class="btn-salir-modal" data-close="detalle-modal">Salir</button>
+        </div>
+    </div>
+
+    <script type="module" src="combate.js"></script>
+</body>
+</html>

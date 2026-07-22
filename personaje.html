@@ -4,33 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hoja de Personaje - DnD 5e</title>
-    <script>
-        // ==========================================================
-        // Guard de acceso para personajes "extra" (detrás del login de
-        // extras.html). Corre síncrono y antes de cualquier otra cosa
-        // para no dejar ver ni un parpadeo de la hoja si no corresponde.
-        //
-        // Para agregar un personaje nuevo a este grupo: sumar su id acá
-        // (mismo string que usás en ?p=...) Y en PERSONAJES_EXTRA de
-        // extras.html (para que aparezca en esa grilla).
-        // ==========================================================
-        (function () {
-            const PERSONAJES_EXTRA = ['varis', 'kael'];
-            const USUARIO_CORRECTO = 'Teo';
-            const CLAVE_CORRECTA = '65iq';
-
-            const params = new URLSearchParams(window.location.search);
-            const personajeActual = params.get('p');
-
-            if (personajeActual && PERSONAJES_EXTRA.includes(personajeActual)) {
-                const autenticado = localStorage.getItem('extras_usuario') === USUARIO_CORRECTO
-                    && localStorage.getItem('extras_clave') === CLAVE_CORRECTA;
-                if (!autenticado) {
-                    window.location.replace('index.html');
-                }
-            }
-        })();
-    </script>
     <link rel="stylesheet" href="estilos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -70,54 +43,68 @@
                 <h2>Tiradas de Salvación</h2>
                 <div id="saves-grid" class="skills-grid"></div>
             </section>
-            <section class="skills-container">
-                <h2>Habilidades (Skills)</h2>
-                <div id="skills-grid" class="skills-grid"></div>
-            </section>
-            <section class="skills-container" style="margin-top: 20px;">
-                <h2>Rasgos y Características</h2>
-                <div id="rasgos-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
-            </section>
-            <section class="skills-container" style="margin-top: 20px;">
-                <h2>Características Activas</h2>
-                <div id="habilidades-uso-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
-            </section>
-            <section class="skills-container" style="margin-top: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--text-muted); padding-bottom: 5px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="margin: 0; border: none;">Armas y Armaduras</h2>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                        <span style="font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); background-color: #ede0d0;">Manos: <span id="manos-display">0 / 2</span></span>
-                        <span id="atk-melee-badge" class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Atk Melee: +0</span>
-                        <span id="atk-finesse-badge" class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Atk Finesse: +0</span>
-                        <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Save DC: 0</span>
+            <details class="skills-container" open>
+                <summary><h2>Habilidades (Skills)</h2></summary>
+                <div class="contenido-plegable">
+                    <div id="skills-grid" class="skills-grid"></div>
+                </div>
+            </details>
+            <details class="skills-container" open style="margin-top: 20px;">
+                <summary><h2>Rasgos y Características</h2></summary>
+                <div class="contenido-plegable">
+                    <div id="rasgos-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
+                </div>
+            </details>
+            <details class="skills-container" open style="margin-top: 20px;">
+                <summary><h2>Características Activas</h2></summary>
+                <div class="contenido-plegable">
+                    <div id="habilidades-uso-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
+                </div>
+            </details>
+            <details class="skills-container" open style="margin-top: 20px;">
+                <summary>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--text-muted); padding-bottom: 5px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+                        <h2 style="margin: 0; border: none;">Armas y Armaduras</h2>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                            <span style="font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); background-color: #ede0d0;">Manos: <span id="manos-display">0 / 2</span></span>
+                            <span id="atk-melee-badge" class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Atk Melee: +0</span>
+                            <span id="atk-finesse-badge" class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Atk Finesse: +0</span>
+                            <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Save DC: 0</span>
+                        </div>
+                    </div>
+                </summary>
+                <div class="contenido-plegable">
+                    <div id="equipo-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
+                </div>
+            </details>
+            <details class="skills-container" open style="margin-top: 20px;">
+            <summary>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--text-muted); padding-bottom: 5px; margin-bottom: 10px;">
+                    <h2 style="margin: 0; border: none;">Hechizos</h2>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <span id="land-badge" class="proficient" style="display: none; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; cursor: pointer; color: var(--accent-color); background-color: #ede0d0;">🌍 Land: Esperando</span>
+                        <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Spell Attack Bonus: +0</span>
+                        <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Spell Save DC: 0</span>
                     </div>
                 </div>
-                <div id="equipo-grid" class="skills-grid" style="grid-template-columns: 1fr;"></div>
-            </section>
-            <section class="skills-container" style="margin-top: 20px;">
-            <!-- Contenedor del título con Flexbox -->
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--text-muted); padding-bottom: 5px; margin-bottom: 10px;">
-                <h2 style="margin: 0; border: none;">Hechizos</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <span id="land-badge" class="proficient" style="display: none; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; cursor: pointer; color: var(--accent-color); background-color: #ede0d0;">🌍 Land: Esperando</span>
-                    <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Spell Attack Bonus: +0</span>
-                    <span class="proficient" style="font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5;">Spell Save DC: 0</span>
+            </summary>
+            <div class="contenido-plegable">
+                <h3>Ranuras de hechizos</h3>
+                <div id="ranuras-grid" class="skills-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;"></div>
+
+                <div id="hechizos-contenedor"></div>
+            </div>
+        </details>
+
+        <details class="skills-container" open style="margin-top:20px;">
+            <summary><h2>Mejoras del Personaje</h2></summary>
+            <div class="contenido-plegable">
+                <div id="improvements-grid"
+                    class="skills-grid"
+                    style="grid-template-columns:1fr;">
                 </div>
             </div>
-            
-            <h3>Ranuras de hechizos</h3>
-            <div id="ranuras-grid" class="skills-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;"></div>
-            
-            <div id="hechizos-contenedor"></div>
-        </section>
-
-        <section class="skills-container" style="margin-top:20px;">
-            <h2>Mejoras del Personaje</h2>
-            <div id="improvements-grid"
-                class="skills-grid"
-                style="grid-template-columns:1fr;">
-            </div>
-        </section>
+        </details>
         </main>
     </div>
 

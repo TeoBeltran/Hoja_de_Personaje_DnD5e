@@ -66,6 +66,15 @@
                 `;
                 grid.appendChild(a);
             });
+
+            const combate = document.createElement('a');
+            combate.href = 'combate.html';
+            combate.className = 'personaje-card personaje-card-extras';
+            combate.innerHTML = `
+                <div class="personaje-icon">⚔️</div>
+                <div class="personaje-nombre">Combate</div>
+            `;
+            grid.appendChild(combate);
         }
 
         function mostrarGrid() {

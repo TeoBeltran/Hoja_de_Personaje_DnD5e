@@ -9,6 +9,7 @@ import {
 
 import {
     calcularProficiencia,
+    calcularPactMagic,
     parseMod,
     formatMod,
     obtenerMod,
@@ -430,6 +431,9 @@ let smitesData = []; // Guarda TODOS los objetos "smite" del JSON (Divine Smite,
 // (ej: "NIVEL 4" si el personaje ya tiene ranuras de nivel 4).
 function mapNivelHechizoARanura(nivelHechizo) {
     if (nivelHechizo === "CANTRIPS") return null; // Cantrips nunca consumen
+    // Pact Magic (Brujo): TODOS los hechizos (sin importar su nivel real) se lanzan
+    // siempre con la única ranura de Pacto disponible a este nivel de personaje.
+    if (pactMagicNivelRanura) return pactMagicNivelRanura;
     const match = /^NIVEL (\d+)$/.exec(nivelHechizo || '');
     if (!match) return null;
     return `Nivel ${match[1]}`;
@@ -438,6 +442,9 @@ function mapNivelHechizoARanura(nivelHechizo) {
 let ranurasInfo = {}; // Guarda qué descanso recupera cada ranura
 let habilidadesInfo = {}; // Guarda qué descanso recupera cada habilidad
 let habilidadesRecuperaCortoCantidad = {}; // Cuántos usos suma un descanso corto (ej: Second Wind: +1, aunque el máximo sea 2)
+// Pact Magic (Brujo): si el personaje tiene el rasgo "esPactMagic", acá se guarda la
+// única ranura ("Nivel N") que existe siempre, sea cual sea el nivel real del hechizo.
+let pactMagicNivelRanura = null;
 
 
 
@@ -1807,6 +1814,19 @@ async function init() {
     nombreModPrincipal = profDatos.principal;
     modPrincipal = obtenerMod(data.modificadores, nombreModPrincipal);
 
+    // === Pact Magic (Brujo): ranuras dinámicas según nivel de personaje ===
+    // Se detecta por CUALQUIER rasgo con "esPactMagic": true, así que un personaje
+    // nuevo que tenga ese mismo rasgo ya queda cubierto sin tocar este script.
+    pactMagicNivelRanura = null;
+    const tienePactMagic = (data.rasgos || []).some(r => r.esPactMagic);
+    if (tienePactMagic && data.hechizos && data.hechizos.ranuras) {
+        const { nivelRanura, cantidad } = calcularPactMagic(nivelTmp);
+        pactMagicNivelRanura = `Nivel ${nivelRanura}`;
+        // Reemplaza lo que hubiera en el JSON: la única ranura real es esta, calculada
+        // en vivo. Así, si el personaje sube de nivel, se recalcula solo la próxima carga.
+        data.hechizos.ranuras = [{ nivel: pactMagicNivelRanura, cantidad: String(cantidad), recupera: 'corto' }];
+    }
+
     // Inicializar ranuras
     data.hechizos.ranuras.forEach(r => {
         ranurasOriginales[r.nivel] = r.cantidad;
@@ -2635,12 +2655,10 @@ async function init() {
     if (invCloseBtn) {
         invCloseBtn.addEventListener('click', () => inventarioModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === inventarioModal) inventarioModal.style.display = 'none'; });
 
     if (invItemCloseBtn) {
         invItemCloseBtn.addEventListener('click', () => invItemModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === invItemModal) invItemModal.style.display = 'none'; });
 
     const invItemUsarBtn = document.getElementById('inv-item-usar');
     if (invItemUsarBtn) {
@@ -2673,12 +2691,6 @@ async function init() {
             invConfirmModal.style.display = 'none';
         });
     }
-    window.addEventListener('click', (e) => {
-        if (e.target === invConfirmModal) {
-            cantidadInventarioPendiente = 0;
-            invConfirmModal.style.display = 'none';
-        }
-    });
 
     // Botones +/- predefinidos
     document.querySelectorAll('.inv-modif').forEach(btn => {
@@ -2719,7 +2731,6 @@ async function init() {
     if (familiarCloseBtn) {
         familiarCloseBtn.addEventListener('click', () => familiarModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === familiarModal) familiarModal.style.display = 'none'; });
 
     document.getElementById('familiar-hp-menos1')?.addEventListener('click', () => modificarVidaFamiliar(-1));
     document.getElementById('familiar-hp-mas1')?.addEventListener('click', () => modificarVidaFamiliar(1));
@@ -2796,7 +2807,6 @@ async function init() {
     if (actionSurgeCloseBtn) {
         actionSurgeCloseBtn.addEventListener('click', () => actionSurgeModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === actionSurgeModal) actionSurgeModal.style.display = 'none'; });
 
     // Calcular y mostrar Save DC, Spell Attack Bonus y Atk Melee/Finesse en headers
     // (función reutilizable: se vuelve a llamar cada vez que se equipa/desequipa algo)
@@ -3501,9 +3511,6 @@ async function init() {
             confirmBorrarModal.style.display = 'none';
         });
     }
-    window.addEventListener('click', (e) => {
-        if (e.target === confirmBorrarModal) confirmBorrarModal.style.display = 'none';
-    });
 
     // Modal de confirmación del DM para descanso largo
     const confirmSi = document.getElementById('confirm-largo-si');
@@ -3527,7 +3534,6 @@ async function init() {
     if (confirmCloseBtn) {
         confirmCloseBtn.addEventListener('click', () => confirmModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === confirmModal) confirmModal.style.display = 'none'; });
 
     // Cerrar modal de descanso
     const restModal = document.getElementById('rest-modal');
@@ -3535,13 +3541,11 @@ async function init() {
     if (restCloseBtn) {
         restCloseBtn.addEventListener('click', () => restModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === restModal) restModal.style.display = 'none'; });
 
     // Listeners para cerrar modal
     if (closeBtn) {
         closeBtn.addEventListener('click', () => modal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 
     // Modal de Vida: botones de daño/curación
     document.querySelectorAll('.hp-btn[data-amount]').forEach(btn => {
@@ -3565,7 +3569,6 @@ async function init() {
     if (hpCloseBtn) {
         hpCloseBtn.addEventListener('click', () => hpModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === hpModal) hpModal.style.display = 'none'; });
 
     // Modal de CA: botones de +/-
     document.querySelectorAll('.hp-btn[data-ca-amount]').forEach(btn => {
@@ -3592,7 +3595,6 @@ async function init() {
     if (caCloseBtn) {
         caCloseBtn.addEventListener('click', () => caModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === caModal) caModal.style.display = 'none'; });
 
     // Modal de Hit Dice: botón menos (mínimo 0)
     const hdMenos = document.getElementById('hd-menos');
@@ -3679,7 +3681,6 @@ async function init() {
             mostrarToast('Smite no usado');
         });
     }
-    window.addEventListener('click', (e) => { if (e.target === smiteModal) smiteModal.style.display = 'none'; });
 
     // Modal de escala de ranura (Fireball, Guiding Bolt, etc.): cerrar/cancelar
     const escalaModal = document.getElementById('escala-modal');
@@ -3694,7 +3695,6 @@ async function init() {
             mostrarToast('Hechizo no usado');
         });
     }
-    window.addEventListener('click', (e) => { if (e.target === escalaModal) escalaModal.style.display = 'none'; });
 
     // Modal de Wild Shape (selector de animal): cerrar/cancelar
     const wildshapeModal = document.getElementById('wildshape-modal');
@@ -3709,7 +3709,6 @@ async function init() {
             mostrarToast('Wild Shape no usado');
         });
     }
-    window.addEventListener('click', (e) => { if (e.target === wildshapeModal) wildshapeModal.style.display = 'none'; });
 
     // Modal de restaurar ranuras (Pearl of Power, Arcane/Natural Recovery): cerrar con la X
     const restaurarModal = document.getElementById('restaurar-modal');
@@ -3717,7 +3716,6 @@ async function init() {
     if (restaurarCloseBtn) {
         restaurarCloseBtn.addEventListener('click', () => restaurarModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === restaurarModal) restaurarModal.style.display = 'none'; });
 
     // Modal de opciones post-golpe: cerrar con la X o con "Listo / Ninguna"
     const postGolpeModal = document.getElementById('post-golpe-modal');
@@ -3729,7 +3727,6 @@ async function init() {
     if (postGolpeListoBtn) {
         postGolpeListoBtn.addEventListener('click', () => postGolpeModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === postGolpeModal) postGolpeModal.style.display = 'none'; });
 
 
     // === UI de selección de Land (Circle of the Land, DnD 5.5e) ===
@@ -3757,7 +3754,6 @@ async function init() {
     if (landCloseBtn && landModal) {
         landCloseBtn.addEventListener('click', () => landModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (landModal && e.target === landModal) landModal.style.display = 'none'; });
 
     // Modal de Hit Dice: cerrar
     const hdModal = document.getElementById('hd-modal');
@@ -3765,7 +3761,6 @@ async function init() {
     if (hdCloseBtn) {
         hdCloseBtn.addEventListener('click', () => hdModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === hdModal) hdModal.style.display = 'none'; });
 
     // Modal de imagen del personaje: cerrar
     const imagenModal = document.getElementById('imagen-modal');
@@ -3773,7 +3768,6 @@ async function init() {
     if (imagenCloseBtn) {
         imagenCloseBtn.addEventListener('click', () => imagenModal.style.display = 'none');
     }
-    window.addEventListener('click', (e) => { if (e.target === imagenModal) imagenModal.style.display = 'none'; });
 
     // Modal genérico de efectos: cerrar
     const efectosModal = document.getElementById('efectos-modal');
@@ -3798,7 +3792,6 @@ async function init() {
     if (efectosCerrar) {
         efectosCerrar.addEventListener('click', cerrarEfectosYContinuar);
     }
-    window.addEventListener('click', (e) => { if (e.target === efectosModal) cerrarEfectosYContinuar(); });
 }
 
 document.addEventListener('DOMContentLoaded', init);

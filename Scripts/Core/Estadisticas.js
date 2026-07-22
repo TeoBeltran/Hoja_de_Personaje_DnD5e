@@ -13,6 +13,25 @@ function calcularProficiencia(nivel) {
     return '+2';
 }
 
+// Tabla oficial de Pact Magic (Brujo): a qué nivel de RANURA lanza todos sus
+// hechizos, y cuántas ranuras tiene, según su nivel de PERSONAJE.
+const TABLA_PACT_MAGIC = [
+    { hasta: 1, nivelRanura: 1, cantidad: 1 },
+    { hasta: 2, nivelRanura: 1, cantidad: 2 },
+    { hasta: 4, nivelRanura: 2, cantidad: 2 },
+    { hasta: 6, nivelRanura: 3, cantidad: 2 },
+    { hasta: 8, nivelRanura: 4, cantidad: 2 },
+    { hasta: 10, nivelRanura: 5, cantidad: 2 },
+    { hasta: 16, nivelRanura: 5, cantidad: 3 },
+    { hasta: 20, nivelRanura: 5, cantidad: 4 }
+];
+
+// Dado el nivel de PERSONAJE de un Brujo, devuelve { nivelRanura, cantidad } de Pact Magic.
+function calcularPactMagic(nivelPersonaje) {
+    const fila = TABLA_PACT_MAGIC.find(f => nivelPersonaje <= f.hasta) || TABLA_PACT_MAGIC[TABLA_PACT_MAGIC.length - 1];
+    return { nivelRanura: fila.nivelRanura, cantidad: fila.cantidad };
+}
+
 // Convierte "+3" o "-1" a número 3 o -1
 function parseMod(modStr) {
     return parseInt(modStr.replace('+', '')) || 0;
@@ -104,6 +123,7 @@ function generarSalvaciones(stats, clase, profBonus, extraProficientes) {
 
 export {
     calcularProficiencia,
+    calcularPactMagic,
     parseMod,
     formatMod,
     obtenerMod,

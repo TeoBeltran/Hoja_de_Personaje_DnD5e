@@ -10,7 +10,8 @@ const ICONOS_PERSONAJE = {
     'orfe': '🌿',
     'cedric': '🎻',
     'aldren': '🔧',
-    'kael': '🙏'
+    'kael': '🙏',
+    'varis': '🏹'
 };
 
 // === Sistema de stats y proficiencias ===

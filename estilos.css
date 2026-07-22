@@ -64,6 +64,55 @@ h2 {
     margin-top: 20px;
 }
 
+/* ===== Secciones plegables (Habilidades, Rasgos, Características Activas,
+   Armas y Armaduras, Hechizos, Mejoras) — Estadísticas/Modificadores/Salvaciones
+   siguen siendo <section> normales, fijas, sin tocar. ===== */
+details.skills-container {
+    padding: 0;
+}
+
+details.skills-container > summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 20px;
+    margin: 0;
+}
+
+details.skills-container > summary::-webkit-details-marker {
+    display: none;
+}
+
+details.skills-container > summary::marker {
+    content: "";
+}
+
+details.skills-container > summary h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+details.skills-container > summary h2::after {
+    content: '▾';
+    font-size: 0.85em;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+details.skills-container[open] > summary h2::after {
+    transform: rotate(180deg);
+}
+
+details.skills-container > summary:hover h2::after {
+    color: var(--accent-color);
+}
+
+details.skills-container > .contenido-plegable {
+    padding: 0 20px 20px 20px;
+}
+
 .skill-btn {
     background-color: #fbf9f4;
     color: var(--text-color);
@@ -121,6 +170,8 @@ h2 {
     border-radius: var(--border-radius);
     width: 80%;
     max-width: 500px;
+    max-height: 88vh;
+    overflow-y: auto;
     position: relative;
     box-shadow: 0 5px 25px rgba(0,0,0,0.2);
     animation: fadeIn 0.3s ease;
@@ -132,7 +183,11 @@ h2 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.close-btn {
+/* Cubre .close-btn Y todas sus variantes con sufijo (.close-btn-hp, .close-btn-ca,
+   .close-btn-inventario, .close-btn-familiar, .close-btn-wildshape, etc.) — cada modal
+   usa su propia clase para poder engancharle su propio listener en script.js, pero
+   todas tienen que verse y posicionarse igual. */
+[class^="close-btn"] {
     color: var(--text-muted);
     position: absolute;
     top: 10px;
@@ -143,7 +198,7 @@ h2 {
     transition: color 0.2s;
 }
 
-.close-btn:hover {
+[class^="close-btn"]:hover {
     color: var(--accent-color);
 }
 
@@ -235,7 +290,7 @@ h2 {
 
 @media print {
     /* Ocultar botones de descarga y el modal al imprimir */
-    #download-pdf, .close-btn, #skill-modal, #familiar-fab, #familiar-modal {
+    #download-pdf, [class^="close-btn"], #skill-modal, #familiar-fab, #familiar-modal {
         display: none !important;
     }
 
