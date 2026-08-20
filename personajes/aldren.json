@@ -67,6 +67,7 @@
   "equipo": [
     {
       "nombre": "Cota de Escamas (Scale Mail)",
+      "imagen": "Scale_Mail.png",
       "esArmadura": true,
       "tipoArmadura": "mediana",
       "armaduraBase": 14,
@@ -77,6 +78,7 @@
     },
     {
       "nombre": "Ballesta Ligera (Crossbow, light)",
+      "imagen": "Crossbow.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "ranged",
@@ -89,6 +91,7 @@
     },
     {
       "nombre": "Martillo Liviano (Light Hammer)",
+      "imagen": "Hammer.png",
       "dano": "1d4",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -154,7 +157,10 @@
         "tipoDano": "curación",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Una criatura tocada recupera 1d8 + modificador de INT de HP."
+        "desc": "Una criatura tocada recupera 1d8 + modificador de INT de HP.",
+        "efectos": [
+          { "tipo": "notificacionYAbreVida", "descripcion": "Cure Wounds", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+        ]
       },
       {
         "nivel": "NIVEL 1",

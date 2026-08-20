@@ -295,7 +295,7 @@
     </div>
 
     <div id="skill-modal" class="modal">
-        <div class="modal-content">
+        <div id="modal-content-principal" class="modal-content">
             <span class="close-btn">&times;</span>
             <h3 id="modal-title"></h3>
             <div id="modal-badges" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;"></div>
@@ -309,6 +309,14 @@
             <div id="modal-equipar" style="margin-top: 15px; display: none;">
                 <button id="btn-equipar-modal" class="hp-btn" style="width: 100%; padding: 10px; font-weight: bold;">Equipar</button>
             </div>
+        </div>
+
+        <!-- Imagen al lado, solo para items equipables (arma/armadura/accesorio). Mismo estilo
+             que el modal de foto de perfil (#imagen-modal). Es hermano de .modal-content, no
+             hijo: así el flex de #skill-modal centra el PAR como grupo, y angostando el texto
+             (clase "con-imagen-lateral" en #modal-content-principal) no queda hueco ni se amontonan. -->
+        <div id="modal-imagen-equipo" class="modal-content" style="display: none; width: 220px; max-width: 38vw; flex-shrink: 0; text-align: center; align-self: center;">
+            <img id="modal-imagen-equipo-img" src="" alt="" style="display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: var(--border-radius); border: 2px solid var(--accent-color);">
         </div>
     </div>
 
@@ -444,6 +452,16 @@
             <p style="line-height: 1.5; margin-bottom: 10px;">Al usar este hechizo se activaron los siguientes efectos:</p>
             <div id="efectos-lista" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0;"></div>
             <button id="efectos-cerrar" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white; padding: 10px; font-weight: bold;">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Modal: "¿Qué puedo usar con mi Acción/Bonus/Reacción/Objeto?" (se abre desde el menú
+         flotante de turno, al tocar cualquiera de esos 4 contadores) -->
+    <div id="turno-recursos-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn-turno-recursos">&times;</span>
+            <h3 id="turno-recursos-titulo" style="color: var(--accent-color); margin-top: 0;"></h3>
+            <div id="turno-recursos-lista" style="display: grid; grid-template-columns: 1fr; gap: 10px; margin: 15px 0; max-height: 60vh; overflow-y: auto;"></div>
         </div>
     </div>
 

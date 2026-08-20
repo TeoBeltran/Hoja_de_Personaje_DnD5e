@@ -90,6 +90,7 @@
       "usos": "2/2",
       "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
       "recupera": "corto",
+      "esPoolCompartido": true,
       "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Turn Undead, Harness Divine Power o Preserve Life)."
     },
     {
@@ -97,7 +98,8 @@
       "accion": "Acción",
       "distancia": "30 ft",
       "duracion": "1 minuto",
-      "desc": "Cuando veas o escuches un No-Muerto a 30 ft, hace tirada de salvación de WIS. Si falla, queda asustado durante 1 minuto o hasta recibir daño. Consume 1 uso de Channel Divinity."
+      "desc": "Cuando veas o escuches un No-Muerto a 30 ft, hace tirada de salvación de WIS. Si falla, queda asustado durante 1 minuto o hasta recibir daño. Consume 1 uso de Channel Divinity.",
+      "consumeUsoDe": "Channel Divinity"
     },
     {
       "nombre": "Channel Divinity: Harness Divine Power",
@@ -111,7 +113,15 @@
       "nombre": "Channel Divinity: Preserve Life",
       "accion": "Acción",
       "distancia": "30 ft",
-      "desc": "Presentá tu símbolo sagrado y curá un total de HP igual a tu nivel de Clérigo × 5. Podés repartir esos puntos entre cualquier cantidad de criaturas a 30 ft (incluído vos). No funciona con criaturas a 0 HP. Consume 1 uso de Channel Divinity."
+      "desc": "Presentá tu símbolo sagrado y curá un total de HP igual a tu nivel de Clérigo × 5. Podés repartir esos puntos entre cualquier cantidad de criaturas a 30 ft (incluído vos). No funciona con criaturas a 0 HP. Consume 1 uso de Channel Divinity.",
+      "consumeUsoDe": "Channel Divinity",
+      "efectos": [
+        {
+          "tipo": "notificacionYAbreVida",
+          "descripcion": "Channel Divinity: Preserve Life",
+          "mensaje": "Repartí <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel × 5</strong> de HP entre las criaturas que elijas. Al cerrar este modal se abre el de vida para que apliques tu parte manualmente."
+        }
+      ]
     },
     {
       "nombre": "Fairy Magic: Faerie Fire",
@@ -164,6 +174,7 @@
   "equipo": [
     {
       "nombre": "Breastplate +1",
+      "imagen": "Breastplate.png",
       "esArmadura": true,
       "tipoArmadura": "media",
       "armaduraBase": 16,
@@ -175,6 +186,7 @@
     },
     {
       "nombre": "Martillo de Guerra (1 mano)",
+      "imagen": "Hammer.png",
       "dano": "1d8",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -187,6 +199,7 @@
     },
     {
       "nombre": "Martillo de Guerra (2 manos)",
+      "imagen": "Hammer.png",
       "dano": "1d10",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -199,6 +212,7 @@
     },
     {
       "nombre": "Martillo Liviano (1 mano)",
+      "imagen": "Hammer.png",
       "dano": "1d4",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -211,6 +225,7 @@
     },
     {
       "nombre": "Amuleto del Devoto (Amulet of the Devout) +1",
+      "imagen": "Amulet.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -300,7 +315,8 @@
         },
         "efectos": [
           { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" }
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" },
+          { "tipo": "notificacionYAbreVida", "descripcion": "Cure Wounds", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
         ]
       },
       {
@@ -338,7 +354,8 @@
         "desc": "Una criatura elegida recupera 1d4 + WIS HP. Cada slot superior al 1 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra.",
         "efectos": [
           { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" }
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" },
+          { "tipo": "notificacionYAbreVida", "descripcion": "Healing Word", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
         ]
       },
       {
@@ -377,7 +394,8 @@
         "desc": "Hasta 6 criaturas elegidas recuperan 1d4 + WIS HP. Cada slot superior al 3 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra a cada una.",
         "efectos": [
           { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra a cada criatura)" }
+          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra a cada criatura)" },
+          { "tipo": "notificacionYAbreVida", "descripcion": "Mass Healing Word", "mensaje": "Aplicá la curación mostrada arriba a cada criatura elegida. Al cerrar este modal se abre el de vida para que apliques la tuya (si te elegiste) manualmente." }
         ]
       },
       {

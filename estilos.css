@@ -91,6 +91,7 @@ details.skills-container > summary h2 {
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    margin-bottom: 0; /* si no, el margen por defecto del h2 queda atrapado dentro del padding del summary y duplica el espacio */
 }
 
 details.skills-container > summary h2::after {
@@ -111,6 +112,14 @@ details.skills-container > summary:hover h2::after {
 
 details.skills-container > .contenido-plegable {
     padding: 0 20px 20px 20px;
+}
+
+/* El summary ya tiene su propio padding-bottom de 20px como espacio después del título/línea
+   divisoria: si la primera grilla dentro del contenido plegable también suma su margin-top de
+   20px (heredado de .skills-grid), el espacio queda duplicado (~40-50px en vez de ~20-30px).
+   Se anula acá SOLO para la primera grilla de cada sección plegable. */
+details.skills-container > .contenido-plegable > .skills-grid:first-child {
+    margin-top: 0;
 }
 
 .skill-btn {
@@ -149,17 +158,22 @@ details.skills-container > .contenido-plegable {
 }
 
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 100; 
+    display: none;
+    position: fixed;
+    z-index: 100;
     left: 0;
     top: 0;
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(3px);
     align-items: center;
     justify-content: center;
+    /* flex-wrap + gap: no afectan a los modales de un solo .modal-content (caso normal), pero
+       permiten que #skill-modal muestre el detalle y la imagen del equipable lado a lado,
+       centrados como grupo, y que se apilen solos si no entran (pantallas chicas). */
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .modal-content {
@@ -176,6 +190,26 @@ details.skills-container > .contenido-plegable {
     box-shadow: 0 5px 25px rgba(0,0,0,0.2);
     animation: fadeIn 0.3s ease;
     color: var(--text-color);
+}
+
+/* Cuando el detalle de un item se muestra junto con la imagen del equipable (ver
+   #modal-imagen-equipo en personaje.html), se angosta un poco para que el PAR quede centrado
+   en vez de que el texto solo se centre y la imagen quede pegada muy a la derecha.
+   IMPORTANTE: también hay que anular el "margin: auto" de .modal-content acá. En un flex
+   container, un margin:auto en un item absorbe TODO el espacio libre de ese lado — si los dos
+   hijos (detalle + imagen) lo tienen, cada uno se estira hacia su borde y quedan lejísimos
+   entre sí en vez de pegados como par. Con margin:0 en ambos, el justify-content:center de
+   .modal es quien los centra juntos, respetando el "gap" de por medio. */
+.modal-content.con-imagen-lateral {
+    max-width: 400px;
+    margin: 0;
+}
+
+/* Misma razón que .con-imagen-lateral de arriba: #modal-imagen-equipo también tiene la clase
+   .modal-content (para heredar fondo/borde/sombra), así que también hereda su margin:auto y
+   hay que anularlo acá para que no se estire hacia el borde derecho de la pantalla. */
+#modal-imagen-equipo {
+    margin: 0;
 }
 
 @keyframes fadeIn {
@@ -285,6 +319,15 @@ details.skills-container > .contenido-plegable {
         margin: 10% auto !important;
         padding: 15px !important;
         box-sizing: border-box !important;
+    }
+
+    /* En pantallas chicas la imagen del equipable se apila debajo del detalle (por el
+       flex-wrap de .modal) en vez de ir al lado — la achicamos para que no ocupe toda la
+       pantalla como si fuera el detalle principal. */
+    #modal-imagen-equipo {
+        width: 150px !important;
+        max-width: 55% !important;
+        margin: 0 auto !important;
     }
 }
 
@@ -455,14 +498,13 @@ details.skills-container > .contenido-plegable {
     color: white !important;
 }
 
-/* Items del menú de turno: solo clickeables cuando están agotados (para restaurar) */
+/* Items del menú de turno: siempre clickeables (abren "¿Qué puedo usar con mi X?", o avisan
+   si ya no queda ese recurso este turno), así que siempre necesitan cursor y hover de botón. */
 .turno-item {
-    cursor: default !important;
-}
-.turno-item:has(.turno-valor[style*="c62828"]) {
     cursor: pointer !important;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
 }
-.turno-item:has(.turno-valor[style*="c62828"]):hover {
+.turno-item:hover {
     background-color: #f5f0e1 !important;
     border-color: var(--accent-color) !important;
 }

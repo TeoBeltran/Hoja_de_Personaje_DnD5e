@@ -111,6 +111,7 @@
   "equipo": [
     { 
       "nombre": "Cuero Tachonado +1", 
+      "imagen": "Studded_Leather.png",
       "esArmadura": true, 
       "tipoArmadura": "ligera", 
       "armaduraBase": 13, 
@@ -121,6 +122,7 @@
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
+      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -140,6 +142,7 @@
     },
         {
       "nombre": "Vara del Guardián del Pacto (Rod of the Pact Keeper) +1",
+      "imagen": "Rod.png",
       "manos": 1, 
       "peso": 5,
       "valor": 1000,
@@ -157,6 +160,7 @@
     },
     {
       "nombre": "Ballesta Ligera", 
+      "imagen": "Crossbow.png",
       "dano": "1d8", 
       "tipoDano": "perforante", 
       "tipo": "finesse", 
@@ -169,6 +173,7 @@
     },
     {
       "nombre": "Daga +1",
+      "imagen": "Dagger.png",
       "dano": "1d4",
       "tipoDano": "perforante",
       "tipo": "melee",

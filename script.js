@@ -36,7 +36,7 @@ import {
     validarArmaduraPorClase
 } from "./Scripts/Core/Util.js";
 
-let modal, modalTitle, modalDesc, closeBtn, modalActions, useSpellBtn;
+let modal, modalTitle, modalDesc, closeBtn, modalActions, useSpellBtn, modalContentPrincipal;
 
 // Estado global
 let ranurasState = {};
@@ -49,6 +49,7 @@ let caActual = 0;
 let caOriginal = 0;
 let habilidadesUsoState = {};
 let togglesActivos = {}; // { "Radiant Soul": true, ... } - habilidades tipo interruptor (se activan y desactivan, no se "gastan" al apagarlas)
+let togglesDuracionContador = {}; // { "Radiant Soul": 2, ... } - turnos pasados desde que se activó un toggle con duración limitada (ver "toggleDuracionTurnos")
 let habilidadesUsoOriginales = {};
 let hitDiceActual = 0;
 let hitDiceMaximo = 0;
@@ -189,6 +190,10 @@ function guardarToggles() {
     localStorage.setItem(STORAGE_PREFIX + 'togglesActivos', JSON.stringify(togglesActivos));
 }
 
+function guardarTogglesDuracion() {
+    localStorage.setItem(STORAGE_PREFIX + 'togglesDuracionContador', JSON.stringify(togglesDuracionContador));
+}
+
 // Suma el daño extra de cualquier habilidad tipo "interruptor" (toggleBonoDano) que esté
 // activa (ej: Radiant Soul: +nivel de daño radiante mientras esté prendida). Devuelve una
 // lista de {nombre, valor} para mezclar con los demás bonos de daño de un arma.
@@ -285,6 +290,25 @@ function rasgoAplicaAContexto(rasgo, tiposContexto, item) {
         if (typeof cond === 'object') return !!item && Object.keys(cond).every(k => item[k] === cond[k]);
         return false;
     });
+}
+
+// Bonos "condicionales": daño extra que la app NO puede calcular sola porque depende de un
+// estado externo que no se trackea (ej: si el objetivo está Enmielado por el Aura del Gran
+// Panal de Nika — la hoja no sabe si el rival recibió miel o no). Se declaran con el campo
+// "bonoCondicional: {formula, tipoDano, nota}" en un rasgo, junto con "disparadores" para saber
+// en qué contexto mostrarlo (mismo mecanismo que las cards de "Efectos Activados").
+// A diferencia de un bonoDano normal, ESTO NUNCA SE SUMA AL TOTAL AUTOMÁTICO: se muestra
+// siempre como badge aparte en naranja, para que se vea pero recuerde que hay que aplicarlo
+// a mano solo cuando corresponda (así no se confunde con los bonos que sí son automáticos).
+function bonosCondicionalesHTML(item, tiposContexto) {
+    return (rasgosGlobal || [])
+        .filter(r => r.bonoCondicional && rasgoAplicaAContexto(r, tiposContexto, item))
+        .map(r => {
+            const bc = r.bonoCondicional;
+            const notaTxt = bc.nota ? ` — ${bc.nota}` : '';
+            return `<span class="skill-mod" style="background-color: #e65100; color: white; margin-left: 4px;" title="${r.nombre}: NO se aplica solo, confirmalo a mano${notaTxt}">+${bc.formula}${bc.tipoDano ? ' ' + bc.tipoDano : ''}</span>`;
+        })
+        .join('');
 }
 
 // Procesa los efectos de un item y muestra el modal si hay alguno aplicable.
@@ -412,6 +436,36 @@ function procesarEfectos(item, contexto) {
         div.innerHTML = `
             <div style="font-weight: bold; color: ${colorBorde}; margin-bottom: 4px;">${efecto.descripcion}</div>
             <div style="font-size: 0.95rem; color: ${efecto.colorCard ? colorBorde : 'var(--text-color)'};">${mensaje}</div>
+        `;
+        lista.appendChild(div);
+    });
+
+    document.getElementById('efectos-modal').style.display = 'flex';
+}
+
+// Muestra una o más notificaciones reutilizando el mismo modal genérico de "Efectos Activados"
+// que usa procesarEfectos() (mismo #efectos-modal / #efectos-lista, mismo estilo de card),
+// pero sin necesitar un item/contexto de ataque. Para avisos que no vienen de golpear con un
+// arma ni lanzar un hechizo (ej: un toggle con duración que se apaga solo al pasar los turnos).
+// Acepta un solo objeto {descripcion, mensaje, colorCard} o un array de varios (ej: si se
+// apagan 2 toggles con duración en el mismo turno, se listan juntos en un solo modal).
+function mostrarNotificacionGenerica(notificaciones) {
+    const lista = document.getElementById('efectos-lista');
+    if (!lista) return;
+    const items = Array.isArray(notificaciones) ? notificaciones : [notificaciones];
+    if (items.length === 0) return;
+
+    lista.innerHTML = '';
+    abrirModalVidaTrasEfectos = false;
+
+    items.forEach(({ descripcion, mensaje, colorCard }) => {
+        const div = document.createElement('div');
+        const colorBorde = colorCard || 'var(--accent-color)';
+        const colorFondo = colorCard ? '#f3e5f5' : '#fbf9f4';
+        div.style.cssText = `padding: 12px; background-color: ${colorFondo}; border: 1px solid var(--border-color); border-left: 4px solid ${colorBorde}; border-radius: var(--border-radius);`;
+        div.innerHTML = `
+            <div style="font-weight: bold; color: ${colorBorde}; margin-bottom: 4px;">${descripcion}</div>
+            <div style="font-size: 0.95rem; color: ${colorCard ? colorBorde : 'var(--text-color)'};">${mensaje}</div>
         `;
         lista.appendChild(div);
     });
@@ -650,6 +704,17 @@ function modificarVida(cantidad) {
 function capitalizar(str) {
     if (!str) return str;
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Convierte el nombre de un ítem en un nombre de archivo esperable (ej: "Lanza (Spear) +1"
+// → "lanza_spear_1"), para poder probar "img/equipamiento/<slug>.png" antes de caer al
+// placeholder. Saca tildes, pasa a minúscula y reemplaza todo lo que no sea letra/número por "_".
+function slugificarNombreItem(nombre) {
+    return (nombre || '')
+        .normalize('NFD').replace(/[̀-ͯ]/g, '') // sacar tildes (rango de diacríticos Unicode)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '');
 }
 
 function extraerBonusHorneado(danoStr) {
@@ -1276,6 +1341,34 @@ function resetearTurno() {
         }
     });
     if (huboRecargaDeTurno) guardarHabilidadesUso();
+
+    // Toggles con duración limitada en turnos (ej: Radiant Soul: "1 minuto" ≈ 6 turnos con
+    // rondas de 10s en esta mesa). Cada vez que se termina un turno con el toggle prendido,
+    // suma 1 a su contador; al llegar al límite se apaga solo y avisa con el modal genérico
+    // (nunca un modal nuevo aparte, reutiliza mostrarNotificacionGenerica).
+    let huboToggleExpirado = false;
+    const notificacionesExpirados = [];
+    (window._habilidadesUsoData || []).forEach(hab => {
+        if (!hab.toggleDuracionTurnos || !togglesActivos[hab.nombre]) return;
+        togglesDuracionContador[hab.nombre] = (togglesDuracionContador[hab.nombre] || 0) + 1;
+        if (togglesDuracionContador[hab.nombre] >= hab.toggleDuracionTurnos) {
+            togglesActivos[hab.nombre] = false;
+            delete togglesDuracionContador[hab.nombre];
+            huboToggleExpirado = true;
+            notificacionesExpirados.push({
+                descripcion: `⏱️ ${hab.nombre} desactivado`,
+                mensaje: `Se cumplieron los ${hab.toggleDuracionTurnos} turnos de duración y se apagó solo.`,
+                colorCard: '#5d4037'
+            });
+        }
+    });
+    if (huboToggleExpirado) {
+        guardarToggles();
+        guardarTogglesDuracion();
+        mostrarNotificacionGenerica(notificacionesExpirados);
+    } else {
+        guardarTogglesDuracion();
+    }
 }
 
 // === Divine Smite (y cualquier otro "smite", ej: Honey Smite) ===
@@ -1664,6 +1757,12 @@ function tomarDescanso(tipo) {
         }
     });
     if (huboToggleApagado) guardarToggles();
+    // Limpiar también los contadores de duración por turno (ver "toggleDuracionTurnos"):
+    // si se reactiva más adelante, arranca de 0 de nuevo, no desde donde había quedado.
+    if (Object.keys(togglesDuracionContador).length > 0) {
+        togglesDuracionContador = {};
+        guardarTogglesDuracion();
+    }
 
     // Si es descanso largo, restaurar vida y Hit Dice al máximo
     if (tipo === 'largo') {
@@ -1732,6 +1831,7 @@ const STORAGE_PREFIX = `pj_${personajeId}_`;
 
 async function init() {
     modal = document.getElementById('skill-modal');
+    modalContentPrincipal = document.getElementById('modal-content-principal');
     modalTitle = document.getElementById('modal-title');
     modalDesc = document.getElementById('modal-desc');
     closeBtn = document.querySelector('.close-btn');
@@ -1761,7 +1861,7 @@ async function init() {
             iconoEl.addEventListener('click', () => {
                 document.getElementById('imagen-modal-titulo').textContent = data.personaje.nombre || '';
                 const img = document.getElementById('imagen-modal-img');
-                img.src = `img/${personajeId}.png`;
+                img.src = `img/personajes/${personajeId}.png`;
                 img.alt = data.personaje.nombre || '';
                 document.getElementById('imagen-modal').style.display = 'flex';
             });
@@ -1889,6 +1989,11 @@ async function init() {
                 modalTitle.textContent = item.nombre;
                 modalDesc.textContent = item.desc;
                 if (modalActions) modalActions.style.display = 'none';
+                // Stats/skills/salvaciones nunca son equipables → sin imagen al lado (limpia el
+                // estado si el modal anterior sí la mostraba, ver abrirModalEquipo).
+                const imgEquipoContStat = document.getElementById('modal-imagen-equipo');
+                if (imgEquipoContStat) imgEquipoContStat.style.display = 'none';
+                if (modalContentPrincipal) modalContentPrincipal.classList.remove('con-imagen-lateral');
                 modal.style.display = 'flex';
             });
         }
@@ -1973,6 +2078,12 @@ async function init() {
     const togglesGuardados = localStorage.getItem(STORAGE_PREFIX + 'togglesActivos');
     if (togglesGuardados) {
         try { togglesActivos = JSON.parse(togglesGuardados); } catch (e) { togglesActivos = {}; }
+    }
+
+    // Cargar contador de turnos de toggles con duración limitada (ver "toggleDuracionTurnos")
+    const togglesDuracionGuardado = localStorage.getItem(STORAGE_PREFIX + 'togglesDuracionContador');
+    if (togglesDuracionGuardado) {
+        try { togglesDuracionContador = JSON.parse(togglesDuracionGuardado); } catch (e) { togglesDuracionContador = {}; }
     }
 
     if (impG && data.improvements) {
@@ -2126,6 +2237,11 @@ async function init() {
             if (modalActions) modalActions.style.display = 'none';
             const modalEquipar = document.getElementById('modal-equipar');
             if (modalEquipar) modalEquipar.style.display = 'none';
+            // Los rasgos nunca son equipables → sin imagen al lado (limpia el estado si el
+            // modal anterior sí la mostraba, ver abrirModalEquipo).
+            const imgEquipoContRasgo = document.getElementById('modal-imagen-equipo');
+            if (imgEquipoContRasgo) imgEquipoContRasgo.style.display = 'none';
+            if (modalContentPrincipal) modalContentPrincipal.classList.remove('con-imagen-lateral');
             // Limpiar badges y línea celeste (los rasgos no los tienen)
             renderModalBadges({});
             renderModalInfoLinea({});
@@ -2199,6 +2315,7 @@ async function init() {
         }
 
         const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
+        const condicionalHTML = (i.dano && i.tipo) ? bonosCondicionalesHTML(i, ['arma']) : '';
         const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee; margin-left: 6px;">${capitalizar(i.tipoDano)}</span>` : '';
         const maestriaHTML = (i.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[i.maestriaArma])
             ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5; margin-left: 6px;">${MAESTRIA_ARMA_INFO[i.maestriaArma].emoji} ${MAESTRIA_ARMA_INFO[i.maestriaArma].nombre}</span>`
@@ -2238,6 +2355,7 @@ async function init() {
                     ${armaduraHTML}
                     ${manosHTML}
                     ${danoHTML}
+                    ${condicionalHTML}
                     ${tipoDanoHTML}
                     ${maestriaHTML}
                 </div>
@@ -2293,6 +2411,13 @@ async function init() {
             if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
             ultimoDanoMostrado = item.tipoDano ? `${danoTexto} ${item.tipoDano}` : danoTexto;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
+
+            // Bonos condicionales (ej: Aura del Gran Panal) — se muestran siempre en naranja,
+            // aparte, porque dependen de algo que la hoja no puede saber (ej: si el objetivo
+            // está Enmielado). Mismo tag de contexto que usa "disparadores" en otros lados.
+            const tiposCtxModal = esHechizoItem ? ['hechizo'] : ['arma'];
+            const condicionalModalHTML = bonosCondicionalesHTML(item, tiposCtxModal);
+            if (condicionalModalHTML) partes.push(condicionalModalHTML);
 
             // Tooltip con detalle de bonos
             const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, detallesModalConMagico);
@@ -2373,7 +2498,11 @@ async function init() {
         useSpellBtn.style.backgroundColor = '#6a1b9a'; // Reset color
 
         const tieneDano = !!item.dano;
-        const esHabilidad = !!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe || !!item.otorgaGolpes || !!item.soloPostGolpe;
+        // "esPoolCompartido" = habilidad "contenedora" que solo existe para mostrar el contador
+        // compartido (ej: Channel Divinity 2/2, Puntos de Ki N/N). Las opciones concretas que la
+        // gastan (con "consumeUsoDe" apuntando a ella) SÍ son accionables cada una por separado;
+        // la habilidad base nunca se usa "directo" sin elegir una opción, así que no muestra botón.
+        const esHabilidad = !item.esPoolCompartido && (!!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe || !!item.otorgaGolpes || !!item.soloPostGolpe);
         const esHechizoConRanura = (tipo === 'hechizo');
         const esCantrip = (tipo === 'cantrip');
         const esArma = (tipo === 'arma') && tieneDano;
@@ -2483,6 +2612,32 @@ async function init() {
         // (accesorios sin efecto numérico, como botas, que igual querés poder marcar como puestas).
         const esEquipable = item.esArmadura || (item.manos && item.manos > 0) || (item.efectos && item.efectos.length > 0) || item.equipable === true;
 
+        // Imagen al lado del detalle, solo para equipables (arma/armadura/accesorio).
+        // Prioridad del nombre de archivo:
+        //   1) item.imagen del JSON (ej. "Hide_Armor.png") — nombre simple elegido a mano,
+        //      recomendado para no depender de adivinar cómo queda "slugificado" un nombre largo.
+        //   2) si no está declarado, cae al viejo auto-slug de item.nombre (compatibilidad con
+        //      ítems que todavía no tienen el campo puesto).
+        //   3) si el archivo no existe (onerror), placeholder.png.
+        const imgEquipoCont = document.getElementById('modal-imagen-equipo');
+        const imgEquipoEl = document.getElementById('modal-imagen-equipo-img');
+        if (imgEquipoCont && imgEquipoEl && modalContentPrincipal) {
+            if (esEquipable) {
+                const archivoImagen = item.imagen || `${slugificarNombreItem(item.nombre)}.png`;
+                imgEquipoEl.onerror = () => {
+                    imgEquipoEl.onerror = null;
+                    imgEquipoEl.src = 'img/equipamiento/placeholder.png';
+                };
+                imgEquipoEl.src = `img/equipamiento/${archivoImagen}`;
+                imgEquipoEl.alt = item.nombre;
+                imgEquipoCont.style.display = 'block';
+                modalContentPrincipal.classList.add('con-imagen-lateral');
+            } else {
+                imgEquipoCont.style.display = 'none';
+                modalContentPrincipal.classList.remove('con-imagen-lateral');
+            }
+        }
+
         if (esEquipable && modalEquipar && btnEqModal) {
             modalEquipar.style.display = 'block';
             const eq = estaEquipado(item);
@@ -2526,6 +2681,141 @@ async function init() {
         }
 
         modal.style.display = 'flex';
+    }
+
+    // Abre el modal genérico de detalle (mismo que usan las cards de hechizos/cantrips/
+    // habilidades al clickearlas) para un item que NO es equipo — se usa desde el modal de
+    // "¿Qué puedo usar con mi X?" para no duplicar la lógica de apertura en cada lugar.
+    function abrirModalGenericoItem(item, tipo) {
+        itemContextoActual = item;
+        modalTitle.innerHTML = item.nombre;
+        modalDesc.innerHTML = (item.desc || '').replace(/\n/g, '<br>');
+
+        const modalEquipar = document.getElementById('modal-equipar');
+        if (modalEquipar) modalEquipar.style.display = 'none';
+
+        // Nunca es equipable (hechizo/cantrip/habilidad) → sin imagen al lado. Necesario para
+        // limpiar el estado si el modal anterior sí la mostraba (ver abrirModalEquipo).
+        const imgEquipoContGenerico = document.getElementById('modal-imagen-equipo');
+        if (imgEquipoContGenerico) imgEquipoContGenerico.style.display = 'none';
+        if (modalContentPrincipal) modalContentPrincipal.classList.remove('con-imagen-lateral');
+
+        renderModalBadges(item);
+        renderModalInfoLinea(item);
+        renderBotonUsar(item, tipo);
+
+        modal.style.display = 'flex';
+    }
+
+    // Clasifica el campo "accion" de un item en el mismo recurso de turno que gastaría
+    // consumirAccion(), pero SIN gastar nada — solo para poder agrupar/filtrar por tipo (ver el
+    // modal de "¿Qué puedo usar con mi Acción/Bonus/Reacción/Objeto?"). Mismas reglas y mismo
+    // orden de chequeo que consumirAccion(): si se cambia una, hay que cambiar la otra.
+    function clasificarTipoAccion(accionStr) {
+        if (!accionStr) return null;
+        const t = accionStr.toLowerCase();
+        if (t.includes('sin acción') || t.includes('sin accion') || t === 'ninguna' || t === 'ninguno') return null;
+        if (t.includes('objeto') || t.includes('interacción') || t.includes('interaccion')) return 'objeto';
+        if (t.includes('bonus') || t.includes('adicional')) return 'bonus';
+        if (t.includes('reacción') || t.includes('reaccion')) return 'reaccion';
+        if (t.includes('acción') || t.includes('accion')) return 'accion';
+        return null;
+    }
+
+    // Junta armas equipadas, hechizos/cantrips, habilidades y objetos de inventario cuyo "accion"
+    // matchea el tipo pedido. Excluye lo que no se puede usar directo desde su propia card
+    // (smites, soloPostGolpe, pools compartidos como Channel Divinity) para no listar algo que
+    // al tocarlo solo va a mostrar un aviso de "no se puede usar así".
+    function recolectarRecursosPorTipo(tipoBuscado) {
+        const resultado = [];
+
+        (data.equipo || []).forEach(i => {
+            if (!i.dano || !i.tipo) return; // solo armas de ataque, no armaduras/accesorios
+            if (clasificarTipoAccion(i.accion) !== tipoBuscado) return;
+            // Se listan todas las armas que declaran este tipo de acción, estén equipadas o no
+            // (igual que hechizos/habilidades ya se listan aunque no tengan usos/ranuras) — si
+            // no está equipada, se avisa acá y el modal real (al tocarla) deja equiparla ahí mismo.
+            const equipada = estaEquipado(i);
+            resultado.push({
+                categoria: 'Arma',
+                nombre: i.nombre,
+                extraHTML: `${!equipada ? '<span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-right: 6px;">(sin equipar)</span>' : ''}<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${i.dano}</span>`,
+                abrir: () => abrirModalEquipo(i, data.equipo)
+            });
+        });
+
+        ((data.hechizos && data.hechizos.lista) || []).forEach(h => {
+            if (clasificarTipoAccion(h.accion) !== tipoBuscado) return;
+            const esCantrip = h.nivel === 'CANTRIPS';
+            resultado.push({
+                categoria: esCantrip ? 'Cantrip' : 'Hechizo',
+                nombre: h.nombre,
+                extraHTML: h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${h.dano}</span>` : '',
+                abrir: () => abrirModalGenericoItem(h, esCantrip ? 'cantrip' : 'hechizo')
+            });
+        });
+
+        (data.habilidadesUso || []).forEach(h => {
+            if (h.tipo === 'asi' || h.oculto || h.esPoolCompartido) return;
+            if (h.tipo === 'smite' || h.soloPostGolpe) return; // se bloquean si se usan directo, no tiene sentido listarlas acá
+            if (clasificarTipoAccion(h.accion) !== tipoBuscado) return;
+            const usosVal = habilidadesUsoState[h.nombre];
+            resultado.push({
+                categoria: 'Habilidad',
+                nombre: h.nombre,
+                extraHTML: usosVal ? `<span class="skill-mod usos-valor">${usosVal}</span>` : '',
+                abrir: () => abrirModalGenericoItem(h, 'habilidad')
+            });
+        });
+
+        inventarioState.forEach(it => {
+            if (clasificarTipoAccion(it.accion) !== tipoBuscado) return;
+            resultado.push({
+                categoria: 'Objeto',
+                nombre: it.nombre,
+                extraHTML: `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">x${it.cantidad}</span>`,
+                abrir: () => abrirModalItemInventario(it)
+            });
+        });
+
+        return resultado;
+    }
+
+    // Pinta y abre el modal de "¿Qué puedo usar con mi X?" para el tipo de recurso clickeado
+    // en el menú flotante de turno (Acción / Acción Adicional / Reacción / Interacción c/Objeto).
+    function abrirModalRecursosPorTipo(tipoBuscado, tituloBonito) {
+        const modalRec = document.getElementById('turno-recursos-modal');
+        const tituloEl = document.getElementById('turno-recursos-titulo');
+        const listaEl = document.getElementById('turno-recursos-lista');
+        if (!modalRec || !tituloEl || !listaEl) return;
+
+        const recursos = recolectarRecursosPorTipo(tipoBuscado);
+        tituloEl.innerHTML = `¿Qué puedo usar con mi ${tituloBonito}?`;
+        listaEl.innerHTML = '';
+
+        if (recursos.length === 0) {
+            listaEl.innerHTML = `<p style="text-align: center; color: var(--text-muted); padding: 10px 0;">No tenés nada equipado/declarado que use ${tituloBonito}.</p>`;
+        } else {
+            recursos.forEach(r => {
+                const btn = document.createElement('button');
+                btn.className = 'skill-btn';
+                btn.style.cssText = 'display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 10px;';
+                btn.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 8px; text-align: left;">
+                        <span style="font-size: 0.75rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; background-color: var(--accent-color); color: white; flex-shrink: 0;">${r.categoria}</span>
+                        <strong>${r.nombre}</strong>
+                    </span>
+                    ${r.extraHTML || ''}
+                `;
+                btn.onclick = () => {
+                    modalRec.style.display = 'none';
+                    r.abrir();
+                };
+                listaEl.appendChild(btn);
+            });
+        }
+
+        modalRec.style.display = 'flex';
     }
 
     // Listener único del botón Equipar dentro del modal
@@ -2769,11 +3059,37 @@ async function init() {
     // maneja automático y preciso con turnoEstado.golpesRestantes (ver Caso 3 del listener de
     // useSpellBtn): el primer golpe con un arma gasta la Acción real, y los golpes extra que
     // corresponden por Extra Attack salen solos sin volver a pedir la Acción.
+    // Además, cada contador abre el modal de "¿Qué puedo usar con mi X?": lista todo lo que
+    // tenga ese tipo de acción declarado (armas equipadas, hechizos/cantrips, habilidades,
+    // objetos de inventario), para no tener que recorrer manualmente cada pestaña.
+    const TITULOS_TIPO_ACCION = { accion: 'Acción', bonus: 'Acción Adicional', reaccion: 'Reacción', objeto: 'Interacción con Objeto' };
     document.querySelectorAll('.turno-item').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
+            const tipo = btn.dataset.tipo;
+            if (!tipo || !TITULOS_TIPO_ACCION[tipo]) return;
+            // Si ya no te queda ese recurso este turno, no tiene sentido mostrar la lista
+            // (nada de eso se podría usar igual) — avisamos con un toast en su lugar.
+            // Caso especial "bonus": igual que consumirAccion(), una Acción Adicional todavía
+            // se puede pagar con la Acción principal si esta última no se gastó.
+            const quedaRecurso = (tipo === 'bonus')
+                ? (turnoEstado.bonus > 0 || turnoEstado.accion > 0)
+                : turnoEstado[tipo] > 0;
+            if (!quedaRecurso) {
+                mostrarToast(`Ya usaste tu ${TITULOS_TIPO_ACCION[tipo]} este turno`, 'warning');
+                return;
+            }
+            turnoPanel.style.display = 'none';
+            abrirModalRecursosPorTipo(tipo, TITULOS_TIPO_ACCION[tipo]);
         });
     });
+
+    // Modal "¿Qué puedo usar con mi X?": cerrar
+    const turnoRecursosModal = document.getElementById('turno-recursos-modal');
+    const turnoRecursosCloseBtn = document.querySelector('.close-btn-turno-recursos');
+    if (turnoRecursosCloseBtn && turnoRecursosModal) {
+        turnoRecursosCloseBtn.addEventListener('click', () => turnoRecursosModal.style.display = 'none');
+    }
 
     // Botón "Terminé mi turno"
     if (turnoReset) {
@@ -2948,20 +3264,7 @@ async function init() {
                 if (disponibles <= 0) btn.classList.add('ranura-vacia');
             }
 
-            btn.onclick = () => {
-                itemContextoActual = h;
-                modalTitle.innerHTML = h.nombre;
-                modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
-
-                const modalEquipar = document.getElementById('modal-equipar');
-                if (modalEquipar) modalEquipar.style.display = 'none';
-
-                renderModalBadges(h);
-                renderModalInfoLinea(h);
-                renderBotonUsar(h, 'habilidad');
-
-                modal.style.display = 'flex';
-            };
+            btn.onclick = () => abrirModalGenericoItem(h, 'habilidad');
             habGrid.appendChild(btn);
         });
     }
@@ -3020,6 +3323,7 @@ async function init() {
                 if (ataquesSpell > 1) danoTextoSpell = `${danoTextoSpell} ×${ataquesSpell}`;
             }
             const danoHTML = h.dano ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white; flex-shrink: 0;">${danoTextoSpell}</span>` : '';
+            const condicionalSpellHTML = h.dano ? bonosCondicionalesHTML(h, [h.nivel === 'CANTRIPS' ? 'cantrip' : 'hechizo']) : '';
             const tipoDanoHTML = h.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee; margin-left: 6px;">${capitalizar(h.tipoDano)}</span>` : '';
 
             // Línea celeste de info
@@ -3034,30 +3338,16 @@ async function init() {
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px; gap: 10px; flex-wrap: wrap;">
                     <span style="font-weight: bold;">${h.nombre}</span>
-                    <div style="display: flex; align-items: center;">
+                    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
                         ${danoHTML}
+                        ${condicionalSpellHTML}
                         ${tipoDanoHTML}
                     </div>
                 </div>
                 ${infoLineaSpellHTML}
                 <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${h.desc.replace(/\n/g, '<br>')}</span>
             `;
-            btn.onclick = () => {
-                itemContextoActual = h;
-                modalTitle.innerHTML = h.nombre;
-                modalDesc.innerHTML = h.desc.replace(/\n/g, '<br>');
-
-                const modalEquipar = document.getElementById('modal-equipar');
-                if (modalEquipar) modalEquipar.style.display = 'none';
-
-                renderModalBadges(h);
-                renderModalInfoLinea(h);
-
-                const tipoHechizo = (h.nivel === "CANTRIPS") ? 'cantrip' : 'hechizo';
-                renderBotonUsar(h, tipoHechizo);
-
-                modal.style.display = 'flex';
-            };
+            btn.onclick = () => abrirModalGenericoItem(h, (h.nivel === "CANTRIPS") ? 'cantrip' : 'hechizo');
             grid.appendChild(btn);
         });
     });
@@ -3141,6 +3431,10 @@ async function init() {
                     if (togglesActivos[habObj.nombre]) {
                         // Desactivar: no cuesta acción ni uso
                         togglesActivos[habObj.nombre] = false;
+                        if (habObj.toggleDuracionTurnos) {
+                            delete togglesDuracionContador[habObj.nombre];
+                            guardarTogglesDuracion();
+                        }
                         guardarToggles();
                         mostrarToast(`${habObj.nombre} desactivado`);
                     } else {
@@ -3156,6 +3450,13 @@ async function init() {
                         guardarHabilidadesUso();
                         actualizarHabilidadUsoDOM(habObj.nombre);
                         togglesActivos[habObj.nombre] = true;
+                        if (habObj.toggleDuracionTurnos) {
+                            // Arranca en 0: recién cuenta como "1 turno pasado" cuando se
+                            // termina el turno actual (ver resetearTurno), no en el instante
+                            // de activarlo (todavía no pasó ningún turno completo).
+                            togglesDuracionContador[habObj.nombre] = 0;
+                            guardarTogglesDuracion();
+                        }
                         guardarToggles();
                         const rTog = consumirAccion(tipoAccion);
                         mostrarToast(`✨ ¡${habObj.nombre} activado! ${rTog.mensaje}`.trim());

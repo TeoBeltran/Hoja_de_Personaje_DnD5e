@@ -205,6 +205,7 @@
   "equipo": [
     {
       "nombre": "Armadura de Cuero (Leather)",
+      "imagen": "Leather_Armor.png",
       "esArmadura": true,
       "tipoArmadura": "ligera",
       "armaduraBase": 11,
@@ -215,6 +216,7 @@
     },
     {
       "nombre": "Capa de Protección (Cloak of Protection)",
+      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -228,6 +230,7 @@
     },
     {
       "nombre": "Instrument of the Bards (Doss Lute)",
+      "imagen": "Lute.png",
       "equipable": true,
       "manos": 1,
       "peso": 2,
@@ -237,6 +240,7 @@
     },
     {
       "nombre": "Daga",
+      "imagen": "Dagger.png",
       "dano": "1d4",
       "tipoDano": "perforante",
       "tipo": "finesse",
@@ -249,6 +253,7 @@
     },
     {
       "nombre": "Estoque (Rapier)",
+      "imagen": "Rapier.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "finesse",
@@ -318,7 +323,10 @@
         "tipoDano": "curación",
         "accion": "Acción Bonus",
         "distancia": "60 ft",
-        "desc": "Una criatura recupera 1d4 + modificador de CHA de HP."
+        "desc": "Una criatura recupera 1d4 + modificador de CHA de HP.",
+        "efectos": [
+          { "tipo": "notificacionYAbreVida", "descripcion": "Healing Word", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+        ]
       },
       {
         "nivel": "NIVEL 1",

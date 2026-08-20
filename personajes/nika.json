@@ -89,8 +89,10 @@
     { "nombre": "Aura del Gran Panal (daño)",
       "desc": "Si el objetivo está Enmielado: +1d4+3 (máx. 7) de daño Radiante extra.",
       "oculto": true,
-      "colorCard": "#6a1b9a",
-      "disparadores": { "arma": true, "hechizo": true }
+      "colorCard": "#e65100",
+      "colorCardFondo": "#fff3e0",
+      "disparadores": { "arma": true, "hechizo": true },
+      "bonoCondicional": { "formula": "1d4+3", "tipoDano": "radiante", "nota": "solo si el objetivo está Enmielado" }
     },
     { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"},
     { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
@@ -110,7 +112,14 @@
         "recupera": "largo",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5."
+        "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5.",
+        "efectos": [
+            {
+                "tipo": "notificacionYAbreVida",
+                "descripcion": "Lay on Hands",
+                "mensaje": "Curás <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel × 5</strong> de HP (repartible entre varias criaturas). Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
+            }
+        ]
     },
     {
         "nombre": "Divine Smite",
@@ -129,6 +138,7 @@
         "usos": "2/2",
         "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
         "recupera": "corto",
+        "esPoolCompartido": true,
         "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Nature's Wrath o Turn the Faithless)."
     },
     {
@@ -151,7 +161,14 @@
         "recupera": "largo",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Tocás a una criatura y la curás una cantidad de HP igual a tu nivel."
+        "desc": "Tocás a una criatura y la curás una cantidad de HP igual a tu nivel.",
+        "efectos": [
+            {
+                "tipo": "notificacionYAbreVida",
+                "descripcion": "Healing Hands",
+                "mensaje": "Curás <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel ({nivelPersonaje})</strong> de HP. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
+            }
+        ]
     },
     {
         "nombre": "Radiant Soul",
@@ -159,9 +176,10 @@
         "recupera": "largo",
         "accion": "Acción Bonus",
         "duracion": "1 minuto",
-        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Mientras esté activo, hacés daño radiante extra igual a tu nivel al usar un ataque o hechizo. Se activa y desactiva como Acción Bonus (el botón cambia solo).",
+        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Mientras esté activo, hacés daño radiante extra igual a tu nivel al usar un ataque o hechizo. Se activa y desactiva como Acción Bonus (el botón cambia solo, o se apaga solo a los 6 turnos).",
         "toggleBonoDano": { "formula": "nivelPersonaje", "tipoDano": "radiante" },
-        "disparadoresSiActivo": { "arma": true, "hechizo": true }
+        "disparadoresSiActivo": { "arma": true, "hechizo": true },
+        "toggleDuracionTurnos": 6
     },
     {
         "nombre": "Polearm Master",
@@ -192,6 +210,7 @@
   "equipo": [
     {
         "nombre": "Armadura de placas (Plate Armor)",
+        "imagen": "Plate_Armor.png",
         "esArmadura": true,
         "tipoArmadura": "pesada",
         "armaduraBase": 18,
@@ -202,6 +221,7 @@
     },
         {
         "nombre": "Lanza (Spear) +1",
+        "imagen": "Spear.png",
         "dano": "1d6",
         "tipoDano": "cortante",
         "tipo": "melee",
@@ -218,6 +238,7 @@
     },
     {
         "nombre": "Capa de protección (Cloak of Protection)",
+        "imagen": "Cloak.png",
         "equipable": true,
         "manos": 0,
         "peso": 1,
@@ -237,6 +258,7 @@
     },
     {
         "nombre": "Escudo centinela (Sentinel Shield)",
+        "imagen": "Shield.png",
         "esArmadura": true,
         "tipoArmadura": "escudo",
         "armaduraBase": 0,
@@ -259,6 +281,7 @@
     },
     { 
       "nombre": "Escudo", 
+      "imagen": "Shield.png",
       "esArmadura": true, 
       "tipoArmadura": "escudo", 
       "armaduraBase": 2, 
@@ -307,7 +330,14 @@
             "tipoDano": "curación",
             "accion": "Acción",
             "distancia": "Toque",
-            "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+            "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra.",
+            "efectos": [
+                {
+                    "tipo": "notificacionYAbreVida",
+                    "descripcion": "Cure Wounds",
+                    "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente."
+                }
+            ]
         },
         {
             "nivel": "NIVEL 1",

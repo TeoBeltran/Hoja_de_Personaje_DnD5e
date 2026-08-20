@@ -144,6 +144,7 @@
   "equipo": [
     {
       "nombre": "Armadura de Cuero Tachonada +1 (Studded Leather +1)",
+      "imagen": "Studded_Leather.png",
       "esArmadura": true,
       "tipoArmadura": "ligera",
       "armaduraBase": 13,
@@ -155,6 +156,7 @@
     },
     {
       "nombre": "Oathbow",
+      "imagen": "Longbow.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "finesse",
@@ -170,6 +172,7 @@
     },
     {
       "nombre": "Bracers of Archery",
+      "imagen": "Bracers.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,

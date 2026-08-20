@@ -128,6 +128,7 @@
   "equipo": [
     {
       "nombre": "Armadura de placas (Plate Armor)",
+      "imagen": "Plate_Armor.png",
       "esArmadura": true,
       "tipoArmadura": "pesada",
       "armaduraBase": 18,
@@ -138,6 +139,7 @@
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
+      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -157,6 +159,7 @@
     },
     {
       "nombre": "Botas de zancada y salto (Boots of Striding and Springing)",
+      "imagen": "Boots.png",
       "equipable": true,
       "manos": 0,
       "peso": 5,
@@ -166,6 +169,7 @@
     },
     {
       "nombre": "Espada Larga (Greatsword) +2",
+      "imagen": "Greatsword.png",
       "dano": "2d6+2",
       "tipoDano": "cortante",
       "tipo": "melee",
@@ -185,6 +189,7 @@
     },
     {
       "nombre": "Arco Largo (Longbow) +1",
+      "imagen": "Longbow.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "ranged",

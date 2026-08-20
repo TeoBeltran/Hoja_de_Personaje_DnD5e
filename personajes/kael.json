@@ -223,6 +223,7 @@
       "usosIgualANivel": true,
       "recupera": "corto",
       "accion": "Varía",
+      "esPoolCompartido": true,
       "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Attacks (redirigir el ataque), Hand of Healing, Hand of Harm y Stunning Strike. Cantidad = tu nivel de monje (se recalcula solo si subís de nivel)."
     },
     {
@@ -316,9 +317,9 @@
       "desc": "Gastá 1 punto de Ki para tocar a una criatura y curarle una tirada de tu dado de Martial Arts (1d6) + tu modificador de WIS de HP.",
       "efectos": [
         {
-          "tipo": "notificacion",
+          "tipo": "notificacionYAbreVida",
           "descripcion": "Hand of Healing",
-          "mensaje": "La criatura tocada recupera <strong style=\"color: #2e7d32; font-size: 1.2rem;\">1d6 + tu mod. de WIS</strong> de HP."
+          "mensaje": "La criatura tocada recupera <strong style=\"color: #2e7d32; font-size: 1.2rem;\">1d6 + tu mod. de WIS</strong> de HP. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
         }
       ]
     },
@@ -333,6 +334,7 @@
   "equipo": [
     {
       "nombre": "Golpe Desarmado (Unarmed Strike)",
+      "imagen": "Fist.png",
       "equipable": true,
       "dano": "1d6",
       "tipoDano": "contundente",
@@ -348,6 +350,7 @@
     },
     {
       "nombre": "Bastón del Monje +1 (Quarterstaff +1)",
+      "imagen": "Quarterstaff.png",
       "dano": "1d6",
       "tipoDano": "contundente",
       "tipo": "finesse",
@@ -363,6 +366,7 @@
     },
     {
       "nombre": "Anillo de Protección +1 (Ring of Protection)",
+      "imagen": "Ring.png",
       "equipable": true,
       "manos": 0,
       "peso": 0,
@@ -382,6 +386,7 @@
     },
     {
       "nombre": "Eldritch Claw Tattoo",
+      "imagen": "Claw.png",
       "equipable": true,
       "manos": 0,
       "peso": 0,
@@ -391,6 +396,7 @@
     },
     {
       "nombre": "Cloak of Displacement",
+      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,

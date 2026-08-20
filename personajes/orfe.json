@@ -249,6 +249,7 @@
   "equipo": [
     {
       "nombre": "Hide Armor +1",
+      "imagen": "Hide_Armor.png",
       "esArmadura": true,
       "tipoArmadura": "media",
       "armaduraBase": 13,
@@ -260,6 +261,7 @@
     },
     {
       "nombre": "Shield",
+      "imagen": "Shield.png",
       "esArmadura": true,
       "tipoArmadura": "escudo",
       "armaduraBase": 2,
@@ -270,6 +272,7 @@
     },
     {
       "nombre": "Moon Scimitar +1",
+      "imagen": "Scimitar.png",
       "dano": "1d6",
       "tipoDano": "cortante",
       "tipo": "melee",
@@ -303,6 +306,7 @@
     },
     {
       "nombre": "Boots of Elvenkind",
+      "imagen": "Boots.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
