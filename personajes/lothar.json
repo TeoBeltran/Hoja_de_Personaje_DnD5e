@@ -36,12 +36,18 @@
             "atributos": {
                 "STR": 2
             }
+        },
+        {
+            "nivel": 8,
+            "atributos": {
+                "STR": 2
+            }
         }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "67/67" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "76/76" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },

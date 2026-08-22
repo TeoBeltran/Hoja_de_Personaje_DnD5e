@@ -1,0 +1,322 @@
+{
+  "personaje": {
+    "nombre": "Aredhel",
+    "clase": "Bardo",
+    "raza": "Elfo (Eladrin)",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 8,
+        "DEX": 15,
+        "CON": 15,
+        "INT": 8,
+        "WIS": 8,
+        "CHA": 15
+    }
+  },
+  "improvements": {
+    "race": [
+      { "atributo": "DEX", "valor": 2, "motivo": "Eladrin (Elfo)" },
+      { "atributo": "CHA", "valor": 1, "motivo": "Eladrin (Elfo) - ASI racial flexible" }
+    ],
+    "feats": [],
+    "asi": [
+      { "nivel": 4, "atributos": { "CHA": 2 } },
+      { "nivel": 8, "atributos": { "CHA": 1, "CON": 1 } }
+    ]
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "67/67" },
+    { "nombre": "Nivel", "valor": "8" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "15" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": true },
+    { "nombre": "Atletismo", "proficiente": false },
+    { "nombre": "Conoc. Arcano", "proficiente": false },
+    { "nombre": "Engaño", "proficiente": true },
+    { "nombre": "Historia", "proficiente": true },
+    { "nombre": "Interpretación", "proficiente": true },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": true },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": true, "experto": true },
+    { "nombre": "Persuasión", "proficiente": true, "experto": true },
+    { "nombre": "Perspicacia", "proficiente": true },
+    { "nombre": "Religión", "proficiente": false },
+    { "nombre": "Sigilo", "proficiente": true },
+    { "nombre": "Supervivencia", "proficiente": false },
+    { "nombre": "Trato animal", "proficiente": false }
+  ],
+  "background": {
+    "nombre": "Entertainer",
+    "habilidades": [
+      {
+        "nombre": "Por Gran Demanda",
+        "desc": "Siempre podés encontrar un lugar para actuar, generalmente en una posada o taberna, pero también en un circo, un teatro o hasta en la corte de un noble. En ese lugar recibís alojamiento y comida gratis, de calidad modesta o cómoda (según el establecimiento), mientras actúes cada noche.<br><br>Además, tu actuación te convierte en una especie de figura local: cuando extraños te reconocen en una ciudad donde actuaste, suelen tomarte simpatía."
+      }
+    ]
+  },
+  "rasgos": [
+    {
+      "nombre": "Bardic Inspiration (d8)",
+      "desc": "Como Acción Bonus, le das a otra criatura que puedas ver a 60 ft un Dado de Inspiración (d8).<br><br>En los próximos 10 minutos, esa criatura puede tirar el dado y sumarlo a una tirada de habilidad, ataque o salvación."
+    },
+    {
+      "nombre": "Countercharm",
+      "desc": "Acción. Mientras tocás o interpretás, vos y las criaturas aliadas a 30 ft que puedan verte u oírte tenés Ventaja en salvaciones contra quedar Asustado o Hechizado.<br><br>Dura hasta el final de tu próximo turno, o hasta que dejes de tocar."
+    },
+    {
+      "nombre": "Cutting Words",
+      "desc": "Reacción. Cuando una criatura a 60 ft que puedas ver hace una tirada de ataque, de habilidad o de daño, podés gastar un uso de Bardic Inspiration para restarle el resultado del dado a esa tirada."
+    },
+    {
+      "nombre": "Font of Inspiration",
+      "desc": "Recuperás todos tus usos de Bardic Inspiration al terminar un descanso corto o largo."
+    },
+    {
+      "nombre": "Jack of All Trades",
+      "desc": "Sumás la mitad de tu bonificador de competencia (redondeado hacia abajo) a cualquier prueba de habilidad que no incluya ya tu bonificador de competencia."
+    },
+    {
+      "nombre": "Song of Rest",
+      "desc": "Durante un descanso corto, si vos u otros miembros del grupo que puedan oírte tocar recuperan HP gastando Hit Dice, cada uno recupera 1d6 HP adicionales.<br><br>(El dado sube a 1d8 en nivel 9, 1d10 en nivel 13 y 1d12 en nivel 17.)"
+    },
+    {
+      "nombre": "Expertise",
+      "desc": "Duplicás tu bonificador de competencia en Percepción y Persuasión (ya reflejado en sus valores)."
+    },
+    {
+      "nombre": "College of Lore: Bonus Proficiencies",
+      "desc": "Ganaste competencia en 3 habilidades a elección (ya reflejadas en la lista de Habilidades)."
+    },
+    {
+      "nombre": "Additional Magical Secrets",
+      "desc": "Aprendiste 2 hechizos adicionales de cualquier lista de clase: Counterspell y Aura of Vitality (ya incluidos en Hechizos)."
+    },
+    {
+      "nombre": "Fey Ancestry",
+      "desc": "Tenés Ventaja en salvaciones contra quedar Hechizado, y la magia no puede dormirte."
+    },
+    {
+      "nombre": "Season (Eladrin)",
+      "desc": "Al terminar un descanso largo, podés cambiar tu Estación: Otoño, Invierno, Primavera o Verano — elegís la que sientas que representa al mundo o tu estado de ánimo.<br><br>La Estación actual determina el efecto extra de Fey Step (ver esa habilidad en Habilidades de Uso)."
+    },
+    {
+      "nombre": "Trance",
+      "desc": "No necesitás dormir. En cambio, entrás en un trance meditativo profundo durante 4 horas al día (en vez de dormir 8 horas)."
+    },
+    {
+      "nombre": "Competencia: Instrumentos Musicales",
+      "desc": "Viola, Laúd, Lira y Cuerno."
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Bardic Inspiration",
+      "usos": "4/4",
+      "recupera": "corto",
+      "accion": "Acción Bonus",
+      "distancia": "60 ft",
+      "duracion": "10 minutos",
+      "desc": "Le das a una criatura un Dado de Inspiración (d8) para sumar a una tirada de ataque, habilidad o salvación.<br><br>Usos = modificador de CHA (4)."
+    },
+    {
+      "nombre": "Countercharm",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Mientras tocás o interpretás, vos y las criaturas aliadas a 30 ft que puedan verte u oírte tenés Ventaja en salvaciones contra Asustado o Hechizado."
+    },
+    {
+      "nombre": "Cutting Words",
+      "consumeUsoDe": "Bardic Inspiration",
+      "accion": "Reacción",
+      "distancia": "60 ft",
+      "desc": "Cuando una criatura a 60 ft que puedas ver hace una tirada de ataque, de habilidad o de daño, gastás 1 uso de Bardic Inspiration para restarle 1d8 al resultado (después de que tire, antes de saber si tuvo éxito)."
+    },
+    {
+      "nombre": "Fey Step",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Acción Bonus",
+      "distancia": "30 ft",
+      "desc": "Te teletransportás mágicamente hasta 30 ft a un espacio desocupado que puedas ver.<br><br>Efecto extra según tu Estación actual (salvación DC 15 = 8 + competencia + CHA):<br>• <b>Otoño</b>: hasta 2 criaturas a 10 ft tuyo hacen salvación de WIS o quedan Hechizadas por vos 1 minuto (o hasta que vos o tus aliados le hagan daño).<br>• <b>Invierno</b>: una criatura a 5 ft tuyo (antes de teletransportarte) hace salvación de WIS o queda Asustada de vos hasta el final de tu próximo turno.<br>• <b>Primavera</b>: podés tocar a una criatura dispuesta a 5 ft — se teletransporta ELLA en tu lugar, a un espacio que veas dentro de 30 ft.<br>• <b>Verano</b>: las criaturas que elijas a 5 ft tuyo reciben daño de fuego igual a tu modificador de CHA (mínimo 1)."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Estoque (Rapier)",
+      "imagen": "Rapier.png",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 2,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Arma finesse a una mano."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mage Hand",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás una mano espectral que puede manipular objetos livianos (hasta 10 lb) a distancia."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Minor Illusion",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás un sonido o una imagen de un objeto (no más grande que un cubo de 5 ft) dentro del rango."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Vicious Mockery",
+        "dano": "1d4",
+        "escala": { "5": "2d4", "11": "3d4", "17": "4d4" },
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Insultás mágicamente a una criatura que pueda oírte. Salvación de WIS o recibe daño psíquico y tiene desventaja en su próxima tirada de ataque."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Detect Magic",
+        "accion": "Acción (Ritual)",
+        "distancia": "Propio (30 ft)",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Sentís la presencia de magia a 30 ft. Si sentís magia así, podés usar tu acción para ver un tenue aura alrededor de cualquier criatura u objeto visible que la porte, y aprender su escuela de magia si la hay."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Dissonant Whispers",
+        "dano": "3d6",
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Le susurrás una melodía discordante a una criatura. Salvación de WIS o recibe daño psíquico y debe usar su reacción para alejarse de vos."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Faerie Fire",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Los objetos en un cubo de 20 ft quedan iluminados. Las criaturas que fallen salvación de DEX quedan iluminadas: los ataques contra ellas tienen ventaja."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Healing Word",
+        "dano": "1d4",
+        "tipoDano": "curación",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Una criatura recupera 1d4 + modificador de CHA de HP.",
+        "efectos": [
+          { "tipo": "notificacionYAbreVida", "descripcion": "Healing Word", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+        ]
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Hold Person",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un humanoide hace salvación de WIS o queda Paralizado mientras dure. Repite la salvación cada turno."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Invisibility",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Una criatura se vuelve invisible hasta que ataque, lance un hechizo o termine el efecto."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Suggestion",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 8 horas",
+        "desc": "Sugerís un curso de acción (en una frase corta) a una criatura que pueda oírte y entenderte. Salvación de WIS o queda obligada a seguir la sugerencia si suena razonable, mientras dure o hasta que se cumpla."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Aura of Vitality",
+        "dano": "2d6",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Aura de 30 ft (propio)",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Energía sanadora irradia de vos en un aura de 30 ft que se mueve con vos. Como Acción Bonus, mientras dure, podés hacer que la energía cure 2d6 HP a una criatura dentro del aura (podés elegirte a vos misma).",
+        "efectos": [
+          { "tipo": "notificacionYAbreVida", "descripcion": "Aura of Vitality", "mensaje": "Aplicá los 2d6 de curación a la criatura elegida dentro del aura. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+        ]
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Counterspell",
+        "accion": "Reacción",
+        "distancia": "60 ft",
+        "desc": "Interrumpís a una criatura lanzando un hechizo. Nivel 3 o menor falla automáticamente; nivel 4+ requiere tirada de característica (DC 10 + nivel del hechizo)."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Dispel Magic",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Termina un hechizo de nivel 3 o menor sobre una criatura, objeto o efecto. Nivel 4+ requiere tirada de característica (DC 10 + nivel del hechizo)."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Hypnotic Pattern",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un patrón de colores llena un cubo de 30 ft. Cada criatura que lo vea hace salvación de WIS o queda Hechizada e Incapacitada (velocidad 0)."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Dimension Door",
+        "accion": "Acción",
+        "distancia": "500 ft",
+        "duracion": "Instantáneo",
+        "desc": "Te teletransportás junto con hasta una criatura dispuesta a un punto que puedas ver o describir dentro del rango. Si el destino queda ocupado, tanto vos como el pasajero reciben 4d6 de daño de fuerza y son empujados al espacio libre más cercano."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Polymorph",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Transformás una criatura que veas en una nueva forma de bestia. La criatura no dispuesta hace salvación de WIS para resistir. Adopta el juego de estadísticas de la bestia elegida (ND igual o menor a la del objetivo), mantiene mente/personalidad/alineamiento y no puede lanzar hechizos mientras dure la forma."
+      }
+    ]
+  },
+  "inventario": [
+    { "nombre": "Diplomat's Pack", "peso": 0, "cantidad": 1, "desc": "Incluye cofre, 2 estuches para mapas y pergaminos, ropa fina, tinta, pluma, lámpara, aceite x2, papel x5, perfume, cera de sellar, jabón." },
+    { "nombre": "Viola (Viol)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de cuerda, uno de tus instrumentos de Bardo." },
+    { "nombre": "Flauta (Flute)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de viento, uno de tus instrumentos de Bardo." },
+    { "nombre": "Favor de un/a Admirador/a", "peso": 0, "cantidad": 1, "desc": "Carta de amor, mechón de pelo o baratija (a elección) — favor de un admirador secreto que conociste actuando. Parte del trasfondo Entertainer." },
+    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+  ]
+}

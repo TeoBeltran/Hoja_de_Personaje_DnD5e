@@ -32,12 +32,18 @@
             "atributos": {
                 "INT": 2
             }
+        },
+        {
+            "nivel": 8,
+            "atributos": {
+                "INT": 2
+            }
         }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "44/44" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "50/50" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -167,7 +173,7 @@
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
       { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
+      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -401,6 +407,15 @@
         "accion": "Acción",
         "distancia": "120 ft",
         "desc": "Creas un muro de fuego sobre una superficie sólida dentro del alcance. Puede ser una línea de hasta 60 ft de largo, 20 ft de alto y 1 ft de grosor, o un anillo de hasta 20 ft de diámetro, 20 ft de alto y 1 ft de grosor. Al aparecer, las criaturas en su área hacen salvación de DEX o reciben 5d8 fuego (mitad si pasan). Un lado del muro emite calor intenso; las criaturas que terminan su turno a 10 ft o menos de ese lado o lo atraviesan por primera vez en un turno reciben 5d8 fuego. Cada slot superior al 4 suma 1d8. Cada slot superior al 4 aumenta el daño en 1d8."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Ice Storm",
+        "dano": "2d8+4d6",
+        "tipoDano": "frío/contundente",
+        "accion": "Acción",
+        "distancia": "300 ft",
+        "desc": "Cae granizo torrencial en un cilindro de 20 ft de radio y 40 ft de alto. Cada criatura en el área hace salvación de DEX: si falla, recibe 2d8 contundente + 4d6 frío (mitad si pasa). El terreno del área queda cubierto de hielo y se vuelve difícil hasta el final de tu próximo turno."
       }
     ]
   },

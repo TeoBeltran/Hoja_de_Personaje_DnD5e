@@ -33,11 +33,20 @@
                 "CHA": 2
             }
         }
+    ],
+    "feats": [
+        {
+            "nivel": 8,
+            "nombre": "Telekinetic",
+            "atributos": {
+                "CHA": 1
+            }
+        }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "52/52" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "59/59" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -219,7 +228,8 @@
           { "nivel": "NIVEL 3", "nombre": "Counterspell", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
           { "nivel": "NIVEL 3", "nombre": "Fear", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal: cada criatura en un cono de 30 ft tiene que pasar una tirada de Sabiduría o soltar lo que tenga en las manos y quedar Frightened. Mientras esté así, en su turno usa toda su acción para correr por el camino más seguro lejos tuyo. Si la criatura pierde de vista a la fuente del miedo, puede repetir la salvación al final de cada uno de sus turnos." },
           { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "escala": { "5": "8d6", "7": "9d6", "9": "10d6" }, "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
-          { "nivel": "NIVEL 4", "nombre": "Banishment", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." }
+          { "nivel": "NIVEL 4", "nombre": "Banishment", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." },
+          { "nivel": "NIVEL 4", "nombre": "Phantasmal Killer", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 min", "desc": "Creás una ilusión terrorífica en la mente del objetivo, visible solo para él. Debe hacer una tirada de salvación de Sabiduría o quedar Frightened durante la duración. Al inicio de cada uno de sus turnos mientras dure el miedo, recibe 4d10 de daño psíquico; puede repetir la salvación al final de cada uno de sus turnos, reduciendo el daño a la mitad si la pasa y terminando el efecto con un segundo acierto consecutivo." }
         ]
   },
   "inventario": [

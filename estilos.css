@@ -257,6 +257,19 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
     color: white !important;
 }
 
+/* Expertise (doble bono de competencia): mismo violeta de "proficient" pero con un borde
+   doble dorado encima, para que se distinga de un vistazo sin agregar un color nuevo a la
+   paleta. Requiere "proficiente" además de "experto" en el JSON (ver Estadisticas.js). */
+.skill-btn.experto {
+    border: 2px solid #6a1b9a !important;
+    box-shadow: 0 0 0 2px #c9a227 !important;
+}
+
+.skill-btn.experto .skill-mod {
+    background-color: #6a1b9a !important;
+    color: #ffe9a8 !important; /* Numerito en dorado clarito sobre el fondo violeta */
+}
+
 #rasgos-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -496,6 +509,15 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.modificado:hover .skill-mod {
     background-color: #6a1b9a !important;
     color: white !important;
+}
+
+/* Expertise mantiene el mismo hover violeta que proficient, pero conserva el aro dorado. */
+.skill-btn.experto:hover {
+    box-shadow: 0 0 0 2px #c9a227 !important;
+}
+
+.skill-btn.experto:hover .skill-mod {
+    color: #ffe9a8 !important;
 }
 
 /* Items del menú de turno: siempre clickeables (abren "¿Qué puedo usar con mi X?", o avisan

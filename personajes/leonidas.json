@@ -36,12 +36,18 @@
             "atributos": {
                 "WIS": 2
             }
+        },
+        {
+            "nivel": 8,
+            "atributos": {
+                "WIS": 2
+            }
         }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "52/52" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "59/59" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -243,7 +249,7 @@
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
       { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
+      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -423,6 +429,14 @@
         "distancia": "Toque",
         "duracion": "8 horas",
         "desc": "Si el objetivo cae a 0 HP por primera vez durante la duración, en vez de caer inconsciente baja a 1 HP. Si es afectado por un efecto que lo mataría instantáneamente, lo niega una vez."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Freedom of Movement",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "8 horas",
+        "desc": "Tocás a una criatura voluntaria. Durante la duración, su movimiento no se ve afectado por terreno difícil, y hechizos y efectos que la restrinjan o reduzcan su velocidad no le afectan. También puede gastar 5 ft de movimiento para liberarse automáticamente de ataduras no mágicas o de estar agarrada."
       }
     ]
   },

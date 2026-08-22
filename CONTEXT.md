@@ -1,6 +1,6 @@
 # CONTEXT.md — Hoja de Personaje D&D 5e/5.5e (Web)
 
-> Documento de contexto para retomar el desarrollo de este proyecto en una conversación nueva, sin depender del historial de chat previo. Última actualización: sesión donde se agregó el sistema de "bonos condicionales" (badge naranja para daño que la app no puede calcular sola, ej. Aura del Gran Panal de Nika), el de "toggles con duración en turnos" (Radiant Soul se apaga solo a los 6 turnos), se corrigió que casi ninguna habilidad/hechizo de curación abría el panel de vida al usarse (Nika, Kael, Leonidas, Aldren, Cedric), se agregó el modal "¿Qué puedo usar con mi X?" en el menú de turno, y se reorganizó `img/` en subcarpetas (`personajes/`, `equipamiento/`) sumando una imagen al lado del modal de detalle para todo ítem equipable.
+> Documento de contexto para retomar el desarrollo de este proyecto en una conversación nueva, sin depender del historial de chat previo. Última actualización: sesión donde se agregó el sistema de "bonos condicionales" (badge naranja para daño que la app no puede calcular sola, ej. Aura del Gran Panal de Nika), el de "toggles con duración en turnos" (Radiant Soul se apaga solo a los 6 turnos), se corrigió que casi ninguna habilidad/hechizo de curación abría el panel de vida al usarse (Nika, Kael, Leonidas, Aldren, Cedric), se agregó el modal "¿Qué puedo usar con mi X?" en el menú de turno, se reorganizó `img/` en subcarpetas (`personajes/`, `equipamiento/`) sumando una imagen al lado del modal de detalle para todo ítem equipable (con nombres de archivo simples vía el campo `imagen` en el JSON), se sumó un séptimo personaje jugable al menú público: Aredhel (Bardo Elfo Eladrin, College of Lore, nivel 8), se agregó soporte real de Expertise (doble bono de competencia) al cálculo de skills, y se subió a nivel 8 a los 6 personajes originales del menú público (Gangstur, Lothar, Nika, Lunareth, Leonidas, Orfe): ASI/Feat de nivel 8 (reglas 2014, mutuamente excluyentes), Vida recalculada con el método average, ranuras de hechizo de nivel 4 corregidas a 4/3/3/2 para los 3 full casters (Lunareth, Leonidas, Orfe — Gangstur usa Pact Magic y Nika es half-caster, ambos sin cambios de ranuras entre nivel 7 y 8, y Lothar no tiene magia), y un hechizo nuevo agregado a cada uno de los 5 casters (Lothar no, por ser Guerrero puro).
 
 ## 1. Qué es esto
 
@@ -8,14 +8,15 @@ Aplicación web (HTML/CSS/JS vanilla, sin build ni framework) que funciona como 
 
 El objetivo del proyecto es reducir la fricción de jugar: en vez de que cada jugador calcule a mano su daño, su CA, cuántas ranuras le quedan, etc., la hoja lo hace sola y further automatiza reglas específicas de cada personaje (Divine Smite, Wild Shape, Extra Attack, etc.) con "scripts" propios por personaje, definidos en el JSON de cada uno.
 
-Hay 6 personajes jugables activos (Gangstur, Lothar, Nika, Lunareth, Leonidas, Orfe) y 3 personajes de respaldo del DM que **no** aparecen en el menú público (Cedric, Aldren, Kael) — accesibles solo por URL directa.
+Hay 7 personajes jugables activos con card en el menú público de `index.html` (Gangstur, Lothar, Nika, Lunareth, Leonidas, Orfe, Aredhel). Además: Kael y Varis tienen card en `extras.html` (detrás de un login usuario/clave hardcodeado en ese mismo archivo); Cedric y Aldren son personajes de respaldo del DM sin card en ningún menú — accesibles solo escribiendo la URL a mano (`personaje.html?p=cedric`).
 
 ## 2. Estructura de archivos
 
 ```
 index.html                     → Menú de selección de personaje (cards con emoji + nombre)
 personaje.html                 → La hoja de personaje en sí (una sola plantilla para todos)
-personajes.json                → Lista de IDs de personajes que aparecen en el menú de index.html
+personajes.json                → Lista informativa de IDs de personajes activos. OJO: index.html NO la lee — sus cards están hardcodeadas directo en el HTML (ver §3). La usa GenerarResumen.js.
+extras.html                     → Menú secundario detrás de login (usuario/clave hardcodeados ahí mismo) para personajes que no van en el menú público (hoy: Kael, Varis) — lista propia PERSONAJES_EXTRA en su <script>, no lee ningún JSON tampoco.
 personajes/<id>.json           → Datos de cada personaje (uno por archivo)
 script.js                      → TODA la lógica de la app (~3900 líneas)
 estilos.css                    → Estilos de personaje.html (tema "pergamino")
@@ -39,7 +40,7 @@ Todo el estado mutable usa `localStorage` con el prefijo `pj_<id>_` (constante `
 
 ## 3. Cómo interactúan los módulos
 
-1. `index.html` lee `personajes.json` (vía `Constantes.js` para los iconos) y arma las cards del menú.
+1. `index.html` tiene las cards de personajes (ícono + nombre + link a `personaje.html?p=<id>`) escritas a mano directo en el HTML — agregar un personaje nuevo al menú público implica sumar su `<a class="personaje-card">` ahí, no editar ningún JSON.
 2. `personaje.html` es la plantilla visual: todos los modales, badges y contenedores están ahí como HTML fijo, mayormente vacíos, y `script.js` los llena dinámicamente en `init()`.
 3. `script.js` (`init()`) hace `fetch` del JSON del personaje, y con eso:
    - Aplica mejoras de stats (`aplicarImprovements`, ver §5).
@@ -60,7 +61,7 @@ Estructura típica de `personajes/<id>.json`:
 personaje       → nombre, clase, raza, tamaño, stats BASE (sin mejoras aplicadas)
 improvements    → race / feats / asi: de dónde salen los bonos que se suman a los stats base
 estadisticas    → HP, nivel, CA, iniciativa, velocidad, etc. ("auto" = lo calcula script.js)
-habilidades     → skills, con nombre en ESPAÑOL exacto (ver §7) y proficiente true/false
+habilidades     → skills, con nombre en ESPAÑOL exacto (ver §7), proficiente true/false, y opcional experto true (Expertise: duplica el bono de competencia, ver §6)
 background      → nombre + rasgos de trasfondo (se renderizan junto a los rasgos de clase)
 rasgos          → pasivas de clase/raza/feat. Texto + metadatos opcionales (disparadores, colorCard, oculto...)
 habilidadesUso  → cosas con botón "Usar" (limitadas o no). Acá vive casi toda la mecánica interactiva.
@@ -147,6 +148,7 @@ Estos son los "verbos" que cualquier personaje puede usar declarando los campos 
 | `colorCard`, `colorCardFondo` (en un rasgo) | Personaliza el color de la card en el modal de efectos cuando se auto-inyecta. |
 | `bonoCondicional: {formula, tipoDano, nota}` (en un rasgo, junto con `disparadores`) | Daño extra que la app NO puede calcular sola porque depende de un estado externo que no se trackea (ej: si el objetivo está Enmielado — Aura del Gran Panal de Nika). Se muestra SIEMPRE como badge naranja aparte del daño automático (violeta), en la card del arma/hechizo y en su modal — nunca se suma al total, es un recordatorio visual para aplicarlo a mano solo cuando corresponda. `formula` se muestra tal cual (no se evalúa como dado, ej. `"1d4+3"` → `"+1d4+3"`). |
 | `efectos: [...]` (en cualquier item) | Lista de efectos ad-hoc propios de ESE item específico (no reutilizables por otros). Tipos soportados: `notificacion` (texto con placeholders `{nivelPersonaje}`, `{WIS}`, etc.), `notificacionYAbreVida` (además abre el modal de vida al cerrar), `autoCuracion`/`autoDano` (evalúa fórmula y la muestra resaltada), `activarActionSurge`, `toggleArmaduraMagica` (Mage Armor), y los "pasivos de equipo" (`CA`, `salvaciones`, `bonoAtaqueHechizo`, `bonoCDHechizo`, `bonoAtaqueMelee`) que NUNCA disparan el modal, se aplican solos vía `calcularBonosEquipoActivo()`. |
+| `experto: true` (en una entrada de `habilidades`, junto con `proficiente: true`) | Expertise: duplica el bono de competencia de esa skill (`calcularValorSkill()` en `Estadisticas.js` lo suma dos veces). Sin `proficiente: true` no hace nada — la Expertise duplica una competencia existente, nunca la reemplaza. Visualmente la card queda con el mismo violeta de "proficient" más un aro dorado (`.skill-btn.experto` en `estilos.css`), para distinguirla de un vistazo. |
 
 El **modal de "Efectos Activados"** (`procesarEfectos()`) es el punto de entrada común: recibe un item + `contexto.tipos` (array de tags: `arma`, `hechizo`, `cantrip`, `habilidad`, `smite`, `postgolpe`) y arma la lista final combinando: efectos propios del item + rasgos con `disparadores` que matcheen + habilidades con `disparadores`/`disparadoresSiActivo` que matcheen. Si se le pasa `contexto.danoTexto`, se muestra como card de recap arriba de todo (útil para repetir el daño calculado, por ejemplo cuando Flurry of Blows hace que el mismo golpe se repita 2 veces).
 
@@ -167,7 +169,6 @@ El **modal de "Efectos Activados"** (`procesarEfectos()`) es el punto de entrada
 ## 8. Limitaciones conocidas / supuestos
 
 - **No hay tirador de dados**: la app nunca tira dados por el jugador. Todo lo que requiere una tirada (iniciativa con ventaja, ataques, salvaciones) se documenta en texto pero no se simula.
-- **No soporta Expertise** (doble proficiencia): si un personaje tiene Expertise en una skill, hay que aceptar que el número mostrado va a quedar más bajo que el real, o ajustarlo a mano en el JSON sabiendo que no va a ser 100% fiel a la fórmula.
 - **Velocidad no es dinámica**: a diferencia de CA/ataque, la velocidad final es un string fijo en `estadisticas`, no se recalcula desde feats/rasgos. Si un personaje tiene algo que la modifica (Mobile, Unarmored Movement), se documenta en texto/rasgo pero el número hay que dejarlo bien puesto a mano.
 - **Un solo "slot" de compañero invocado por personaje**: no soporta tener familiar + wildshape + steed simultáneos, es una elección de diseño (así era antes de este sistema, y simplifica mucho la UI).
 - **`localStorage` puede quedar desactualizado**: si se cambia una fórmula de cálculo (ej. la de CA), los valores ya guardados en `localStorage` de sesiones viejas no se recalculan solos — hay que usar el botón "Restaurar" correspondiente (CA, vida, etc.) para que tome el nuevo valor. Ya pasó al menos una vez y probablemente vuelva a pasar.
@@ -182,4 +183,3 @@ El **modal de "Efectos Activados"** (`procesarEfectos()`) es el punto de entrada
 - Evaluar si conviene que Counterspell (u otros hechizos de Reacción) también tengan su propia card "gastada" visual además de consumir el recurso de Reacción compartido (quedó pendiente, no bloqueante).
 - `curacionExtra` de la Moon Scimitar de Orfe (1d4 extra al curar con hechizo mientras está equipada) está declarado en el JSON pero no enganchado a ningún cálculo todavía.
 - Posible mejora: hacer que la velocidad final sí sea dinámica (sumar feats/rasgos automáticamente) en vez de texto fijo.
-- Posible mejora: soporte de Expertise real (doble proficiencia) en el cálculo de skills.

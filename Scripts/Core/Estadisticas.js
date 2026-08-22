@@ -55,12 +55,16 @@ function statAMod(score) {
     return Math.floor((score - 10) / 2);
 }
 
-// Calcula el valor de una skill: mod de la stat + (proficiencia si aplica)
+// Calcula el valor de una skill: mod de la stat + (proficiencia si aplica) + (proficiencia
+// de nuevo si además tiene Expertise — "experto: true" en el JSON duplica el bono de
+// competencia, tal como la regla real. Requiere "proficiente: true" para tener efecto: la
+// Expertise SIEMPRE duplica una competencia existente, nunca la reemplaza.
 function calcularValorSkill(skill, stats, profBonus) {
     const statKey = SKILL_STAT[skill.nombre];
     if (!statKey || !stats || stats[statKey] === undefined) return 0;
     let valor = statAMod(stats[statKey]);
     if (skill.proficiente) valor += profBonus;
+    if (skill.proficiente && skill.experto) valor += profBonus;
     return valor;
 }
 
@@ -74,6 +78,7 @@ function generarHabilidades(habilidadesBase, stats, profBonus) {
             nombre: skill.nombre,
             valor: formatMod(valor),
             proficiente: skill.proficiente || false,
+            experto: Boolean(skill.proficiente && skill.experto),
             stat: statKey,
             desc: SKILL_DESC[skill.nombre] || ''
         };

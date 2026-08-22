@@ -1980,7 +1980,7 @@ async function init() {
 
     const createBtn = (item) => {
         const btn = document.createElement('button');
-        btn.className = `skill-btn ${item.proficiente ? 'proficient' : ''}`;
+        btn.className = `skill-btn ${item.proficiente ? 'proficient' : ''} ${item.experto ? 'experto' : ''}`.trim();
         // Texto en bordó para Percepción P. (recordatorio de actualizar)
         const colorEspecial = (item.nombre === "Percepción P.") ? 'style="color: #8b0000;"' : '';
         btn.innerHTML = `<span ${colorEspecial}>${item.nombre}</span> ${item.valor ? `<span class="skill-mod">${item.valor}</span>` : ''}`;

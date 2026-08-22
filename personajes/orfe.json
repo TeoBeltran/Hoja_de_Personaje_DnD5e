@@ -41,12 +41,19 @@
             "atributos": {
                 "WIS": 2
             }
+        },
+        {
+            "nivel": 8,
+            "atributos": {
+                "WIS": 1,
+                "CON": 1
+            }
         }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "52/52" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "67/67" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -382,7 +389,7 @@
       { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
       { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
       { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "1", "recupera": "largo" }
+      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
     ],
     "lista": [
       {
@@ -471,6 +478,15 @@
             "4": "8d8"
           }
         }
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Stoneskin",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 hora",
+        "componentes": "V, S, M (polvo de diamante de 100 gp consumido)",
+        "desc": "Tocás a una criatura voluntaria. Hasta que termine el hechizo, tiene resistencia a daño contundente, cortante y perforante no mágico."
       }
     ]
   },

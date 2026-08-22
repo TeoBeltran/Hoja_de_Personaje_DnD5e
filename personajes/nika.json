@@ -34,11 +34,19 @@
                 "STR": 0
             }
         }
+    ],
+    "asi": [
+        {
+            "nivel": 8,
+            "atributos": {
+                "STR": 2
+            }
+        }
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "60/60" },
-    { "nombre": "Nivel", "valor": "7" },
+    { "nombre": "Vida", "valor": "68/68" },
+    { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
     { "nombre": "Velocidad", "valor": "30ft" },
@@ -434,6 +442,16 @@
             "distancia": "120 ft",
             "duracion": "Concentración, 1 minuto",
             "desc": "Crea un cilindro de luz pálida de 5 ft de radio y 40 ft de alto. Cuando una criatura entra al área por primera vez o inicia su turno ahí, hace tirada de CON: 2d10 radiante (mitad si pasa). En tu turno podés gastar Acción para mover el rayo 60 ft. +1d10 por cada slot superior al 2."
+        },
+        {
+            "nivel": "NIVEL 2",
+            "nombre": "Branding Smite",
+            "dano": "2d6",
+            "tipoDano": "radiante",
+            "accion": "Acción Bonus",
+            "distancia": "Propio",
+            "duracion": "Concentración, 1 minuto",
+            "desc": "El próximo ataque con arma que hagas antes de que termine el hechizo suma 2d6 de daño radiante extra, y el objetivo golpeado emite luz tenue en 5 ft mientras dure, sin poder volverse invisible."
         },
         {
             "nivel": "NIVEL 2",
