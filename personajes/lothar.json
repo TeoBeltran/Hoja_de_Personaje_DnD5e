@@ -28,6 +28,11 @@
             "atributos": {
                 "STR": 0
             }
+        },
+        {
+            "nivel": 6,
+            "nombre": "Tough",
+            "atributos": {}
         }
     ],
     "asi": [
@@ -46,7 +51,7 @@
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "76/76" },
+    { "nombre": "Vida", "valor": "92/92" },
     { "nombre": "Nivel", "valor": "8" },
     { "nombre": "CA", "valor": "auto" },
     { "nombre": "Iniciativa", "valor": "auto" },
@@ -90,7 +95,8 @@
     { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20).", "disparadores": { "arma": true } },
     { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "arma": true } },
     { "nombre": "Tactical Shift", "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "habilidad": "Second Wind" } },
-    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
+    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." },
+    { "nombre": "Tough", "desc": "Tus puntos de vida máximos aumentan en 2 por cada nivel de personaje que tengas (ya reflejado en Vida)." }
   ],
   "habilidadesUso": [
     {

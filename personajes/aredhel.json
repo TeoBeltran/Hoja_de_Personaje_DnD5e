@@ -151,17 +151,70 @@
   ],
   "equipo": [
     {
-      "nombre": "Estoque (Rapier)",
+      "nombre": "Cuero Tachonado +1 (Studded Leather)",
+      "imagen": "Studded_Leather.png",
+      "esArmadura": true,
+      "tipoArmadura": "ligera",
+      "armaduraBase": 13,
+      "manos": 0,
+      "peso": 13,
+      "valor": 1000,
+      "magico": true,
+      "desc": "Armadura ligera mágica. CA: 13 + Modificador de Destreza."
+    },
+    {
+      "nombre": "Estoque +1 (Rapier)",
       "imagen": "Rapier.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "finesse",
       "manos": 1,
       "peso": 2,
-      "valor": 25,
+      "valor": 1000,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Arma finesse a una mano."
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "desc": "Estoque mágico. Finesse, a una mano. +1 a las tiradas de ataque y al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
+    },
+    {
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "imagen": "Cloak.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        { "tipo": "CA", "valor": 1 },
+        { "tipo": "salvaciones", "valor": 1 }
+      ]
+    },
+    {
+      "nombre": "Medallón de la Elocuencia +1",
+      "imagen": "Amulet.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 1500,
+      "magico": true,
+      "desc": "Medallón mágico grabado con notas musicales. Mientras esté equipado otorga +1 a las tiradas de ataque con hechizos de bardo y +1 a la CD de salvación de tus hechizos de bardo.",
+      "efectos": [
+        { "tipo": "bonoAtaqueHechizo", "valor": 1 },
+        { "tipo": "bonoCDHechizo", "valor": 1 }
+      ]
+    },
+    {
+      "nombre": "Botas del Pueblo Feérico (Boots of Elvenkind)",
+      "imagen": "Boots.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 250,
+      "magico": true,
+      "desc": "Botas mágicas. Tus pasos no producen sonido. Las criaturas tienen desventaja en pruebas para escucharte cuando te movés."
     }
   ],
   "hechizos": {

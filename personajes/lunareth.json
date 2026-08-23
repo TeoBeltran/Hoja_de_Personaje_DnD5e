@@ -416,6 +416,14 @@
         "accion": "Acción",
         "distancia": "300 ft",
         "desc": "Cae granizo torrencial en un cilindro de 20 ft de radio y 40 ft de alto. Cada criatura en el área hace salvación de DEX: si falla, recibe 2d8 contundente + 4d6 frío (mitad si pasa). El terreno del área queda cubierto de hielo y se vuelve difícil hasta el final de tu próximo turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Greater Invisibility",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Vos o una criatura voluntaria que toques se vuelve invisible durante la duración, incluso al atacar o lanzar hechizos."
       }
     ]
   },

@@ -88,7 +88,13 @@
     { "nombre": "Disciple of Life", "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo." },
     { "nombre": "Blessed Healer", "desc": "Cuando lanzás un hechizo de curación de nivel 1 o mayor sobre otra criatura, vos también recuperás HP igual a 2 + el nivel del hechizo." },
     { "nombre": "Volar", "desc": "Podés moverte 30 ft de distancia mientras volás." },
-    { "nombre": "Spiritual Weapon: bono WIS", "desc": "Spiritual Weapon suma WIS al daño.", "bonoDano": "WIS", "aplicaA": "hechizo:Spiritual Weapon" }
+    { "nombre": "Spiritual Weapon: bono WIS", "desc": "Spiritual Weapon suma WIS al daño.", "bonoDano": "WIS", "aplicaA": "hechizo:Spiritual Weapon" },
+    {
+      "nombre": "Divine Strike",
+      "desc": "Una vez en cada uno de tus turnos, cuando golpeás a una criatura con un ataque de arma, podés infundir el golpe con energía divina: hace 1d8 de daño radiante extra.",
+      "disparadores": { "arma": true },
+      "bonoCondicional": { "formula": "1d8", "tipoDano": "radiante", "nota": "Solo 1 vez por turno" }
+    }
   ],
   "habilidadesUso": [
     {

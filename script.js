@@ -1851,20 +1851,22 @@ async function init() {
         const iconoEl = document.getElementById('icono-personaje');
         const claseEl = document.getElementById('clase-valor');
         const razaEl = document.getElementById('raza-valor');
+        const abrirModalImagenPerfil = () => {
+            document.getElementById('imagen-modal-titulo').textContent = data.personaje.nombre || '';
+            const img = document.getElementById('imagen-modal-img');
+            img.src = `img/personajes/${personajeId}.png`;
+            img.alt = data.personaje.nombre || '';
+            document.getElementById('imagen-modal').style.display = 'flex';
+        };
         if (nombreTextoEl && data.personaje.nombre) {
             nombreTextoEl.textContent = data.personaje.nombre;
             document.title = `${data.personaje.nombre} - Hoja de Personaje`;
+            nombreTextoEl.addEventListener('click', abrirModalImagenPerfil);
         }
         const iconosEl = document.querySelectorAll('.icono-personaje');
         iconosEl.forEach(iconoEl => {
             iconoEl.textContent = ICONOS_PERSONAJE[personajeId] || '🎭';
-            iconoEl.addEventListener('click', () => {
-                document.getElementById('imagen-modal-titulo').textContent = data.personaje.nombre || '';
-                const img = document.getElementById('imagen-modal-img');
-                img.src = `img/personajes/${personajeId}.png`;
-                img.alt = data.personaje.nombre || '';
-                document.getElementById('imagen-modal').style.display = 'flex';
-            });
+            iconoEl.addEventListener('click', abrirModalImagenPerfil);
         });
         if (claseEl) claseEl.textContent = data.personaje.clase || '';
         if (razaEl) razaEl.textContent = data.personaje.raza || '';
