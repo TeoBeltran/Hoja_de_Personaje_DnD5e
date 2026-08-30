@@ -1854,6 +1854,10 @@ async function init() {
         const abrirModalImagenPerfil = () => {
             document.getElementById('imagen-modal-titulo').textContent = data.personaje.nombre || '';
             const img = document.getElementById('imagen-modal-img');
+            img.onerror = () => {
+                img.onerror = null;
+                img.src = 'img/personajes/placeholder.png';
+            };
             img.src = `img/personajes/${personajeId}.png`;
             img.alt = data.personaje.nombre || '';
             document.getElementById('imagen-modal').style.display = 'flex';

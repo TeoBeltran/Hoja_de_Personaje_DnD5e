@@ -1,0 +1,464 @@
+{
+  "personaje": {
+    "nombre": "Chiaragorn",
+    "clase": "Mago",
+    "raza": "High Elf",
+    "tamano": "estandar",
+    "stats": {
+        "STR": 8,
+        "DEX": 14,
+        "CON": 14,
+        "INT": 15,
+        "WIS": 12,
+        "CHA": 8
+    }
+  },
+  "improvements": {
+    "race": [
+        {
+            "atributo": "DEX",
+            "valor": 2,
+            "motivo": "Elf"
+        },
+        {
+            "atributo": "INT",
+            "valor": 1,
+            "motivo": "Half Elf"
+        }
+    ],
+    "asi": [
+        {
+            "nivel": 1,
+            "atributos": {
+                "INT": 2
+            }
+        },
+        {
+            "nivel": 8,
+            "atributos": {
+                "INT": 2
+            }
+        }
+    ]
+  },
+  "estadisticas": [
+    { "nombre": "Vida", "valor": "50/50" },
+    { "nombre": "Nivel", "valor": "8" },
+    { "nombre": "CA", "valor": "auto" },
+    { "nombre": "Iniciativa", "valor": "auto" },
+    { "nombre": "Velocidad", "valor": "30ft" },
+    { "nombre": "Percepción P.", "valor": "11" },
+    { "nombre": "Proficiencia", "valor": "auto" },
+    { "nombre": "Hit Dice", "valor": "auto" }
+  ],
+  "habilidades": [
+    { "nombre": "Acrobacias", "proficiente": false },
+    { "nombre": "Atletismo", "proficiente": false },
+    { "nombre": "Conoc. Arcano", "proficiente": true },
+    { "nombre": "Engaño", "proficiente": false },
+    { "nombre": "Historia", "proficiente": true },
+    { "nombre": "Interpretación", "proficiente": false },
+    { "nombre": "Intimidación", "proficiente": false },
+    { "nombre": "Investigación", "proficiente": true },
+    { "nombre": "Juego de manos", "proficiente": false },
+    { "nombre": "Medicina", "proficiente": false },
+    { "nombre": "Naturaleza", "proficiente": false },
+    { "nombre": "Percepción", "proficiente": true },
+    { "nombre": "Persuasión", "proficiente": false },
+    { "nombre": "Perspicacia", "proficiente": false },
+    { "nombre": "Religión", "proficiente": true },
+    { "nombre": "Sigilo", "proficiente": false },
+    { "nombre": "Supervivencia", "proficiente": false },
+    { "nombre": "Trato animal", "proficiente": false }
+  ],
+  "background": {
+    "nombre": "Sage",
+    "habilidades": [
+      {
+        "nombre": "Researcher",
+        "desc": "Cuando intentás aprender o recordar un dato puntual, si no lo sabés, generalmente sabés dónde y de quién podrías obtenerlo: una biblioteca, un sabio, un erudito, un templo o un texto antiguo. Esta información puede requerir viaje, gastos o favores."
+      }
+    ]
+  },
+  "rasgos": [
+    { "nombre": "Arcane Tradition: School of Evocation", "desc": "Te especializás en Magia de Evocación: hechizos que crean energía mágica destructiva (fuego, rayos, fuerza). Esta tradición desbloquea features adicionales a medida que subís de nivel." },
+    { "nombre": "Evocation Savant", "desc": "El oro y el tiempo que debés gastar para copiar un hechizo de Evocación a tu spellbook se reduce a la mitad." },
+    { "nombre": "Sculpt Spells", "desc": "Cuando lanzás un hechizo de Evocación que afecta a otras criaturas, podés proteger a un número de ellas igual a 1 + el nivel del hechizo (mínimo 1). Las criaturas elegidas pasan automáticamente la salvación contra el hechizo y no reciben daño si fallaban.", "disparadores": { "hechizo": true } },
+    { "nombre": "Potent Cantrip", "desc": "Cuando una criatura pasa la salvación contra un cantrip tuyo, igual recibe la mitad del daño (sin otros efectos secundarios).", "disparadores": { "cantrip": true } },
+    { "nombre": "Cantrip Formulas", "desc": "Cuando terminás un descanso largo, podés reemplazar uno de los cantrips de mago que conocés por otro de la lista de cantrips de mago." },
+    { "nombre": "Darkvision", "desc": "Acostumbrado a las sombras del bosque, tenés visión superior en condiciones de poca luz. Podés ver en luz tenue dentro de 60 ft como si fuera luz brillante, y en oscuridad como si fuera luz tenue (en oscuridad solo distinguís en grises, no colores)." },
+    { "nombre": "Keen Senses", "desc": "Tenés proficiencia en Percepción." },
+    { "nombre": "Fey Ancestry", "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir." },
+    { "nombre": "Elf Weapon Training", "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
+    { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." },
+    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."}
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Recuperación Arcana (Arcane Recovery)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Especial",
+      "distancia": "Propio",
+      "desc": "Una vez por día, después de terminar un descanso corto, podés recuperar ranuras de hechizo gastadas. Las ranuras pueden tener un nivel total combinado igual o menor a la mitad de tu nivel de mago (redondeado hacia arriba), y ninguna ranura individual puede ser de nivel 6 o superior. A nivel 6 podés recuperar 3 niveles totales (ej: 1 ranura de Nivel 3, o 1 de Nivel 2 + 1 de Nivel 1).",
+      "recuperacionPresupuesto": {
+        "formula": "mitadNivelArriba",
+        "maxNivelSlot": 5
+      }
+    },
+    {
+      "nombre": "Perla de poder (Pearl of Power)",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "desc": "Recupera un espacio de conjuro gastado de nivel 3 o menor.",
+      "restaurarRanura": {
+        "maxNivel": 3
+      }
+    },
+    {
+      "nombre": "Sombrero del disfraz (Hat of Disguise)",
+      "usos": "ilimitado",
+      "accion": "Acción",
+      "desc": "(No sirve en combate) Permite lanzar Disguise Self ilimitadamente mientras uses este sombrero."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "imagen": "Cloak.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
+      ]
+    },
+    {
+      "nombre": "Varita del mago de guerra (Wand of the War Mage) +1",
+      "imagen": "Wand.png",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "rango",
+      "manos": 1,
+      "peso": 1,
+      "valor": 500,
+      "accion": "Acción",
+      "magico": true,
+      "desc": "Varita mágica. Otorga +1 a las tiradas de ataque con hechizos e ignora media cobertura al lanzar conjuros.",
+      "efectos": [
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "ignorarCobertura",
+          "valor": "media"
+        }
+      ]
+    }
+  ],
+  "hechizos": {
+    "ranuras": [
+      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
+      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
+      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Fire Bolt",
+        "dano": "1d10",
+        "escala": { "5": "2d10", "11": "3d10", "17": "4d10" },
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Lanzás un dardo de fuego a una criatura u objeto. Tirada de ataque a distancia. Si golpea, daño de fuego (escala con nivel). Objetos no llevados o vestidos se prenden fuego."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Shocking Grasp",
+        "dano": "1d8",
+        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "tipoDano": "rayo",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tirada de ataque melee con ventaja si el objetivo lleva armadura metálica. Si golpea, daño de rayo y el objetivo no puede tomar reacciones hasta el inicio de su próximo turno."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mind Sliver",
+        "dano": "1d6",
+        "escala": { "5": "2d6", "11": "3d6", "17": "4d6" },
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "El objetivo hace tirada de salvación de INT. Si falla, recibe daño psíquico y resta 1d4 a su próxima tirada de salvación antes del final de tu próximo turno."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Minor Illusion",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás un sonido o una imagen ilusoria de un objeto dentro del rango. La ilusión cabe en un cubo de 5 ft. Una criatura puede usar Acción para examinarla con tirada de Investigación contra tu Spell Save DC para descubrirla."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Prestidigitation",
+        "accion": "Acción",
+        "distancia": "10 ft",
+        "duracion": "Hasta 1 hora",
+        "desc": "Truco de magia menor. Podés crear efectos como: encender o apagar una vela, limpiar/ensuciar un objeto, calentar/enfriar comida, hacer aparecer una marca o símbolo en una superficie, crear un objeto trivial no funcional, o producir un sonido o luz inofensiva."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Toll the Dead",
+        "dano": "1d8",
+        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "tipoDano": "necrótico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "El objetivo hace salvación de WIS. Si falla, recibe el daño base con 1d8 (1d12 si está debajo de su HP máximo). El daño escala con nivel."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Find Familiar",
+        "accion": "Acción",
+        "distancia": "10 ft",
+        "duracion": "Permanente",
+        "desc": "Invocás un familiar (forma de animal pequeño). Es leal y te asiste. Podés ver/oír a través de él, comunicarte telepáticamente a 100 ft, y darle órdenes. Si llega a 0 HP desaparece y podés re-invocarlo con otra ceremonia. Cast time: 1 hora.",
+        "familiar": {
+          "_nota": "Forma elegida sin especificar (SRD permite: murciélago, gato, cangrejo, rana, halcón, lagartija, pulpo, búho, serpiente venenosa, pez, rata, cuervo, caballito de mar, araña o comadreja). Puse Búho de placeholder: ajustá nombre/emoji/CA/vida si eligió otra forma.",
+          "id": "familiar-chiaragorn",
+          "nombre": "Búho",
+          "tipo": "Familiar",
+          "emoji": "🦉",
+          "vidaMaxima": 1,
+          "ca": 11,
+          "mod": "DEX +1",
+          "notas": "Un familiar NO puede atacar (regla oficial). Puede usar su Reacción para entregar hechizos de toque a 100ft de vos, prestarte sus sentidos (acción: ver/oír a través de él hasta tu próximo turno), y espiar. No escala con tu nivel de personaje.",
+          "ataques": []
+        }
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Mage Armor",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "8 horas",
+        "desc": "Tocás a una criatura voluntaria sin armadura. Mientras dure, su CA base se vuelve 13 + DEX. El hechizo termina si se pone armadura o si lo cancela como acción. Si lo lanzás sobre vos mismo, la CA se actualiza automáticamente. Se desactiva tras un descanso largo.",
+        "efectos": [
+          {
+            "tipo": "toggleArmaduraMagica",
+            "descripcion": "Mage Armor activado",
+            "caBase": 13,
+            "mensaje": "Tu CA ahora es <strong>13 + DEX ({DEX})</strong> por 8 horas. Se desactivará automáticamente con tu próximo descanso largo."
+          }
+        ]
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "Reacción cuando sos golpeado por un ataque o sos objetivo de Magic Missile. Hasta el inicio de tu próximo turno, tenés +5 de CA (incluso contra el ataque que la activó) y no recibís daño por Magic Missile."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Magic Missile",
+        "dano": "1d4+1",
+        "tipoDano": "fuerza",
+        "ataques": 3,
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Creás 3 dardos de fuerza brillantes. Cada dardo golpea una criatura a elección dentro del rango (automático, sin tirada de ataque). Cada dardo hace 1d4+1 de daño de fuerza. Cada slot superior al 1 suma 1 dardo."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Absorb Elements",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "Reacción cuando recibís daño de ácido, frío, fuego, rayo o trueno. Tenés resistencia a ese tipo de daño hasta el inicio de tu próximo turno. Si después hacés un ataque melee antes del final de tu próximo turno, sumás 1d6 del mismo tipo al daño. Cada slot superior al 1 suma 1d6."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Detect Magic",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Mientras dura, sentís magia a 30 ft. Podés ver un aura alrededor de objetos o criaturas mágicas y conocer la escuela de magia."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Ice Knife",
+        "dano": "1d10",
+        "tipoDano": "perforante",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Creás una daga de hielo y la lanzás. Tirada de ataque a distancia: si golpea, 1d10 perforante. Tirada de ataque o no, la daga explota: criaturas a 5 ft del objetivo hacen salvación de DEX o reciben 2d6 frío (mitad si pasan). Cada slot superior al 1 suma 1d6 frío."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Mage Hand",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás una mano espectral flotante. Podés usarla para manipular objetos, abrir puertas o contenedores no cerrados, llevar objetos de hasta 10 lb. Como Acción Bonus en turnos siguientes, podés moverla 30 ft y manipular cosas. No puede atacar ni activar items mágicos."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Misty Step",
+        "accion": "Acción Adicional",
+        "distancia": "30 ft",
+        "duracion": "Instantánea",
+        "desc": "Rodeado por niebla plateada momentáneamente, te teletransportás hasta 30 ft a un espacio que puedas ver."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Scorching Ray",
+        "dano": "2d6",
+        "tipoDano": "fuego",
+        "ataques": 3,
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Creás 3 rayos de fuego. Hacé una tirada de ataque a distancia separada por cada rayo. Cada rayo que golpea hace 2d6 fuego. Cada slot superior al 2 suma 1 rayo."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Web",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Creás telarañas pegajosas en un cubo de 20 ft. El área es terreno difícil y oscurece la zona. Las criaturas que entren o empiecen turno en el área deben hacer salvación de DEX o quedar restrained. Una criatura restrained puede usar Acción para hacer chequeo de STR contra tu Spell Save DC y liberarse. El fuego destruye 5 ft cuadrados haciendo 2d4 fuego al que esté ahí."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Hold Person",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un humanoide elegido debe hacer salvación de WIS o queda paralizado. Puede repetir la salvación al final de cada turno. Cada slot superior al 2 te permite afectar 1 humanoide adicional (deben estar a 30 ft entre ellos)."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Fireball",
+        "dano": "8d6",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "150 ft",
+        "desc": "Una bola brillante de fuego explota en un radio de 20 ft. Todas las criaturas en el área hacen salvación de DEX o reciben 8d6 fuego (mitad si pasan). El fuego se propaga por las esquinas. Objetos no llevados se prenden fuego. Cada slot superior al 3 suma 1d6.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "3": "8d6",
+            "4": "9d6"
+          }
+        }
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Counterspell",
+        "accion": "Reacción",
+        "distancia": "60 ft",
+        "duracion": "Instantánea",
+        "desc": "Reacción cuando ves a una criatura lanzar un hechizo. El hechizo falla automáticamente si es de nivel 3 o menor. Si es de nivel 4 o más, hacé chequeo con la habilidad de tu casteador (DC = 10 + nivel del hechizo). Si pasás, el hechizo falla. Cada slot superior al 3 sube el nivel automático en 1."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Hypnotic Pattern",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Creás un patrón de luces giratorias en un cubo de 30 ft. Las criaturas que lo vean deben hacer salvación de WIS o quedar charmed por la duración: se quedan quietas, su velocidad es 0 y están incapacitated. Termina si reciben daño o son sacudidas por un aliado con Acción."
+      },
+      {
+        "nivel": "NIVEL 3",
+        "nombre": "Haste",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Una criatura voluntaria elegida obtiene: velocidad ×2, +2 CA, ventaja en salvaciones de DEX, y una acción adicional cada turno (solo para Atacar (un ataque), Dash, Disengage, Hide o Use an Object). Al terminar el hechizo, el objetivo queda lethargic: no puede moverse ni hacer acciones durante 1 turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Dimension Door",
+        "accion": "Acción",
+        "distancia": "500 ft",
+        "desc": "Te teletransportás instantáneamente a un punto que puedas ver o describir dentro del rango. Podés llevar contigo una criatura voluntaria de tu tamaño o menor. Si el destino está ocupado o fuera de línea de visión, el hechizo falla."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Wall of Fire",
+        "dano": "5d8",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Creas un muro de fuego sobre una superficie sólida dentro del alcance. Puede ser una línea de hasta 60 ft de largo, 20 ft de alto y 1 ft de grosor, o un anillo de hasta 20 ft de diámetro, 20 ft de alto y 1 ft de grosor. Al aparecer, las criaturas en su área hacen salvación de DEX o reciben 5d8 fuego (mitad si pasan). Un lado del muro emite calor intenso; las criaturas que terminan su turno a 10 ft o menos de ese lado o lo atraviesan por primera vez en un turno reciben 5d8 fuego. Cada slot superior al 4 suma 1d8. Cada slot superior al 4 aumenta el daño en 1d8."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Ice Storm",
+        "dano": "2d8+4d6",
+        "tipoDano": "frío/contundente",
+        "accion": "Acción",
+        "distancia": "300 ft",
+        "desc": "Cae granizo torrencial en un cilindro de 20 ft de radio y 40 ft de alto. Cada criatura en el área hace salvación de DEX: si falla, recibe 2d8 contundente + 4d6 frío (mitad si pasa). El terreno del área queda cubierto de hielo y se vuelve difícil hasta el final de tu próximo turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Greater Invisibility",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Vos o una criatura voluntaria que toques se vuelve invisible durante la duración, incluso al atacar o lanzar hechizos."
+      }
+    ]
+  },
+  "inventario": [
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 50,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Arcane Focus",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Cristal, varita o bastón usado como foco para canalizar tus hechizos."
+    },
+    {
+      "nombre": "Spellbook",
+      "peso": 3,
+      "cantidad": 1,
+      "desc": "Tu libro de hechizos. Contiene todos los hechizos que conocés. Si lo perdés, no podés preparar hechizos nuevos hasta recuperarlo o reescribirlo (gastando oro y tiempo)."
+    },
+    {
+      "nombre": "Scroll of Fireball",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Fireball una única vez. Luego de usarlo, el pergamino se destruye."
+    },
+    {
+      "nombre": "Scroll of Fly",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Fly una única vez. Luego de usarlo, el pergamino se destruye."
+    }
+  ]
+}

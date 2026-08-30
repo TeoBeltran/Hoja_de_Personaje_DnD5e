@@ -8,6 +8,8 @@ const ICONOS_PERSONAJE = {
     'lunareth': '📖',
     'leonidas': '✨',
     'orfe': '🌿',
+    'chiaragorn': '🔥',
+    'lyralei': '🗝️',
     'cedric': '🎻',
     'aldren': '🔧',
     'kael': '🙏',
