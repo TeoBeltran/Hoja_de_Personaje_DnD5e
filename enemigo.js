@@ -44,12 +44,30 @@ if (!record) {
     }
 
     var SECCIONES = {
-        habilidades: { titulo: 'Habilidad / Pasiva', lista: 'lista-habilidades' },
-        acciones: { titulo: 'Acción', lista: 'lista-acciones' },
-        accionesBonus: { titulo: 'Acción Adicional', lista: 'lista-accionesBonus' },
-        reacciones: { titulo: 'Reacción', lista: 'lista-reacciones' },
-        accionesLegendarias: { titulo: 'Acción Legendaria', lista: 'lista-accionesLegendarias' }
+        habilidades: { titulo: 'Habilidades / Pasivas' },
+        acciones: { titulo: 'Acciones' },
+        accionesBonus: { titulo: 'Acciones Adicionales' },
+        reacciones: { titulo: 'Reacciones' },
+        accionesLegendarias: { titulo: 'Acciones Legendarias' }
     };
+
+    // ===== Daño: siempre se trabaja como un array de {cantidad, dado, extra, tipoDano} =====
+    // (compatibilidad con entradas viejas que tenían los campos sueltos en vez del array).
+
+    function normalizarDanos(item) {
+        if (item.danos && Array.isArray(item.danos)) return item.danos;
+        if (item.danoDado) {
+            return [{ cantidad: item.danoCantidad, dado: item.danoDado, extra: item.danoExtra, tipoDano: item.tipoDano }];
+        }
+        return [];
+    }
+
+    function formatoDano(d) {
+        if (!d || !d.dado) return '';
+        var extra = parseInt(d.extra) || 0;
+        var cant = parseInt(d.cantidad) || 0;
+        return cant + 'd' + d.dado + (extra >= 0 ? '+' + extra : extra) + (d.tipoDano ? ' ' + d.tipoDano : '');
+    }
 
     // ===== Render general =====
 
@@ -105,57 +123,10 @@ if (!record) {
         });
     }
 
-    function formatoDano(item) {
-        if (!item.danoDado) return '';
-        var extra = parseInt(item.danoExtra) || 0;
-        var cant = parseInt(item.danoCantidad) || 0;
-        return cant + 'd' + item.danoDado + (extra >= 0 ? '+' + extra : extra) + (item.tipoDano ? ' ' + item.tipoDano : '');
-    }
-
-    function renderSeccion(clave) {
-        var cfg = SECCIONES[clave];
-        var cont = document.getElementById(cfg.lista);
-        cont.innerHTML = '';
-        var items = record[clave] || [];
-
-        if (items.length === 0) {
-            var vacio = document.createElement('p');
-            vacio.className = 'lista-vacia';
-            vacio.textContent = 'Todavía no hay nada acá.';
-            cont.appendChild(vacio);
-            return;
-        }
-
-        items.forEach(function (item, idx) {
-            var div = document.createElement('div');
-            div.className = 'entrada-item';
-
-            var badges = '';
-            if (item.bonoAtaque !== undefined && item.bonoAtaque !== null && item.bonoAtaque !== '') {
-                badges += '<span class="skill-mod" style="background-color:#2e7d32;color:white;">' + fmtMod(item.bonoAtaque) + ' al ataque</span>';
-            }
-            if (item.alcance) {
-                badges += '<span class="skill-mod" style="background-color:#5d4037;color:white;">' + escapeHTML(item.alcance) + '</span>';
-            }
-            var dano = formatoDano(item);
-            if (dano) {
-                badges += '<span class="skill-mod" style="background-color:#6a1b9a;color:white;">' + escapeHTML(dano) + '</span>';
-            }
-
-            div.innerHTML =
-                '<span class="entrada-borrar" title="Borrar">&times;</span>' +
-                '<h4>' + escapeHTML(item.nombre) + '</h4>' +
-                (badges ? '<div class="entrada-badges">' + badges + '</div>' : '') +
-                (item.desc ? '<p>' + escapeHTML(item.desc).replace(/\n/g, '<br>') + '</p>' : '') +
-                (item.efectoAdicional ? '<p><strong>Efecto adicional:</strong> ' + escapeHTML(item.efectoAdicional).replace(/\n/g, '<br>') + '</p>' : '');
-
-            div.querySelector('.entrada-borrar').addEventListener('click', function () {
-                if (!confirm('¿Borrar "' + item.nombre + '"?')) return;
-                record[clave].splice(idx, 1);
-                guardarRecord();
-                renderSeccion(clave);
-            });
-            cont.appendChild(div);
+    function renderMenuCategorias() {
+        Object.keys(SECCIONES).forEach(function (clave) {
+            var el = document.getElementById('count-' + clave);
+            if (el) el.textContent = (record[clave] || []).length;
         });
     }
 
@@ -163,7 +134,7 @@ if (!record) {
         renderCabecera();
         renderStats();
         renderMods();
-        Object.keys(SECCIONES).forEach(renderSeccion);
+        renderMenuCategorias();
     }
 
     // ===== Modal de Vida (mismo patrón de combate.js: colores por umbral, clamp) =====
@@ -244,7 +215,7 @@ if (!record) {
         renderStats();
     });
 
-    // ===== Modal genérico Velocidad / Iniciativa / Ícono =====
+    // ===== Modal genérico Velocidad / Iniciativa =====
 
     var valorModal = document.getElementById('valor-modal');
     var valorModalTitle = document.getElementById('valor-modal-title');
@@ -261,10 +232,6 @@ if (!record) {
         valorInput.focus();
     }
 
-    document.getElementById('icono-enemigo').addEventListener('click', function () {
-        abrirModalValor('icono', 'Ícono (emoji)', 'text');
-    });
-
     formValor.addEventListener('submit', function (e) {
         e.preventDefault();
         if (!campoValorActual) return;
@@ -275,8 +242,46 @@ if (!record) {
         }
         guardarRecord();
         renderStats();
-        renderCabecera();
         valorModal.style.display = 'none';
+    });
+
+    // ===== Modal para cambiar el ícono (desplegable + opción personalizada) =====
+
+    var iconoModal = document.getElementById('icono-modal');
+    var iconoSelect = document.getElementById('icono-select');
+    var iconoCustom = document.getElementById('icono-custom');
+    var formIcono = document.getElementById('form-icono');
+
+    document.getElementById('icono-enemigo').addEventListener('click', function () {
+        var valorActual = record.icono || '👹';
+        var opciones = Array.prototype.map.call(iconoSelect.options, function (o) { return o.value; });
+        if (opciones.indexOf(valorActual) !== -1) {
+            iconoSelect.value = valorActual;
+            iconoCustom.style.display = 'none';
+            iconoCustom.value = '';
+        } else {
+            iconoSelect.value = '__custom__';
+            iconoCustom.style.display = 'block';
+            iconoCustom.value = valorActual;
+        }
+        iconoModal.style.display = 'flex';
+    });
+
+    iconoSelect.addEventListener('change', function () {
+        var esCustom = iconoSelect.value === '__custom__';
+        iconoCustom.style.display = esCustom ? 'block' : 'none';
+        if (esCustom) iconoCustom.focus();
+    });
+
+    formIcono.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var elegido = iconoSelect.value === '__custom__'
+            ? (iconoCustom.value.trim() || '👹')
+            : iconoSelect.value;
+        record.icono = elegido;
+        guardarRecord();
+        renderCabecera();
+        iconoModal.style.display = 'none';
     });
 
     // ===== Modal único para agregar una entrada (el tipo lo elige un desplegable) =====
@@ -291,13 +296,26 @@ if (!record) {
     var entradaDanoDado = document.getElementById('entrada-dano-dado');
     var entradaDanoExtra = document.getElementById('entrada-dano-extra');
     var entradaTipoDano = document.getElementById('entrada-tipo-dano');
+    var entradaMasDanoCheck = document.getElementById('entrada-mas-dano-check');
+    var bloqueDanoExtra = document.getElementById('bloque-dano-extra');
+    var entradaDano2Cant = document.getElementById('entrada-dano2-cant');
+    var entradaDano2Dado = document.getElementById('entrada-dano2-dado');
+    var entradaDano2Extra = document.getElementById('entrada-dano2-extra');
+    var entradaTipoDano2 = document.getElementById('entrada-tipo-dano2');
     var entradaDesc = document.getElementById('entrada-desc');
     var entradaEfecto = document.getElementById('entrada-efecto');
+
+    entradaMasDanoCheck.addEventListener('change', function () {
+        bloqueDanoExtra.style.display = entradaMasDanoCheck.checked ? 'block' : 'none';
+    });
 
     document.getElementById('btn-agregar-global').addEventListener('click', function () {
         formEntrada.reset();
         entradaDanoCant.value = 0;
         entradaDanoExtra.value = 0;
+        entradaDano2Cant.value = 0;
+        entradaDano2Extra.value = 0;
+        bloqueDanoExtra.style.display = 'none';
         entradaModal.style.display = 'flex';
         entradaNombre.focus();
     });
@@ -309,38 +327,179 @@ if (!record) {
         var seccion = entradaTipo.value;
         if (!SECCIONES[seccion]) return;
 
+        var danos = [];
+        if (entradaDanoDado.value) {
+            danos.push({
+                cantidad: parseInt(entradaDanoCant.value) || 0,
+                dado: entradaDanoDado.value,
+                extra: parseInt(entradaDanoExtra.value) || 0,
+                tipoDano: entradaTipoDano.value
+            });
+        }
+        if (entradaMasDanoCheck.checked && entradaDano2Dado.value) {
+            danos.push({
+                cantidad: parseInt(entradaDano2Cant.value) || 0,
+                dado: entradaDano2Dado.value,
+                extra: parseInt(entradaDano2Extra.value) || 0,
+                tipoDano: entradaTipoDano2.value
+            });
+        }
+
         var item = {
             nombre: nombre,
             bonoAtaque: entradaBonoAtaque.value !== '' ? (parseInt(entradaBonoAtaque.value) || 0) : null,
             alcance: entradaAlcance.value.trim(),
-            danoCantidad: parseInt(entradaDanoCant.value) || 0,
-            danoDado: entradaDanoDado.value,
-            danoExtra: parseInt(entradaDanoExtra.value) || 0,
-            tipoDano: entradaTipoDano.value,
+            danos: danos,
             desc: entradaDesc.value.trim(),
             efectoAdicional: entradaEfecto.value.trim()
         };
 
         record[seccion].push(item);
         guardarRecord();
-        renderSeccion(seccion);
-
-        // Abre la sección correspondiente para que se vea lo recién agregado.
-        var detailsEl = document.getElementById(SECCIONES[seccion].lista).closest('details');
-        if (detailsEl) detailsEl.open = true;
-
+        renderMenuCategorias();
         entradaModal.style.display = 'none';
+    });
+
+    // ===== Modal: lista de entradas de una categoría =====
+
+    var listaModal = document.getElementById('lista-modal');
+    var listaModalTitulo = document.getElementById('lista-modal-titulo');
+    var listaModalContenido = document.getElementById('lista-modal-contenido');
+
+    function abrirListaModal(clave) {
+        listaModalTitulo.textContent = SECCIONES[clave].titulo;
+        listaModalContenido.innerHTML = '';
+        var items = record[clave] || [];
+
+        if (items.length === 0) {
+            var vacio = document.createElement('p');
+            vacio.className = 'lista-vacia';
+            vacio.textContent = 'Todavía no hay nada acá.';
+            listaModalContenido.appendChild(vacio);
+        } else {
+            items.forEach(function (item, idx) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'skill-btn';
+                var primerDano = formatoDano(normalizarDanos(item)[0]);
+                btn.innerHTML =
+                    '<span class="fila-lista-btn">' +
+                    '<strong>' + escapeHTML(item.nombre) + '</strong>' +
+                    (primerDano ? '<span class="skill-mod" style="background-color:#6a1b9a;color:white;">' + escapeHTML(primerDano) + '</span>' : '') +
+                    '</span>';
+                btn.addEventListener('click', function () {
+                    listaModal.style.display = 'none';
+                    abrirDetalleModal(clave, idx);
+                });
+                listaModalContenido.appendChild(btn);
+            });
+        }
+
+        listaModal.style.display = 'flex';
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('#menu-categorias [data-cat]'), function (btn) {
+        btn.addEventListener('click', function () {
+            abrirListaModal(btn.dataset.cat);
+        });
+    });
+
+    // ===== Modal: detalle de una entrada =====
+
+    var detalleModal = document.getElementById('detalle-modal');
+    var detalleNombre = document.getElementById('detalle-nombre');
+    var detalleBadges = document.getElementById('detalle-badges');
+    var detalleDesc = document.getElementById('detalle-desc');
+    var detalleEfectoCont = document.getElementById('detalle-efecto-cont');
+    var detalleEfecto = document.getElementById('detalle-efecto');
+    var seccionDetalleActual = null;
+    var idxDetalleActual = null;
+
+    function abrirDetalleModal(clave, idx) {
+        var item = (record[clave] || [])[idx];
+        if (!item) return;
+        seccionDetalleActual = clave;
+        idxDetalleActual = idx;
+
+        detalleNombre.textContent = item.nombre;
+
+        var badges = '';
+        if (item.bonoAtaque !== undefined && item.bonoAtaque !== null && item.bonoAtaque !== '') {
+            badges += '<span class="skill-mod" style="background-color:#2e7d32;color:white;">' + fmtMod(item.bonoAtaque) + ' al ataque</span>';
+        }
+        if (item.alcance) {
+            badges += '<span class="skill-mod" style="background-color:#5d4037;color:white;">' + escapeHTML(item.alcance) + '</span>';
+        }
+        normalizarDanos(item).forEach(function (d) {
+            var texto = formatoDano(d);
+            if (texto) badges += '<span class="skill-mod" style="background-color:#6a1b9a;color:white;">' + escapeHTML(texto) + '</span>';
+        });
+        detalleBadges.innerHTML = badges;
+
+        detalleDesc.innerHTML = item.desc ? escapeHTML(item.desc).replace(/\n/g, '<br>') : '<em style="color:var(--text-muted);">Sin descripción.</em>';
+
+        if (item.efectoAdicional) {
+            detalleEfecto.innerHTML = escapeHTML(item.efectoAdicional).replace(/\n/g, '<br>');
+            detalleEfectoCont.style.display = 'block';
+        } else {
+            detalleEfectoCont.style.display = 'none';
+        }
+
+        detalleModal.style.display = 'flex';
+    }
+
+    document.getElementById('btn-borrar-entrada').addEventListener('click', function () {
+        if (seccionDetalleActual === null || idxDetalleActual === null) return;
+        var item = record[seccionDetalleActual][idxDetalleActual];
+        abrirConfirmar('¿Borrar "' + item.nombre + '"?', function () {
+            record[seccionDetalleActual].splice(idxDetalleActual, 1);
+            guardarRecord();
+            renderMenuCategorias();
+            detalleModal.style.display = 'none';
+            seccionDetalleActual = null;
+            idxDetalleActual = null;
+        });
+    });
+
+    // ===== Modal de confirmación genérico (reemplaza confirm()/alert() nativos) =====
+
+    var confirmarModal = document.getElementById('confirmar-modal');
+    var confirmarMensaje = document.getElementById('confirmar-mensaje');
+    var confirmarSiBtn = document.getElementById('confirmar-si');
+    var confirmarNoBtn = document.getElementById('confirmar-no');
+    var confirmarCallback = null;
+
+    function abrirConfirmar(mensaje, onSi) {
+        confirmarMensaje.textContent = mensaje;
+        confirmarCallback = onSi;
+        confirmarModal.style.display = 'flex';
+    }
+
+    confirmarSiBtn.addEventListener('click', function () {
+        var cb = confirmarCallback;
+        confirmarModal.style.display = 'none';
+        confirmarCallback = null;
+        if (cb) cb();
+    });
+
+    confirmarNoBtn.addEventListener('click', function () {
+        confirmarModal.style.display = 'none';
+        confirmarCallback = null;
     });
 
     // ===== Borrar enemigo =====
 
     document.getElementById('btn-borrar-enemigo').addEventListener('click', function () {
-        if (!confirm('¿Borrar a "' + record.nombre + '" definitivamente? Esta acción no se puede deshacer.')) return;
-        localStorage.removeItem('enemigo_' + id);
-        window.location.href = 'enemigos.html';
+        abrirConfirmar('¿Borrar a "' + record.nombre + '" definitivamente? Esta acción no se puede deshacer.', function () {
+            localStorage.removeItem('enemigo_' + id);
+            window.location.href = 'enemigos.html';
+        });
     });
 
     // ===== Cierre de modales (mismo patrón que enemigos.html/combate.html) =====
+    // El modal de confirmación NO tiene botón de cerrar ni se cierra clickeando afuera
+    // a propósito: obliga a elegir Sí o No explícitamente (mismo criterio que ya usaba
+    // #detalle-modal en combate.html para no cerrarse por accidente).
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (el) {
         el.addEventListener('click', function () {
@@ -350,6 +509,7 @@ if (!record) {
     });
 
     Array.prototype.forEach.call(document.querySelectorAll('.modal'), function (modal) {
+        if (modal.id === 'confirmar-modal') return;
         modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 modal.style.display = 'none';
