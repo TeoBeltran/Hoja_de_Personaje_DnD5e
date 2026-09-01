@@ -77,6 +77,38 @@
             font-size: 1rem;
         }
 
+        .form-modal textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            font-size: 0.78rem;
+            line-height: 1.4;
+            resize: vertical;
+        }
+
+        .modal-content.modal-ancho {
+            max-width: 680px;
+        }
+
+        .btn-copiar {
+            width: 100%;
+            margin-top: 8px;
+            padding: 9px;
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            background: none;
+            color: var(--accent-color);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-copiar:hover { background-color: var(--accent-color); color: white; }
+
         .check-mas-dano {
             display: flex;
             align-items: center;
@@ -271,6 +303,27 @@
         </div>
     </div>
 
+    <!-- ===== Modal: Importar Enemigo (JSON) ===== -->
+    <div id="modal-importar" class="modal">
+        <div class="modal-content form-modal modal-ancho">
+            <span class="close-btn" data-close="modal-importar">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Importar Enemigo (JSON)</h3>
+
+            <label for="import-instrucciones">1. Copiá esto y pegáselo a una IA junto con la descripción del monstruo que querés</label>
+            <textarea id="import-instrucciones" readonly rows="7"></textarea>
+            <button type="button" class="btn-copiar" id="btn-copiar-instrucciones">📋 Copiar instrucciones</button>
+
+            <label for="import-json" style="margin-top: 20px;">2. Pegá acá el JSON que te devolvió la IA</label>
+            <textarea id="import-json" rows="10" placeholder='{ "nombre": "...", "vidaMaxima": 30, ... }'></textarea>
+            <div class="login-error" id="import-error"></div>
+
+            <div class="modal-acciones">
+                <button type="button" class="btn-cancelar" data-close="modal-importar">Cancelar</button>
+                <button type="button" class="btn-confirmar" id="btn-importar-confirmar">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==========================================================
         // Login de la sección Enemigos (mismo patrón que extras.html).
@@ -340,6 +393,16 @@
             `;
             btnAgregar.addEventListener('click', abrirModalAgregar);
             grid.appendChild(btnAgregar);
+
+            const btnImportar = document.createElement('button');
+            btnImportar.type = 'button';
+            btnImportar.className = 'personaje-card btn-agregar';
+            btnImportar.innerHTML = `
+                <div class="personaje-icon">📥</div>
+                <div class="personaje-nombre">Importar</div>
+            `;
+            btnImportar.addEventListener('click', abrirModalImportar);
+            grid.appendChild(btnImportar);
         }
 
         function mostrarGrid() {
@@ -499,6 +562,174 @@
             };
             localStorage.setItem(`enemigo_${id}`, JSON.stringify(record));
             cerrarModalAgregar();
+            renderGrid();
+        });
+
+        // ==========================================================
+        // Modal Importar Enemigo (JSON pegado a mano, generado por una IA).
+        // No hay selector de archivo: el flujo es copiar el texto de
+        // instrucciones, pegarlo en un chat de IA junto con la descripción
+        // del monstruo deseado, y pegar el JSON que devuelva en el textarea
+        // de abajo. Acepta tanto un objeto único como un array de objetos
+        // (para importar varios enemigos de una).
+        // ==========================================================
+        const INSTRUCCIONES_IMPORT_JSON =
+`Necesito que generes un JSON para un enemigo de D&D 5e (o varios, dentro de un array) con EXACTAMENTE esta estructura (no agregues campos extra ni el campo "id"):
+
+{
+  "nombre": string,
+  "icono": string (UN solo emoji, ej "🐉"),
+  "vidaMaxima": number,
+  "caBase": number,
+  "velocidad": string (ej "30ft"),
+  "iniciativa": number (el modificador ya calculado, ej 2),
+  "accionesPorTurno": number (default 1; más de 1 solo si puede repetir "Acción" en su turno, ej multiataque),
+  "legendariasHabilitadas": boolean,
+  "legendariasPorRonda": number (0 si legendariasHabilitadas es false),
+  "mods": { "STR": number, "DEX": number, "CON": number, "INT": number, "WIS": number, "CHA": number } (los MODIFICADORES ya calculados, no el puntaje bruto),
+  "habilidades": [ ...entradas... ],
+  "acciones": [ ...entradas... ],
+  "accionesBonus": [ ...entradas... ],
+  "reacciones": [ ...entradas... ],
+  "accionesLegendarias": [ ...entradas... ]
+}
+
+Cada entrada dentro de esos 5 arrays (podés dejar el array vacío [] si no aplica) tiene esta forma:
+
+{
+  "nombre": string,
+  "bonoAtaque": number o null (lo que se suma a 1d20 al atacar; null si no es un ataque),
+  "alcance": string (ej "cuerpo a cuerpo 5 ft", "" si no aplica),
+  "danos": [ { "cantidad": number, "dado": "4"|"6"|"8"|"10"|"12" (STRING, SIN la letra "d"), "extra": number, "tipoDano": string en español minúscula (cortante/perforante/contundente/ácido/frío/fuego/fuerza/necrótico/veneno/psíquico/radiante/rayo/trueno) } ] (array vacío [] si no hace daño numérico; puede tener 2 elementos si hace dos tipos de daño distintos),
+  "consumo": number (SOLO relevante en "acciones" y "accionesLegendarias": cuántas unidades de ese pool gasta usar esta entrada, default 1; usalo para modelar multiataque — ej un monstruo con accionesPorTurno=2 puede tener una entrada con consumo=1 usable dos veces por turno, y otra con consumo=2 que gasta todas las acciones de una),
+  "desc": string (descripción del efecto en español),
+  "efectoAdicional": string ("" si no aplica; ej una tirada de salvación y qué pasa si falla/acierta)
+}
+
+Devolveme SOLO el JSON (o el array de JSONs), sin texto alrededor y sin bloques de código \`\`\`.
+
+Acá te describo el/los monstruo(s) que quiero:
+`;
+
+        const modalImportar = document.getElementById('modal-importar');
+        const importInstruccionesTA = document.getElementById('import-instrucciones');
+        const importJsonTA = document.getElementById('import-json');
+        const importErrorEl = document.getElementById('import-error');
+
+        function abrirModalImportar() {
+            importInstruccionesTA.value = INSTRUCCIONES_IMPORT_JSON;
+            importJsonTA.value = '';
+            importErrorEl.textContent = '';
+            modalImportar.style.display = 'flex';
+        }
+
+        document.getElementById('btn-copiar-instrucciones').addEventListener('click', function () {
+            const btn = this;
+            const textoOriginal = btn.textContent;
+            importInstruccionesTA.focus();
+            importInstruccionesTA.select();
+            let copiado = false;
+            try { copiado = document.execCommand('copy'); } catch (e) { copiado = false; }
+            if (!copiado && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(INSTRUCCIONES_IMPORT_JSON).catch(() => {});
+            }
+            btn.textContent = '✅ Copiado';
+            setTimeout(() => { btn.textContent = textoOriginal; }, 1500);
+        });
+
+        function normalizarEntradaImportada(e) {
+            e = (e && typeof e === 'object') ? e : {};
+            let danos = [];
+            if (Array.isArray(e.danos)) {
+                danos = e.danos.filter(d => d && typeof d === 'object').map(d => ({
+                    cantidad: parseInt(d.cantidad) || 0,
+                    dado: (['4', '6', '8', '10', '12'].includes(String(d.dado).replace(/\D/g, ''))) ? String(d.dado).replace(/\D/g, '') : '6',
+                    extra: parseInt(d.extra) || 0,
+                    tipoDano: d.tipoDano ? String(d.tipoDano) : ''
+                }));
+            }
+            const bono = e.bonoAtaque;
+            return {
+                nombre: e.nombre ? String(e.nombre) : 'Sin nombre',
+                bonoAtaque: (bono !== undefined && bono !== null && bono !== '') ? (parseInt(bono) || 0) : null,
+                alcance: e.alcance ? String(e.alcance) : '',
+                danos,
+                consumo: (parseInt(e.consumo) > 0) ? parseInt(e.consumo) : 1,
+                desc: e.desc ? String(e.desc) : '',
+                efectoAdicional: e.efectoAdicional ? String(e.efectoAdicional) : ''
+            };
+        }
+
+        function normalizarEnemigoImportado(obj) {
+            if (!obj || typeof obj !== 'object') return null;
+            const nombre = obj.nombre ? String(obj.nombre).trim() : '';
+            if (!nombre) return null;
+
+            const vidaMaxima = Math.max(1, parseInt(obj.vidaMaxima) || 1);
+            const caBase = Math.max(0, parseInt(obj.caBase) || 10);
+            const accionesPorTurno = Math.max(1, parseInt(obj.accionesPorTurno) || 1);
+            const legendariasHabilitadas = !!obj.legendariasHabilitadas;
+            const legendariasPorRonda = legendariasHabilitadas ? Math.max(1, parseInt(obj.legendariasPorRonda) || 1) : 0;
+            const mods = (obj.mods && typeof obj.mods === 'object') ? obj.mods : {};
+            const id = `${slugify(nombre)}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+
+            return {
+                id,
+                nombre,
+                icono: (obj.icono && String(obj.icono).trim()) || '👹',
+                vidaMaxima,
+                vidaActual: vidaMaxima,
+                caBase,
+                caActual: caBase,
+                velocidad: obj.velocidad ? String(obj.velocidad) : '',
+                iniciativa: parseInt(obj.iniciativa) || 0,
+                accionesPorTurno,
+                legendariasHabilitadas,
+                legendariasPorRonda,
+                turnoActual: { accion: accionesPorTurno, bonus: 1, reaccion: 1, legendaria: legendariasPorRonda },
+                mods: {
+                    STR: parseInt(mods.STR) || 0,
+                    DEX: parseInt(mods.DEX) || 0,
+                    CON: parseInt(mods.CON) || 0,
+                    INT: parseInt(mods.INT) || 0,
+                    WIS: parseInt(mods.WIS) || 0,
+                    CHA: parseInt(mods.CHA) || 0
+                },
+                habilidades: Array.isArray(obj.habilidades) ? obj.habilidades.map(normalizarEntradaImportada) : [],
+                acciones: Array.isArray(obj.acciones) ? obj.acciones.map(normalizarEntradaImportada) : [],
+                accionesBonus: Array.isArray(obj.accionesBonus) ? obj.accionesBonus.map(normalizarEntradaImportada) : [],
+                reacciones: Array.isArray(obj.reacciones) ? obj.reacciones.map(normalizarEntradaImportada) : [],
+                accionesLegendarias: Array.isArray(obj.accionesLegendarias) ? obj.accionesLegendarias.map(normalizarEntradaImportada) : []
+            };
+        }
+
+        document.getElementById('btn-importar-confirmar').addEventListener('click', function () {
+            const raw = importJsonTA.value.trim();
+            importErrorEl.textContent = '';
+
+            if (!raw) {
+                importErrorEl.textContent = 'Pegá un JSON primero.';
+                return;
+            }
+
+            let parsed;
+            try {
+                parsed = JSON.parse(raw);
+            } catch (e) {
+                importErrorEl.textContent = 'Ese texto no es un JSON válido: ' + e.message;
+                return;
+            }
+
+            const lista = Array.isArray(parsed) ? parsed : [parsed];
+            const importados = lista.map(normalizarEnemigoImportado).filter(Boolean);
+
+            if (importados.length === 0) {
+                importErrorEl.textContent = 'No se pudo importar: a cada enemigo le falta el campo "nombre".';
+                return;
+            }
+
+            importados.forEach(en => localStorage.setItem(`enemigo_${en.id}`, JSON.stringify(en)));
+            modalImportar.style.display = 'none';
             renderGrid();
         });
 
