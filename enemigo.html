@@ -102,11 +102,21 @@
             padding-top: 10px;
         }
 
+        #bloque-consumo {
+            border-top: 1px dashed var(--border-color);
+            margin-top: 14px;
+            padding-top: 10px;
+        }
+
         .modal-acciones {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 20px;
+        }
+
+        .modal-acciones.una-columna {
+            grid-template-columns: 1fr;
         }
 
         .modal-acciones button {
@@ -133,7 +143,7 @@
         .btn-agregar-global {
             display: block;
             width: 100%;
-            margin-top: 14px;
+            margin: 4px 0 24px 0;
             padding: 14px;
             border: 2px dashed var(--accent-color);
             border-radius: var(--border-radius);
@@ -151,14 +161,7 @@
             border-style: solid;
         }
 
-        /* ===== Menú de categorías (Habilidad/Acción/Acción Adicional/Reacción/Legendaria) ===== */
-        #menu-categorias .skill-btn {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* ===== Filas dentro del modal-lista (una por entrada de la categoría elegida) ===== */
+        /* ===== Filas dentro del modal-lista (una por entrada, usado desde el menú de turno) ===== */
         .fila-lista-btn {
             display: flex;
             align-items: center;
@@ -168,12 +171,12 @@
             text-align: left;
         }
 
-        /* ===== Badges dentro del modal de detalle ===== */
+        /* ===== Badges (usados tanto en las cards inline como en el modal de detalle) ===== */
         .entrada-badges {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin: 10px 0;
+            margin: 8px 0;
         }
 
         .entrada-badges .skill-mod {
@@ -192,11 +195,59 @@
         #detalle-efecto-cont { margin-top: 10px; }
         #detalle-efecto-cont strong { color: var(--accent-color); }
 
+        /* ===== Cards inline de cada entrada dentro de las 5 secciones ===== */
+        .entrada-item {
+            background-color: #fbf9f4;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+        }
+
+        .entrada-item-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .entrada-item-header h4 {
+            margin: 0;
+            color: var(--accent-color);
+        }
+
+        .entrada-item-botones {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .entrada-item-botones button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+            padding: 2px 4px;
+            line-height: 1;
+            color: var(--text-muted);
+        }
+
+        .entrada-item-botones button:hover { color: var(--accent-color); }
+        .entrada-item-botones .entrada-borrar:hover { color: #c62828; }
+
+        .entrada-item p {
+            margin: 0;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+
+        .entrada-item p strong { color: var(--accent-color); }
+
         /* ===== Modal de confirmación genérico ===== */
         #confirmar-modal .modal-content { text-align: center; }
         #confirmar-mensaje { font-size: 1.05rem; margin: 10px 0 20px 0; line-height: 1.5; }
 
-        /* Vida/CA/Velocidad/Iniciativa son clickeables como en la hoja de jugador */
+        /* Vida/CA/Velocidad/Iniciativa/Acciones/Legendarias son clickeables como en la hoja de jugador */
         #stats-grid .skill-btn { cursor: pointer; }
         #stats-grid .skill-btn:hover { background-color: var(--accent-color); color: white; }
 
@@ -208,6 +259,36 @@
             transform: none;
             box-shadow: none;
         }
+
+        /* ===== Menú flotante de turno (mismo patrón que personaje.html) ===== */
+        #turno-fab { position: fixed; bottom: 30px; right: 30px; z-index: 90; }
+        #turno-toggle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background-color: var(--accent-color); color: white; border: none;
+            cursor: pointer; font-size: 1.8rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        #turno-panel {
+            display: none; position: absolute; bottom: 75px; right: 0; width: 280px;
+            background-color: var(--card-bg); border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius); padding: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+        #turno-panel h4 {
+            margin: 0 0 12px 0; color: var(--accent-color); text-align: center;
+            text-transform: uppercase; letter-spacing: 1px; font-size: 1rem;
+        }
+        #turno-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
+        .turno-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color);
+            border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);
+            width: 100%; font-family: inherit;
+        }
+        .turno-valor {
+            font-weight: bold; padding: 2px 10px; border-radius: 4px;
+            background-color: #2e7d32; color: white;
+        }
+        .turno-valor.agotado { background-color: #c62828; }
+        #turno-reset { width: 100%; padding: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -234,17 +315,77 @@
 
         <br>
 
-        <section class="skills-container">
-            <h2>Habilidades y Acciones</h2>
-            <div class="skills-grid" id="menu-categorias">
-                <button type="button" class="skill-btn" data-cat="habilidades"><span>Habilidad / Pasiva</span><span class="skill-mod" id="count-habilidades">0</span></button>
-                <button type="button" class="skill-btn" data-cat="acciones"><span>Acción</span><span class="skill-mod" id="count-acciones">0</span></button>
-                <button type="button" class="skill-btn" data-cat="accionesBonus"><span>Acción Adicional</span><span class="skill-mod" id="count-accionesBonus">0</span></button>
-                <button type="button" class="skill-btn" data-cat="reacciones"><span>Reacción</span><span class="skill-mod" id="count-reacciones">0</span></button>
-                <button type="button" class="skill-btn" data-cat="accionesLegendarias"><span>Acción Legendaria</span><span class="skill-mod" id="count-accionesLegendarias">0</span></button>
+        <button type="button" id="btn-agregar-global" class="btn-agregar-global">+ Agregar</button>
+
+        <details class="skills-container" open>
+            <summary><h2>Habilidades / Pasivas</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-habilidades"></div>
             </div>
-            <button type="button" id="btn-agregar-global" class="btn-agregar-global">+ Agregar</button>
-        </section>
+        </details>
+
+        <br>
+
+        <details class="skills-container" open>
+            <summary><h2>Acciones</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-acciones"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Acciones Bonus</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-accionesBonus"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Reacciones</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-reacciones"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Acciones Legendarias</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-accionesLegendarias"></div>
+            </div>
+        </details>
+    </div>
+
+    <!-- ===== Menú flotante de turno (igual que en la hoja de jugador) ===== -->
+    <div id="turno-fab">
+        <button id="turno-toggle" title="Turno del enemigo">⚔️</button>
+        <div id="turno-panel">
+            <h4>Turno</h4>
+            <div id="turno-grid">
+                <button type="button" class="turno-item" data-tipo="accion">
+                    <span>Acción</span>
+                    <span class="turno-valor" id="turno-valor-accion">1 / 1</span>
+                </button>
+                <button type="button" class="turno-item" data-tipo="bonus">
+                    <span>Acción Adicional</span>
+                    <span class="turno-valor" id="turno-valor-bonus">1 / 1</span>
+                </button>
+                <button type="button" class="turno-item" data-tipo="reaccion">
+                    <span>Reacción</span>
+                    <span class="turno-valor" id="turno-valor-reaccion">1 / 1</span>
+                </button>
+                <button type="button" class="turno-item" data-tipo="legendaria" id="turno-item-legendaria" style="display: none;">
+                    <span>Acciones Legendarias</span>
+                    <span class="turno-valor" id="turno-valor-legendaria">3 / 3</span>
+                </button>
+            </div>
+            <button type="button" id="turno-reset" class="hp-btn hp-heal">🔄 Terminé mi turno</button>
+        </div>
     </div>
 
     <!-- ===== Modal de Vida ===== -->
@@ -281,7 +422,7 @@
         </div>
     </div>
 
-    <!-- ===== Modal genérico para editar Velocidad / Iniciativa ===== -->
+    <!-- ===== Modal genérico para editar Velocidad / Iniciativa / Acciones por turno ===== -->
     <div id="valor-modal" class="modal">
         <div class="modal-content form-modal">
             <span class="close-btn" data-close="valor-modal">&times;</span>
@@ -345,11 +486,33 @@
         </div>
     </div>
 
-    <!-- ===== Modal para agregar una entrada (Habilidad/Acción/Acción Bonus/Reacción/Acción Legendaria) ===== -->
+    <!-- ===== Modal para configurar Acciones Legendarias (checkbox + cantidad por ronda) ===== -->
+    <div id="legendarias-modal" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="legendarias-modal">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Acciones Legendarias</h3>
+            <form id="form-legendarias">
+                <label class="check-mas-dano">
+                    <input type="checkbox" id="leg-check">
+                    ¿Tiene acciones legendarias?
+                </label>
+                <div id="leg-cant-cont" style="display: none; margin-top: 8px;">
+                    <label for="leg-cant">¿Cuántas por ronda?</label>
+                    <input type="number" id="leg-cant" min="1" value="3">
+                </div>
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" data-close="legendarias-modal">Cancelar</button>
+                    <button type="submit" class="btn-confirmar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Modal para agregar/editar una entrada (Habilidad/Acción/Acción Bonus/Reacción/Acción Legendaria) ===== -->
     <div id="entrada-modal" class="modal">
         <div class="modal-content form-modal">
             <span class="close-btn" data-close="entrada-modal">&times;</span>
-            <h3 style="color: var(--accent-color); margin-top: 0;">Agregar</h3>
+            <h3 id="entrada-modal-titulo" style="color: var(--accent-color); margin-top: 0;">Agregar</h3>
             <form id="form-entrada">
                 <label for="entrada-tipo">Tipo</label>
                 <select id="entrada-tipo" required>
@@ -458,6 +621,11 @@
                     </select>
                 </div>
 
+                <div id="bloque-consumo" style="display: none;">
+                    <label for="entrada-consumo" id="entrada-consumo-label">Consume cuántas Acciones</label>
+                    <input type="number" id="entrada-consumo" min="1" value="1">
+                </div>
+
                 <label for="entrada-desc">Descripción</label>
                 <textarea id="entrada-desc" placeholder="Descripción general del ataque, habilidad o efecto."></textarea>
 
@@ -466,13 +634,13 @@
 
                 <div class="modal-acciones">
                     <button type="button" class="btn-cancelar" data-close="entrada-modal">Cancelar</button>
-                    <button type="submit" class="btn-confirmar">Confirmar</button>
+                    <button type="submit" class="btn-confirmar" id="entrada-submit-btn">Confirmar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ===== Modal: lista de entradas de una categoría (mismo patrón que "¿Qué puedo usar con mi X?" de la hoja de jugador) ===== -->
+    <!-- ===== Modal: lista de entradas de una categoría (se abre desde el menú de turno) ===== -->
     <div id="lista-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" data-close="lista-modal">&times;</span>
@@ -481,7 +649,7 @@
         </div>
     </div>
 
-    <!-- ===== Modal: detalle de una entrada (se abre desde el modal de lista) ===== -->
+    <!-- ===== Modal: detalle de una entrada (solo lectura, para consultar rápido en combate) ===== -->
     <div id="detalle-modal" class="modal">
         <div class="modal-content">
             <span class="close-btn" data-close="detalle-modal">&times;</span>
@@ -489,9 +657,8 @@
             <div id="detalle-badges" class="entrada-badges"></div>
             <p id="detalle-desc"></p>
             <p id="detalle-efecto-cont" style="display: none;"><strong>Efecto adicional:</strong> <span id="detalle-efecto"></span></p>
-            <div class="modal-acciones">
+            <div class="modal-acciones una-columna">
                 <button type="button" class="btn-cancelar" data-close="detalle-modal">Cerrar</button>
-                <button type="button" id="btn-borrar-entrada" class="btn-peligro">🗑️ Borrar</button>
             </div>
         </div>
     </div>
