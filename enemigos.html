@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enemigos - DnD 5e</title>
+    <link rel="stylesheet" href="estilos-menu.css">
+    <style>
+        /* ===== Modal genérico + form-modal (mismo patrón que combate.html) ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: auto;
+            padding: 25px;
+            border: 2px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 480px;
+            max-height: 88vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            color: var(--text-muted);
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover { color: var(--accent-color); }
+
+        .form-modal label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin: 12px 0 4px 0;
+        }
+
+        .form-modal input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .mods-grid-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .mods-grid-form label {
+            text-align: center;
+            margin: 0 0 4px 0;
+        }
+
+        .mods-grid-form input {
+            text-align: center;
+        }
+
+        .modal-acciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-acciones button {
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-cancelar { background-color: var(--text-muted); }
+        .btn-confirmar { background-color: var(--accent-color); }
+
+        .confirm-panel { text-align: center; }
+        .confirm-panel p { font-size: 1.05rem; margin-bottom: 20px; line-height: 1.5; }
+
+        .personaje-card.btn-agregar {
+            border-style: dashed;
+            cursor: pointer;
+            background: none;
+            font-family: inherit;
+        }
+
+        .grid-vacio {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <header>
+            <h1 id="titulo-pagina">🐉 Enemigos</h1>
+            <p class="subtitle" id="subtitulo-pagina">Acceso restringido</p>
+        </header>
+
+        <!-- === Formulario de login (se oculta si ya hay sesión guardada) === -->
+        <div class="login-container" id="login-container">
+            <form class="login-form" id="login-form" autocomplete="off">
+                <div>
+                    <label for="login-usuario">Usuario</label>
+                    <input type="text" id="login-usuario" name="usuario" autocomplete="off" required>
+                </div>
+                <div>
+                    <label for="login-clave">Contraseña</label>
+                    <input type="password" id="login-clave" name="clave" autocomplete="off" required>
+                </div>
+                <div class="login-error" id="login-error"></div>
+                <button type="submit">Ingresar</button>
+            </form>
+            <a href="index.html" class="volver-link">← Volver al menú principal</a>
+        </div>
+
+        <!-- === Grid de enemigos (se muestra solo si el login es correcto) === -->
+        <div class="personajes-grid" id="enemigos-grid" style="display: none;"></div>
+        <a href="index.html" class="volver-link" id="volver-link-grid" style="display: none;">← Volver al menú principal</a>
+    </div>
+
+    <!-- ===== Modal: Agregar Enemigo (form + paso de confirmación) ===== -->
+    <div id="modal-agregar" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="modal-agregar">&times;</span>
+
+            <div id="panel-form">
+                <h3 style="color: var(--accent-color); margin-top: 0;">Nuevo Enemigo</h3>
+                <form id="form-enemigo">
+                    <label for="en-nombre">Nombre</label>
+                    <input type="text" id="en-nombre" required>
+
+                    <label for="en-icono">Ícono (emoji)</label>
+                    <input type="text" id="en-icono" placeholder="👹  (ej: 🐉 🐺 🧟 💀 🕷️ 🧌 🐗 👺)" maxlength="4">
+
+                    <label for="en-vida">Vida</label>
+                    <input type="number" id="en-vida" min="0" required>
+
+                    <label for="en-ca">CA</label>
+                    <input type="number" id="en-ca" min="0" required>
+
+                    <label for="en-velocidad">Velocidad</label>
+                    <input type="text" id="en-velocidad" placeholder="ej: 30ft" required>
+
+                    <label for="en-iniciativa">Iniciativa</label>
+                    <input type="number" id="en-iniciativa" required>
+
+                    <label style="margin-top: 18px;">Modificadores de habilidad</label>
+                    <div class="mods-grid-form">
+                        <div><label for="en-str">STR</label><input type="number" id="en-str" value="0" required></div>
+                        <div><label for="en-dex">DEX</label><input type="number" id="en-dex" value="0" required></div>
+                        <div><label for="en-con">CON</label><input type="number" id="en-con" value="0" required></div>
+                        <div><label for="en-int">INT</label><input type="number" id="en-int" value="0" required></div>
+                        <div><label for="en-wis">WIS</label><input type="number" id="en-wis" value="0" required></div>
+                        <div><label for="en-cha">CHA</label><input type="number" id="en-cha" value="0" required></div>
+                    </div>
+
+                    <div class="modal-acciones">
+                        <button type="button" class="btn-cancelar" data-close="modal-agregar">Cancelar</button>
+                        <button type="submit" class="btn-confirmar">Confirmar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="panel-confirm" class="confirm-panel" style="display: none;">
+                <h3 style="color: var(--accent-color); margin-top: 0;">¿Estás seguro?</h3>
+                <p id="confirm-resumen"></p>
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" id="btn-confirm-no">No</button>
+                    <button type="button" class="btn-confirmar" id="btn-confirm-si">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================================
+        // Login de la sección Enemigos (mismo patrón que extras.html).
+        // Los enemigos en sí NO viven en un array hardcodeado acá: se
+        // guardan en localStorage (una key "enemigo_<id>" por cada uno,
+        // creados desde el modal de abajo) y esta página los enumera
+        // escaneando localStorage por prefijo "enemigo_".
+        // ==========================================================
+        const USUARIO_CORRECTO = 'DM';
+        const CLAVE_CORRECTA = 'boss1234';
+
+        function estaAutenticado() {
+            return localStorage.getItem('enemigos_usuario') === USUARIO_CORRECTO
+                && localStorage.getItem('enemigos_clave') === CLAVE_CORRECTA;
+        }
+
+        function slugify(nombre) {
+            return nombre
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '') || 'enemigo';
+        }
+
+        function fmtMod(n) {
+            n = parseInt(n) || 0;
+            return n >= 0 ? `+${n}` : `${n}`;
+        }
+
+        function listarEnemigos() {
+            const lista = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('enemigo_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        if (data && data.id && data.nombre) lista.push(data);
+                    } catch (e) { /* key corrupta, se ignora */ }
+                }
+            }
+            lista.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            return lista;
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('enemigos-grid');
+            grid.innerHTML = '';
+            const lista = listarEnemigos();
+
+            lista.forEach(en => {
+                const a = document.createElement('a');
+                a.href = `enemigo.html?id=${encodeURIComponent(en.id)}`;
+                a.className = 'personaje-card';
+                a.innerHTML = `
+                    <div class="personaje-icon">${en.icono || '👹'}</div>
+                    <div class="personaje-nombre">${en.nombre}</div>
+                `;
+                grid.appendChild(a);
+            });
+
+            const btnAgregar = document.createElement('button');
+            btnAgregar.type = 'button';
+            btnAgregar.className = 'personaje-card btn-agregar';
+            btnAgregar.innerHTML = `
+                <div class="personaje-icon">➕</div>
+                <div class="personaje-nombre">Agregar</div>
+            `;
+            btnAgregar.addEventListener('click', abrirModalAgregar);
+            grid.appendChild(btnAgregar);
+        }
+
+        function mostrarGrid() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('enemigos-grid').style.display = 'grid';
+            document.getElementById('volver-link-grid').style.display = 'block';
+            document.getElementById('subtitulo-pagina').textContent = 'Bestiario de la mesa';
+            renderGrid();
+        }
+
+        function mostrarLogin() {
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('enemigos-grid').style.display = 'none';
+            document.getElementById('volver-link-grid').style.display = 'none';
+            document.getElementById('subtitulo-pagina').textContent = 'Acceso restringido';
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const usuario = document.getElementById('login-usuario').value.trim();
+            const clave = document.getElementById('login-clave').value;
+            const errorEl = document.getElementById('login-error');
+
+            if (usuario === USUARIO_CORRECTO && clave === CLAVE_CORRECTA) {
+                localStorage.setItem('enemigos_usuario', usuario);
+                localStorage.setItem('enemigos_clave', clave);
+                errorEl.textContent = '';
+                mostrarGrid();
+            } else {
+                errorEl.textContent = 'Usuario o contraseña incorrectos.';
+            }
+        });
+
+        // ===== Modal Agregar Enemigo =====
+        const modalAgregar = document.getElementById('modal-agregar');
+        const panelForm = document.getElementById('panel-form');
+        const panelConfirm = document.getElementById('panel-confirm');
+        const formEnemigo = document.getElementById('form-enemigo');
+        let datosPendientes = null;
+
+        function abrirModalAgregar() {
+            formEnemigo.reset();
+            ['en-str', 'en-dex', 'en-con', 'en-int', 'en-wis', 'en-cha'].forEach(id => {
+                document.getElementById(id).value = 0;
+            });
+            document.getElementById('en-icono').value = '';
+            panelForm.style.display = 'block';
+            panelConfirm.style.display = 'none';
+            modalAgregar.style.display = 'flex';
+        }
+
+        function cerrarModalAgregar() {
+            modalAgregar.style.display = 'none';
+            datosPendientes = null;
+        }
+
+        formEnemigo.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nombre = document.getElementById('en-nombre').value.trim();
+            if (!nombre) return;
+
+            datosPendientes = {
+                nombre,
+                icono: document.getElementById('en-icono').value.trim() || '👹',
+                vida: parseInt(document.getElementById('en-vida').value) || 0,
+                ca: parseInt(document.getElementById('en-ca').value) || 0,
+                velocidad: document.getElementById('en-velocidad').value.trim(),
+                iniciativa: parseInt(document.getElementById('en-iniciativa').value) || 0,
+                mods: {
+                    STR: parseInt(document.getElementById('en-str').value) || 0,
+                    DEX: parseInt(document.getElementById('en-dex').value) || 0,
+                    CON: parseInt(document.getElementById('en-con').value) || 0,
+                    INT: parseInt(document.getElementById('en-int').value) || 0,
+                    WIS: parseInt(document.getElementById('en-wis').value) || 0,
+                    CHA: parseInt(document.getElementById('en-cha').value) || 0
+                }
+            };
+
+            document.getElementById('confirm-resumen').innerHTML =
+                `¿Confirmás crear a ${datosPendientes.icono} <strong>${datosPendientes.nombre}</strong>?<br>` +
+                `Vida ${datosPendientes.vida} · CA ${datosPendientes.ca} · Velocidad ${datosPendientes.velocidad || '—'} · Iniciativa ${fmtMod(datosPendientes.iniciativa)}<br>` +
+                `STR ${fmtMod(datosPendientes.mods.STR)} · DEX ${fmtMod(datosPendientes.mods.DEX)} · CON ${fmtMod(datosPendientes.mods.CON)} · ` +
+                `INT ${fmtMod(datosPendientes.mods.INT)} · WIS ${fmtMod(datosPendientes.mods.WIS)} · CHA ${fmtMod(datosPendientes.mods.CHA)}`;
+
+            panelForm.style.display = 'none';
+            panelConfirm.style.display = 'block';
+        });
+
+        document.getElementById('btn-confirm-no').addEventListener('click', function () {
+            // "No" vuelve al modal (no lo cierra), como pidió el usuario.
+            panelConfirm.style.display = 'none';
+            panelForm.style.display = 'block';
+        });
+
+        document.getElementById('btn-confirm-si').addEventListener('click', function () {
+            if (!datosPendientes) return;
+            const id = `${slugify(datosPendientes.nombre)}_${Date.now().toString(36)}`;
+            const record = {
+                id,
+                nombre: datosPendientes.nombre,
+                icono: datosPendientes.icono,
+                vidaMaxima: datosPendientes.vida,
+                vidaActual: datosPendientes.vida,
+                caBase: datosPendientes.ca,
+                caActual: datosPendientes.ca,
+                velocidad: datosPendientes.velocidad,
+                iniciativa: datosPendientes.iniciativa,
+                mods: datosPendientes.mods,
+                habilidades: [],
+                acciones: [],
+                accionesBonus: [],
+                reacciones: [],
+                accionesLegendarias: []
+            };
+            localStorage.setItem(`enemigo_${id}`, JSON.stringify(record));
+            cerrarModalAgregar();
+            renderGrid();
+        });
+
+        // Cierre por X / botón data-close.
+        document.querySelectorAll('[data-close]').forEach(el => {
+            el.addEventListener('click', () => {
+                document.getElementById(el.dataset.close).style.display = 'none';
+                datosPendientes = null;
+            });
+        });
+
+        // Cierre clickeando afuera del modal.
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    datosPendientes = null;
+                }
+            });
+        });
+
+        // Al cargar la página: si ya había sesión guardada, saltear el login directo.
+        if (estaAutenticado()) {
+            mostrarGrid();
+        } else {
+            mostrarLogin();
+        }
+    </script>
+</body>
+</html>

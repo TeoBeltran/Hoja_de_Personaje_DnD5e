@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enemigo - DnD 5e</title>
+    <link rel="stylesheet" href="estilos.css">
+    <style>
+        /* ===== Header y navegación propia de esta hoja ===== */
+        .header-acciones {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-acciones a, .header-acciones button {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            padding: 0;
+        }
+
+        .header-acciones a:hover { color: var(--accent-color); }
+        .header-acciones .btn-borrar-enemigo:hover { color: #c62828; }
+
+        #icono-enemigo {
+            font-size: 1.8rem;
+            cursor: pointer;
+            margin-right: 8px;
+            display: inline-block;
+        }
+        #icono-enemigo:hover { transform: scale(1.15); }
+
+        /* ===== Modal genérico + form-modal (mismo patrón que combate.html/enemigos.html) ===== */
+        .form-modal label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin: 12px 0 4px 0;
+        }
+
+        .form-modal input, .form-modal textarea, .form-modal select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        .form-modal textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-modal .campos-dano {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .form-modal .campos-dano label {
+            text-align: center;
+            margin: 0 0 4px 0;
+            font-size: 0.75rem;
+        }
+
+        .form-modal .campos-dano input, .form-modal .campos-dano select {
+            text-align: center;
+        }
+
+        .form-modal .fila-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .modal-acciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-acciones button {
+            padding: 10px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-cancelar { background-color: var(--text-muted); }
+        .btn-confirmar { background-color: var(--accent-color); }
+
+        /* ===== Entradas dentro de cada sección (Habilidades/Acciones/etc) ===== */
+        .lista-vacia {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 0.9rem;
+            padding: 4px 0 12px 0;
+        }
+
+        .entrada-item {
+            background-color: #fbf9f4;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 12px 30px 12px 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .entrada-item h4 {
+            margin: 0 0 6px 0;
+            color: var(--accent-color);
+        }
+
+        .entrada-item p {
+            margin: 0;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+
+        .entrada-borrar {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .entrada-borrar:hover { color: #c62828; }
+
+        .btn-agregar-seccion {
+            display: block;
+            width: 100%;
+            margin-top: 4px;
+            padding: 10px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            background: none;
+            color: var(--accent-color);
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .btn-agregar-seccion:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-style: solid;
+        }
+
+        .btn-agregar-global {
+            display: block;
+            width: 100%;
+            margin: 4px 0 24px 0;
+            padding: 14px;
+            border: 2px dashed var(--accent-color);
+            border-radius: var(--border-radius);
+            background: none;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.05rem;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-agregar-global:hover {
+            background-color: var(--accent-color);
+            color: white;
+            border-style: solid;
+        }
+
+        .entrada-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 2px 0 8px 0;
+        }
+
+        .entrada-badges .skill-mod {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .entrada-item p strong { color: var(--accent-color); }
+
+        /* Vida/CA/Velocidad/Iniciativa son clickeables como en la hoja de jugador */
+        #stats-grid .skill-btn { cursor: pointer; }
+        #stats-grid .skill-btn:hover { background-color: var(--accent-color); color: white; }
+
+        /* Modificadores: solo lectura, sin hover de botón */
+        #mods-grid .skill-btn { cursor: default; }
+        #mods-grid .skill-btn:hover {
+            background-color: #fbf9f4;
+            color: var(--text-color);
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span id="icono-enemigo" title="Cambiar ícono">👹</span><span id="nombre-texto">Enemigo</span></h1>
+            <div class="header-acciones">
+                <a href="enemigos.html">← Volver a Enemigos</a>
+                <button type="button" id="btn-borrar-enemigo" class="btn-borrar-enemigo">🗑️ Borrar enemigo</button>
+            </div>
+        </header>
+
+        <section class="skills-container">
+            <h2>Estadísticas</h2>
+            <div class="skills-grid" id="stats-grid"></div>
+        </section>
+
+        <br>
+
+        <section class="skills-container">
+            <h2>Modificadores</h2>
+            <div class="skills-grid" id="mods-grid"></div>
+        </section>
+
+        <br>
+
+        <button type="button" id="btn-agregar-global" class="btn-agregar-global">+ Agregar</button>
+
+        <details class="skills-container" open>
+            <summary><h2>Habilidades / Pasivas</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-habilidades"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container" open>
+            <summary><h2>Acciones</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-acciones"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Acciones Bonus</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-accionesBonus"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Reacciones</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-reacciones"></div>
+            </div>
+        </details>
+
+        <br>
+
+        <details class="skills-container">
+            <summary><h2>Acciones Legendarias</h2></summary>
+            <div class="contenido-plegable">
+                <div id="lista-accionesLegendarias"></div>
+            </div>
+        </details>
+    </div>
+
+    <!-- ===== Modal de Vida ===== -->
+    <div id="hp-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-close="hp-modal">&times;</span>
+            <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align: center;">Vida</h3>
+            <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
+            <div id="hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 20px;">
+                <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="hp-btn hp-damage" data-amount="-1">-1 HP</button>
+                <button class="hp-btn hp-heal" data-amount="1">+1 HP</button>
+                <button class="hp-btn hp-damage" data-amount="-5">-5 HP</button>
+                <button class="hp-btn hp-heal" data-amount="5">+5 HP</button>
+                <button class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
+                <button class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Modal de CA ===== -->
+    <div id="ca-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" data-close="ca-modal">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0; text-align: center;">Clase de Armadura</h3>
+            <div id="ca-display" style="text-align: center; font-size: 3rem; font-weight: bold; margin: 20px 0; color: var(--accent-color);"></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                <button class="hp-btn hp-damage" data-ca-amount="-1">-1</button>
+                <button class="hp-btn hp-heal" data-ca-amount="1">+1</button>
+            </div>
+            <button type="button" id="ca-reset" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white;">Restaurar valor original</button>
+        </div>
+    </div>
+
+    <!-- ===== Modal genérico para editar Velocidad / Iniciativa ===== -->
+    <div id="valor-modal" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="valor-modal">&times;</span>
+            <h3 id="valor-modal-title" style="color: var(--accent-color); margin-top: 0;">Editar</h3>
+            <form id="form-valor">
+                <input type="text" id="valor-input" required>
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" data-close="valor-modal">Cancelar</button>
+                    <button type="submit" class="btn-confirmar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Modal para agregar una entrada (Habilidad/Acción/Acción Bonus/Reacción/Acción Legendaria) ===== -->
+    <div id="entrada-modal" class="modal">
+        <div class="modal-content form-modal">
+            <span class="close-btn" data-close="entrada-modal">&times;</span>
+            <h3 style="color: var(--accent-color); margin-top: 0;">Agregar</h3>
+            <form id="form-entrada">
+                <label for="entrada-tipo">Tipo</label>
+                <select id="entrada-tipo" required>
+                    <option value="habilidades">Habilidad / Pasiva</option>
+                    <option value="acciones">Acción</option>
+                    <option value="accionesBonus">Acción Adicional</option>
+                    <option value="reacciones">Reacción</option>
+                    <option value="accionesLegendarias">Acción Legendaria</option>
+                </select>
+
+                <label for="entrada-nombre">Nombre</label>
+                <input type="text" id="entrada-nombre" required>
+
+                <div class="fila-2">
+                    <div>
+                        <label for="entrada-bono-ataque">Bono de Ataque (opcional)</label>
+                        <input type="number" id="entrada-bono-ataque" placeholder="ej: 7">
+                    </div>
+                    <div>
+                        <label for="entrada-alcance">Alcance / Rango (opcional)</label>
+                        <input type="text" id="entrada-alcance" placeholder="ej: cuerpo a cuerpo 5 ft">
+                    </div>
+                </div>
+
+                <label style="margin-top: 14px;">Daño (opcional) — formato AdB+C</label>
+                <div class="campos-dano">
+                    <div>
+                        <label for="entrada-dano-cant">A (cant. dados)</label>
+                        <input type="number" id="entrada-dano-cant" min="0" value="0">
+                    </div>
+                    <div>
+                        <label for="entrada-dano-dado">B (dado)</label>
+                        <select id="entrada-dano-dado">
+                            <option value="">— Sin daño —</option>
+                            <option value="4">d4</option>
+                            <option value="6">d6</option>
+                            <option value="8">d8</option>
+                            <option value="10">d10</option>
+                            <option value="12">d12</option>
+                            <option value="20">d20</option>
+                            <option value="100">d100</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="entrada-dano-extra">C (extra)</label>
+                        <input type="number" id="entrada-dano-extra" value="0">
+                    </div>
+                </div>
+
+                <label for="entrada-tipo-dano" style="margin-top: 10px;">Tipo de Daño (opcional)</label>
+                <select id="entrada-tipo-dano">
+                    <option value="">—</option>
+                    <option value="cortante">Cortante</option>
+                    <option value="perforante">Perforante</option>
+                    <option value="contundente">Contundente</option>
+                    <option value="ácido">Ácido</option>
+                    <option value="frío">Frío</option>
+                    <option value="fuego">Fuego</option>
+                    <option value="fuerza">Fuerza</option>
+                    <option value="necrótico">Necrótico</option>
+                    <option value="veneno">Veneno</option>
+                    <option value="psíquico">Psíquico</option>
+                    <option value="radiante">Radiante</option>
+                    <option value="rayo">Rayo</option>
+                    <option value="trueno">Trueno</option>
+                </select>
+
+                <label for="entrada-desc">Descripción</label>
+                <textarea id="entrada-desc" placeholder="Descripción general del ataque, habilidad o efecto."></textarea>
+
+                <label for="entrada-efecto">Efecto adicional (opcional)</label>
+                <textarea id="entrada-efecto" placeholder="Ej: El objetivo debe superar una TS de Constitución CD 15 o queda Envenenado durante 1 minuto."></textarea>
+
+                <div class="modal-acciones">
+                    <button type="button" class="btn-cancelar" data-close="entrada-modal">Cancelar</button>
+                    <button type="submit" class="btn-confirmar">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="enemigo.js"></script>
+</body>
+</html>
