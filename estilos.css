@@ -2,6 +2,7 @@
 :root {
     --bg-color: #f5f0e1;
     --card-bg: #eae3d0;
+    --btn-bg: #fbf9f4;
     --accent-color: #5d4037;
     --accent-hover: #795548;
     --text-color: #2e1a10;
@@ -9,6 +10,36 @@
     --border-color: #d7ccc8;
     --border-radius: 8px;
 }
+
+/* ===== Tema oscuro (toggle 🌙/☀️ en cada página, guardado en localStorage["tema"]) =====
+   Misma paleta "pergamino" pero invertida a marrones bien oscuros con acento cobrizo/dorado,
+   en vez de un gris genérico — para mantener la identidad visual de la app.
+   --accent-color acá es un compromiso: se usa TANTO de fondo de botón con texto blanco
+   (necesita ser bastante oscuro para que el blanco contraste) COMO de texto/borde sobre el
+   fondo oscuro de página (necesita ser bastante claro para contrastar ahí) — un cobrizo medio
+   funciona razonablemente en los dos roles sin quedar perfecto en ninguno. */
+html[data-theme="dark"] {
+    --bg-color: #1b140f;
+    --card-bg: #2a2018;
+    --btn-bg: #362a1e;
+    --accent-color: #b8763f;
+    --accent-hover: #cf8f54;
+    --text-color: #ece3d6;
+    --text-muted: #a99885;
+    --border-color: #4a3a2c;
+}
+
+/* Colores de texto inyectados como estilo inline por script.js (línea celeste de
+   acción/distancia/duración, texto de daño/curación en modales, "Percepción P." en rojo
+   oscuro) que no pasan por variables CSS: quedaban demasiado oscuros/poco visibles sobre el
+   nuevo fondo oscuro, así que se los reemplaza acá por versiones más claras. El selector
+   usa [style^="..."] (el color es siempre la primera propiedad en esos estilos inline
+   puntuales) para no pisar por accidente ningún "background-color" que contenga el mismo
+   texto (ej. "background-color: #2e7d32" también contiene la substring "color: #2e7d32"). */
+html[data-theme="dark"] [style^="color: #0277bd"] { color: #4fc3f7 !important; }
+html[data-theme="dark"] [style^="color: #2e7d32"] { color: #66bb6a !important; }
+html[data-theme="dark"] [style^="color: #c62828"] { color: #ef5350 !important; }
+html[data-theme="dark"] [style^="color: #8b0000"] { color: #ef5350 !important; }
 
 * {
     box-sizing: border-box;
@@ -123,7 +154,7 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn {
-    background-color: #fbf9f4;
+    background-color: var(--btn-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
     padding: 12px;
@@ -502,7 +533,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.modificado:hover {
     background-color: #b39ddb !important; /* Violeta claro */
     border-color: #6a1b9a !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 
 .skill-btn.proficient:hover .skill-mod,
@@ -533,7 +567,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 
 .skill-btn.proficient:hover span,
 .skill-btn.modificado:hover span {
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 
 /* En tablets y celulares: Modificadores y Salvaciones en grid 2x3 */
@@ -603,7 +640,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.velocidad-reducida:hover {
     background-color: #ffcdd2 !important;
     border-color: #c62828 !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 
 .skill-btn.velocidad-reducida:hover .skill-mod {
@@ -612,7 +652,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn.velocidad-reducida:hover span {
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 
 /* Color del tile de Vida según % actual — jugadores (personaje.html) Y enemigos
@@ -631,7 +674,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.vida-full:hover {
     background-color: #a5d6a7 !important;
     border-color: #1b5e20 !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 .skill-btn.vida-full:hover .skill-mod {
     background-color: #1b5e20 !important;
@@ -648,7 +694,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.vida-baja:hover {
     background-color: #fff59d !important;
     border-color: #f9a825 !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 .skill-btn.vida-baja:hover .skill-mod {
     background-color: #f9a825 !important;
@@ -665,7 +714,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.vida-critica:hover {
     background-color: #ffcc80 !important;
     border-color: #ef6c00 !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 .skill-btn.vida-critica:hover .skill-mod {
     background-color: #ef6c00 !important;
@@ -682,10 +734,41 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 .skill-btn.vida-muy-critica:hover {
     background-color: #ffcdd2 !important;
     border-color: #c62828 !important;
-    color: var(--text-color) !important;
+    /* Fondo fijo y clarito (no sigue el tema oscuro a propósito, es un "flash" de hover) -
+       por eso el texto queda con un color oscuro fijo en vez de var(--text-color), que en
+       tema oscuro sería claro y quedaría ilegible sobre este fondo claro. */
+    color: #2e1a10 !important;
 }
 .skill-btn.vida-muy-critica:hover .skill-mod {
     background-color: #c62828 !important;
     color: white !important;
 }
 
+
+/* ===== Botón flotante de tema claro/oscuro (toggle, esquina superior derecha) =====
+   Mismo botón en todas las páginas de la app — ver el <script> chiquito al lado de cada
+   <button id="btn-tema"> en el HTML para la lógica de guardado en localStorage["tema"]. */
+.btn-tema {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 50;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-color);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    transition: background-color 0.2s ease;
+}
+
+.btn-tema:hover {
+    background-color: var(--accent-color);
+}

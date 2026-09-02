@@ -6,8 +6,42 @@
     <title>Hoja de Personaje - DnD 5e</title>
     <link rel="stylesheet" href="estilos.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Aplica el tema guardado ANTES de pintar la página (evita el flash del tema por defecto).
+        (function () {
+            try {
+                if (localStorage.getItem('tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body>
+    <button type="button" id="btn-tema" class="btn-tema" title="Cambiar tema">🌙</button>
+    <script>
+        // Toggle de tema claro/oscuro (mismo patrón en todas las páginas de la app).
+        (function () {
+            var btn = document.getElementById('btn-tema');
+            function actualizarIconoTema() {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                btn.textContent = oscuro ? '☀️' : '🌙';
+                btn.title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+            }
+            actualizarIconoTema();
+            btn.addEventListener('click', function () {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (oscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('tema', 'claro');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('tema', 'oscuro');
+                }
+                actualizarIconoTema();
+            });
+        })();
+    </script>
     <div class="container">
         <header>
             <h1 id="nombre-personaje" style="display: inline-flex; align-items: center; gap: 12px; justify-content: center;">

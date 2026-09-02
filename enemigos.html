@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enemigos - DnD 5e</title>
     <link rel="stylesheet" href="estilos-menu.css">
+    <script>
+        // Aplica el tema guardado ANTES de pintar la página (evita el flash del tema por defecto).
+        (function () {
+            try {
+                if (localStorage.getItem('tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         /* ===== Modal genérico + form-modal (mismo patrón que combate.html) ===== */
         .modal {
@@ -175,32 +185,40 @@
     </style>
 </head>
 <body>
+    <button type="button" id="btn-tema" class="btn-tema" title="Cambiar tema">🌙</button>
+    <script>
+        // Toggle de tema claro/oscuro (mismo patrón en todas las páginas de la app).
+        (function () {
+            var btn = document.getElementById('btn-tema');
+            function actualizarIconoTema() {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                btn.textContent = oscuro ? '☀️' : '🌙';
+                btn.title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+            }
+            actualizarIconoTema();
+            btn.addEventListener('click', function () {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (oscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('tema', 'claro');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('tema', 'oscuro');
+                }
+                actualizarIconoTema();
+            });
+        })();
+    </script>
     <div class="menu-container">
         <header>
             <h1 id="titulo-pagina">🐉 Enemigos</h1>
-            <p class="subtitle" id="subtitulo-pagina">Acceso restringido</p>
+            <p class="subtitle" id="subtitulo-pagina">Bestiario de la mesa</p>
         </header>
 
-        <!-- === Formulario de login (se oculta si ya hay sesión guardada) === -->
-        <div class="login-container" id="login-container">
-            <form class="login-form" id="login-form" autocomplete="off">
-                <div>
-                    <label for="login-usuario">Usuario</label>
-                    <input type="text" id="login-usuario" name="usuario" autocomplete="off" required>
-                </div>
-                <div>
-                    <label for="login-clave">Contraseña</label>
-                    <input type="password" id="login-clave" name="clave" autocomplete="off" required>
-                </div>
-                <div class="login-error" id="login-error"></div>
-                <button type="submit">Ingresar</button>
-            </form>
-            <a href="index.html" class="volver-link">← Volver al menú principal</a>
-        </div>
-
-        <!-- === Grid de enemigos (se muestra solo si el login es correcto) === -->
-        <div class="personajes-grid" id="enemigos-grid" style="display: none;"></div>
-        <a href="index.html" class="volver-link" id="volver-link-grid" style="display: none;">← Volver al menú principal</a>
+        <!-- Sin login propio: el acceso a esta página ya queda gateado un nivel arriba,
+             por el login de extras.html (usuario/clave DM). -->
+        <div class="personajes-grid" id="enemigos-grid"></div>
+        <a href="index.html" class="volver-link">← Volver al menú principal</a>
     </div>
 
     <!-- ===== Modal: Agregar Enemigo (form + paso de confirmación) ===== -->
@@ -326,19 +344,13 @@
 
     <script>
         // ==========================================================
-        // Login de la sección Enemigos (mismo patrón que extras.html).
+        // Esta página ya NO tiene login propio (antes lo tenía, usuario DM):
+        // el acceso queda gateado un nivel arriba por el login de extras.html.
         // Los enemigos en sí NO viven en un array hardcodeado acá: se
         // guardan en localStorage (una key "enemigo_<id>" por cada uno,
         // creados desde el modal de abajo) y esta página los enumera
         // escaneando localStorage por prefijo "enemigo_".
         // ==========================================================
-        const USUARIO_CORRECTO = 'DM';
-        const CLAVE_CORRECTA = 'boss1234';
-
-        function estaAutenticado() {
-            return localStorage.getItem('enemigos_usuario') === USUARIO_CORRECTO
-                && localStorage.getItem('enemigos_clave') === CLAVE_CORRECTA;
-        }
 
         function slugify(nombre) {
             return nombre
@@ -404,37 +416,6 @@
             btnImportar.addEventListener('click', abrirModalImportar);
             grid.appendChild(btnImportar);
         }
-
-        function mostrarGrid() {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('enemigos-grid').style.display = 'grid';
-            document.getElementById('volver-link-grid').style.display = 'block';
-            document.getElementById('subtitulo-pagina').textContent = 'Bestiario de la mesa';
-            renderGrid();
-        }
-
-        function mostrarLogin() {
-            document.getElementById('login-container').style.display = 'block';
-            document.getElementById('enemigos-grid').style.display = 'none';
-            document.getElementById('volver-link-grid').style.display = 'none';
-            document.getElementById('subtitulo-pagina').textContent = 'Acceso restringido';
-        }
-
-        document.getElementById('login-form').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const usuario = document.getElementById('login-usuario').value.trim();
-            const clave = document.getElementById('login-clave').value;
-            const errorEl = document.getElementById('login-error');
-
-            if (usuario === USUARIO_CORRECTO && clave === CLAVE_CORRECTA) {
-                localStorage.setItem('enemigos_usuario', usuario);
-                localStorage.setItem('enemigos_clave', clave);
-                errorEl.textContent = '';
-                mostrarGrid();
-            } else {
-                errorEl.textContent = 'Usuario o contraseña incorrectos.';
-            }
-        });
 
         // ===== Modal Agregar Enemigo =====
         const modalAgregar = document.getElementById('modal-agregar');
@@ -744,12 +725,8 @@ Acá te describo el/los monstruo(s) que quiero:
         // A propósito NO hay cierre clickeando afuera del modal: solo la X / "Cancelar"
         // lo cierran, para que un misclick no lo cierre por accidente.
 
-        // Al cargar la página: si ya había sesión guardada, saltear el login directo.
-        if (estaAutenticado()) {
-            mostrarGrid();
-        } else {
-            mostrarLogin();
-        }
+        // Sin login: se renderiza el grid directo al cargar la página.
+        renderGrid();
     </script>
 </body>
 </html>

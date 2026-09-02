@@ -5,8 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extras - Selección de Personaje - DnD 5e</title>
     <link rel="stylesheet" href="estilos-menu.css">
+    <script>
+        // Aplica el tema guardado ANTES de pintar la página (evita el flash del tema por defecto).
+        (function () {
+            try {
+                if (localStorage.getItem('tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
 </head>
 <body>
+    <button type="button" id="btn-tema" class="btn-tema" title="Cambiar tema">🌙</button>
+    <script>
+        // Toggle de tema claro/oscuro (mismo patrón en todas las páginas de la app).
+        (function () {
+            var btn = document.getElementById('btn-tema');
+            function actualizarIconoTema() {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                btn.textContent = oscuro ? '☀️' : '🌙';
+                btn.title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+            }
+            actualizarIconoTema();
+            btn.addEventListener('click', function () {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (oscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('tema', 'claro');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('tema', 'oscuro');
+                }
+                actualizarIconoTema();
+            });
+        })();
+    </script>
     <div class="menu-container">
         <header>
             <h1 id="titulo-pagina">Extras</h1>
@@ -32,6 +66,10 @@
 
         <!-- === Grid de personajes extra (se muestra solo si el login es correcto) === -->
         <div class="personajes-grid" id="personajes-grid" style="display: none;"></div>
+        <div id="sesion-bar" style="display: none; text-align: center; margin-top: 20px;">
+            <a href="index.html" class="volver-link" style="display: inline; margin: 0 12px;">← Volver al menú principal</a>
+            <button type="button" id="btn-cerrar-sesion" class="volver-link" style="display: inline; margin: 0 12px; background: none; border: none; font: inherit; cursor: pointer; padding: 0;">🔓 Cerrar sesión</button>
+        </div>
     </div>
 
     <script>
@@ -45,8 +83,8 @@
             { id: 'kael', nombre: 'Kael', icono: '🙏' }
         ];
 
-        const USUARIO_CORRECTO = 'Teo';
-        const CLAVE_CORRECTA = '65iq';
+        const USUARIO_CORRECTO = 'DM';
+        const CLAVE_CORRECTA = 'boss1234';
 
         function estaAutenticado() {
             return localStorage.getItem('extras_usuario') === USUARIO_CORRECTO
@@ -89,6 +127,7 @@
         function mostrarGrid() {
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('personajes-grid').style.display = 'grid';
+            document.getElementById('sesion-bar').style.display = 'block';
             document.getElementById('subtitulo-pagina').textContent = 'Hoja de Personaje - DnD 5e';
             renderGrid();
         }
@@ -96,6 +135,7 @@
         function mostrarLogin() {
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('personajes-grid').style.display = 'none';
+            document.getElementById('sesion-bar').style.display = 'none';
             document.getElementById('subtitulo-pagina').textContent = 'Acceso restringido';
         }
 
@@ -113,6 +153,17 @@
             } else {
                 errorEl.textContent = 'Usuario o contraseña incorrectos.';
             }
+        });
+
+        // "Cerrar sesión": borra la sesión guardada y vuelve al login, para poder tipear
+        // usuario/clave de nuevo si en algún momento cambian (ya no hay forma de "editarlos"
+        // una vez logueado más que volver a pasar por acá).
+        document.getElementById('btn-cerrar-sesion').addEventListener('click', function () {
+            localStorage.removeItem('extras_usuario');
+            localStorage.removeItem('extras_clave');
+            document.getElementById('login-usuario').value = '';
+            document.getElementById('login-clave').value = '';
+            mostrarLogin();
         });
 
         // Al cargar la página: si ya había sesión guardada, saltear el login directo.

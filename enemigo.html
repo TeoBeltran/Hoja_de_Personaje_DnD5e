@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enemigo - DnD 5e</title>
     <link rel="stylesheet" href="estilos.css">
+    <script>
+        // Aplica el tema guardado ANTES de pintar la página (evita el flash del tema por defecto).
+        (function () {
+            try {
+                if (localStorage.getItem('tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         /* ===== Header y navegación propia de esta hoja ===== */
         .header-acciones {
@@ -197,7 +207,7 @@
 
         /* ===== Cards inline de cada entrada dentro de las 5 secciones ===== */
         .entrada-item {
-            background-color: #fbf9f4;
+            background-color: var(--btn-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
             padding: 12px 14px;
@@ -207,7 +217,7 @@
         }
 
         .entrada-item:hover {
-            background-color: #f5f0e1;
+            background-color: var(--bg-color);
             border-color: var(--accent-color);
         }
 
@@ -261,7 +271,7 @@
         /* Modificadores: solo lectura, sin hover de botón */
         #mods-grid .skill-btn { cursor: default; }
         #mods-grid .skill-btn:hover {
-            background-color: #fbf9f4;
+            background-color: var(--btn-bg);
             color: var(--text-color);
             transform: none;
             box-shadow: none;
@@ -286,7 +296,7 @@
         #turno-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
         .turno-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color);
+            padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color);
             border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);
             width: 100%; font-family: inherit;
         }
@@ -296,9 +306,40 @@
         }
         .turno-valor.agotado { background-color: #c62828; }
         #turno-reset { width: 100%; padding: 10px; font-weight: bold; }
+
+        /* Ajuste de tema oscuro: estos dos son texto rojo suelto sobre un fondo que sí
+           cambia con el tema (card-bg/entrada-item), quedaban muy oscuros para leerse. */
+        html[data-theme="dark"] .header-acciones .btn-borrar-enemigo:hover,
+        html[data-theme="dark"] .entrada-item-botones .entrada-borrar:hover {
+            color: #ef5350;
+        }
     </style>
 </head>
 <body>
+    <button type="button" id="btn-tema" class="btn-tema" title="Cambiar tema">🌙</button>
+    <script>
+        // Toggle de tema claro/oscuro (mismo patrón en todas las páginas de la app).
+        (function () {
+            var btn = document.getElementById('btn-tema');
+            function actualizarIconoTema() {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                btn.textContent = oscuro ? '☀️' : '🌙';
+                btn.title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+            }
+            actualizarIconoTema();
+            btn.addEventListener('click', function () {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (oscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('tema', 'claro');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('tema', 'oscuro');
+                }
+                actualizarIconoTema();
+            });
+        })();
+    </script>
     <div class="container">
         <header>
             <h1><span id="icono-enemigo" title="Cambiar ícono">👹</span><span id="nombre-texto">Enemigo</span></h1>

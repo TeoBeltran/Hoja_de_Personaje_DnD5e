@@ -23,6 +23,9 @@ const PERSONAJES_DISPONIBLES = [
     { id: 'lunareth', nombre: 'Lunareth' },
     { id: 'nika', nombre: 'Nika' },
     { id: 'orfe', nombre: 'Orfe' },
+    { id: 'aredhel', nombre: 'Aredhel' },
+    { id: 'chiaragorn', nombre: 'Chiaragorn' },
+    { id: 'lyralei', nombre: 'Lyralei' },
     { id: 'cedric', nombre: 'Cedric' },
     { id: 'kael', nombre: 'Kael' },
     { id: 'varis', nombre: 'Varis' }
@@ -32,6 +35,7 @@ const COMBATE_KEY = 'combate_participantes';
 const TURNO_KEY = 'combate_turno';
 const HISTORIAL_KEY = 'combate_historial';
 const CONDICIONES_KEY = 'combate_condiciones';
+const BITACORA_KEY = 'combate_bitacora';
 const HISTORIAL_MAX = 30;
 
 // Set curado de condiciones/marcadores rápidos. Para agregar una nueva: sumarla acá.
@@ -159,6 +163,24 @@ function cargarCondiciones() {
 
 function guardarCondiciones() {
     localStorage.setItem(CONDICIONES_KEY, JSON.stringify(condiciones));
+}
+
+// ================== Bitácora de sesión (bloc de notas libre) ==================
+
+// Se guarda con un pequeño debounce mientras se tipea (no en cada tecla), y muestra
+// "Guardado ✓ hh:mm" para que quede claro que no se pierde nada al cerrar la pestaña.
+let bitacoraDebounceId = null;
+
+function cargarBitacora() {
+    const textarea = document.getElementById('bitacora-texto');
+    textarea.value = localStorage.getItem(BITACORA_KEY) || '';
+}
+
+function guardarBitacora() {
+    const textarea = document.getElementById('bitacora-texto');
+    localStorage.setItem(BITACORA_KEY, textarea.value);
+    const hora = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('bitacora-guardado').textContent = `Guardado ✓ ${hora}`;
 }
 
 function toggleCondicion(uid, key) {
@@ -293,6 +315,28 @@ function leerHabilidadesUsoCompartidas(personajeId, data) {
     if (raw) {
         try { estado = JSON.parse(raw); } catch (e) { estado = {}; }
     }
+    // Habilidades cuyo máximo de usos escala con el nivel (ej: Channel Divinity) o es
+    // directamente igual al nivel (ej: Puntos de Ki del Monje) no traen un "usos" fijo en
+    // el JSON — hay que calcularlo acá igual que hace script.js al cargar la ficha real
+    // (ver aplicarASIs/carga de habilidadesUso ahí). Sin esto quedan afuera del filtro de
+    // abajo y nunca se ven en este modal — era el caso real de Puntos de Ki, que no tiene
+    // ningún "usos" estático de respaldo en el JSON.
+    const nivel = nivelDePersonaje(data);
+    (data.habilidadesUso || []).forEach(h => {
+        if (h.usosPorNivel) {
+            let maxCalc = 1;
+            Object.keys(h.usosPorNivel)
+                .map(k => parseInt(k))
+                .sort((a, b) => a - b)
+                .forEach(umbral => {
+                    if (nivel >= umbral) maxCalc = h.usosPorNivel[String(umbral)];
+                });
+            h.usos = `${maxCalc}/${maxCalc}`;
+        }
+        if (h.usosIgualANivel) {
+            h.usos = `${nivel}/${nivel}`;
+        }
+    });
     // Solo las que tienen un pool de usos propio (ej: "5/5"). Las que solo
     // "consumeUsoDe" otra (ej: Cutting Words) no tienen contador propio.
     const def = (data.habilidadesUso || []).filter(h => h.usos && !h.oculto);
@@ -770,6 +814,8 @@ async function render() {
 function abrirModalHp(p) {
     hpModalTarget = p;
     actualizarHpModalDOM();
+    document.getElementById('hp-input-danio').value = '0';
+    document.getElementById('hp-input-cura').value = '0';
     document.getElementById('hp-modal').style.display = 'flex';
 }
 
@@ -1087,7 +1133,13 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarTurno();
     cargarHistorial();
     cargarCondiciones();
+    cargarBitacora();
     render();
+
+    document.getElementById('bitacora-texto').addEventListener('input', () => {
+        clearTimeout(bitacoraDebounceId);
+        bitacoraDebounceId = setTimeout(guardarBitacora, 500);
+    });
 
     document.getElementById('btn-siguiente-turno').addEventListener('click', () => {
         const ordenados = [...construirListaParaRender()].sort((a, b) => b.iniciativa - a.iniciativa);
@@ -1133,6 +1185,27 @@ document.addEventListener('DOMContentLoaded', () => {
             const amount = btn.dataset.amount ? parseInt(btn.dataset.amount) : 0;
             const maxAmount = btn.dataset.maxAmount ? parseInt(btn.dataset.maxAmount) : 0;
             aplicarCambioHp(amount, maxAmount);
+        });
+    });
+
+    // Daño/Curación del modal de Vida: se tipean los dos montos y se aplican juntos como un
+    // solo cambio neto (cura - daño), para que el historial registre una única entrada.
+    const hpInputDanio = document.getElementById('hp-input-danio');
+    const hpInputCura = document.getElementById('hp-input-cura');
+    document.getElementById('hp-aplicar-btn').addEventListener('click', () => {
+        const danio = Math.max(0, parseInt(hpInputDanio.value) || 0);
+        const cura = Math.max(0, parseInt(hpInputCura.value) || 0);
+        aplicarCambioHp(cura - danio, 0);
+        hpInputDanio.value = '0';
+        hpInputCura.value = '0';
+        hpInputDanio.focus();
+    });
+    [hpInputDanio, hpInputCura].forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('hp-aplicar-btn').click();
+            }
         });
     });
 

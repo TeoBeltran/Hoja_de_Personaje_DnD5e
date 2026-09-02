@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rastreador de Combate - DnD 5e</title>
     <link rel="stylesheet" href="estilos.css">
+    <script>
+        // Aplica el tema guardado ANTES de pintar la página (evita el flash del tema por defecto).
+        (function () {
+            try {
+                if (localStorage.getItem('tema') === 'oscuro') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         /* ===== Layout propio del rastreador de combate ===== */
         body { display: block; padding: 20px 12px; }
@@ -112,6 +122,34 @@
             color: var(--text-muted);
             font-style: italic;
             font-size: 0.85rem;
+        }
+
+        #bitacora-texto {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 220px;
+            resize: vertical;
+            padding: 10px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        #bitacora-texto:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .bitacora-guardado {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            min-height: 1.2em;
+            margin-top: 4px;
         }
 
         .combatiente-card.turno-activo {
@@ -526,9 +564,52 @@
         }
 
         .volver-link:hover { color: var(--accent-color); }
+
+        /* ===== Ajustes de tema oscuro para los rojos/verdes fijos de esta página =====
+           Los que van sobre un fondo blanco/de color fijo (ej. botones ".btn-borrar:hover"
+           con fondo rojo sólido y texto blanco) ya funcionan igual en cualquier tema y no
+           necesitan nada acá — esto es solo para los que son texto/borde suelto sobre un
+           fondo que SÍ cambia con el tema (--card-bg, --bg-color). */
+        html[data-theme="dark"] .combate-toolbar button.btn-borrar {
+            border-color: #ef5350;
+            color: #ef5350;
+        }
+        html[data-theme="dark"] .btn-quitar:hover {
+            color: #ef5350;
+        }
+        html[data-theme="dark"] label[style^="color: #c62828"] {
+            color: #ef5350 !important;
+        }
+        html[data-theme="dark"] label[style^="color: #2e7d32"] {
+            color: #66bb6a !important;
+        }
     </style>
 </head>
 <body>
+    <button type="button" id="btn-tema" class="btn-tema" title="Cambiar tema">🌙</button>
+    <script>
+        // Toggle de tema claro/oscuro (mismo patrón en todas las páginas de la app).
+        (function () {
+            var btn = document.getElementById('btn-tema');
+            function actualizarIconoTema() {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                btn.textContent = oscuro ? '☀️' : '🌙';
+                btn.title = oscuro ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro';
+            }
+            actualizarIconoTema();
+            btn.addEventListener('click', function () {
+                var oscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+                if (oscuro) {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('tema', 'claro');
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('tema', 'oscuro');
+                }
+                actualizarIconoTema();
+            });
+        })();
+    </script>
     <div class="combate-container">
         <a href="index.html" class="volver-link" style="margin-top: 0; margin-bottom: 10px;">← Volver al menú principal</a>
         <div class="combate-header">
@@ -558,6 +639,12 @@
                 <div class="panel-lateral panel-historial">
                     <div class="panel-titulo">📜 Historial de daño/cura</div>
                     <div id="historial-lista" class="historial-lista"></div>
+                </div>
+
+                <div class="panel-lateral panel-bitacora">
+                    <div class="panel-titulo">📓 Bitácora de sesión</div>
+                    <textarea id="bitacora-texto" placeholder="Anotá acá lo que quieras: loot repartido, decisiones importantes, NPCs con los que hablaron, para qué sesión quedó pendiente algo..."></textarea>
+                    <div id="bitacora-guardado" class="bitacora-guardado"></div>
                 </div>
             </div>
         </div>
@@ -589,9 +676,11 @@
         </div>
     </div>
 
-    <!-- ===== Modal de Vida (mismo estilo/clases que el de cada ficha) ===== -->
+    <!-- ===== Modal de Vida =====
+         El daño/cura se tipea y se aplica de una — así el historial de combate registra un
+         solo cambio neto (ej. "-16 HP") en vez de una entrada por cada click de +/-1 o +/-5. -->
     <div id="hp-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content form-modal">
             <span class="close-btn" data-close="hp-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
             <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Vida</h3>
             <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
@@ -599,12 +688,19 @@
                 <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="hp-btn hp-damage" data-amount="-1">-1 HP</button>
-                <button class="hp-btn hp-heal" data-amount="1">+1 HP</button>
-                <button class="hp-btn hp-damage" data-amount="-5">-5 HP</button>
-                <button class="hp-btn hp-heal" data-amount="5">+5 HP</button>
-                <button class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
-                <button class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
+                <div>
+                    <label for="hp-input-danio" style="color: #c62828;">Daño</label>
+                    <input type="number" id="hp-input-danio" min="0" value="0">
+                </div>
+                <div>
+                    <label for="hp-input-cura" style="color: #2e7d32;">Curación</label>
+                    <input type="number" id="hp-input-cura" min="0" value="0">
+                </div>
+            </div>
+            <button type="button" id="hp-aplicar-btn" class="btn-confirmar" style="width: 100%; padding: 10px; border: none; border-radius: var(--border-radius); font-weight: bold; cursor: pointer; color: white; margin-top: 14px;">Aplicar</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px;">
+                <button type="button" class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
+                <button type="button" class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
             </div>
         </div>
     </div>

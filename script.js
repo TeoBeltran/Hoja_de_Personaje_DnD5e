@@ -1380,6 +1380,7 @@ function resetearTurno() {
                 colorCard: '#5d4037'
             });
         }
+        actualizarBadgeDuracionDOM(hab.nombre);
     });
     if (huboToggleExpirado) {
         guardarToggles();
@@ -1706,6 +1707,23 @@ function actualizarHabilidadUsoDOM(nombre) {
         } else {
             el.classList.remove('ranura-vacia');
         }
+    }
+}
+
+// Refresca el badge "⏱️ N turnos" de una habilidad toggle con duración limitada (ver
+// toggleDuracionTurnos) sin re-renderizar toda la card. Se llama al activar/desactivar el
+// toggle y al terminar cada turno (que es cuando el contador avanza, ver resetearTurno).
+function actualizarBadgeDuracionDOM(nombre) {
+    const habObj = (window._habilidadesUsoData || []).find(h => h.nombre === nombre);
+    if (!habObj || !habObj.toggleDuracionTurnos) return;
+    const span = document.getElementById(`dur-badge-${nombre.replace(/[^a-zA-Z0-9]/g, '-')}`);
+    if (!span) return;
+    if (togglesActivos[nombre]) {
+        const restantes = Math.max(0, habObj.toggleDuracionTurnos - (togglesDuracionContador[nombre] || 0));
+        span.textContent = `⏱️ ${restantes} turno${restantes === 1 ? '' : 's'}`;
+        span.style.display = '';
+    } else {
+        span.style.display = 'none';
     }
 }
 
@@ -2357,7 +2375,7 @@ async function init() {
 
         let manosHTML = '';
         if (i.manos && i.manos > 0) {
-            manosHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); background-color: #ede0d0; margin-right: 6px;">${i.manos === 2 ? '2 manos' : '1 mano'}</span>`;
+            manosHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid var(--accent-color); border-radius: 4px; color: var(--accent-color); background-color: var(--card-bg); margin-right: 6px;">${i.manos === 2 ? '2 manos' : '1 mano'}</span>`;
         }
 
         const eq = estaEquipado(i);
@@ -3272,10 +3290,22 @@ async function init() {
                 ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee;">${capitalizar(h.tipoDano)}</span>`
                 : '';
 
+            // Badge "⏱️ N turnos" para toggles con duración limitada (ej: Radiant Soul),
+            // mientras estén activos. Id estable para poder refrescarlo sin re-renderizar
+            // toda la card (ver actualizarBadgeDuracionDOM, llamado al terminar turno y al
+            // activar/desactivar el toggle).
+            const slugHab = h.nombre.replace(/[^a-zA-Z0-9]/g, '-');
+            const activoConDuracion = h.toggleDuracionTurnos && togglesActivos[h.nombre];
+            const restantesIniciales = activoConDuracion
+                ? Math.max(0, h.toggleDuracionTurnos - (togglesDuracionContador[h.nombre] || 0))
+                : 0;
+            const duracionBadgeHTML = `<span id="dur-badge-${slugHab}" style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: #5d4037; ${activoConDuracion ? '' : 'display: none;'}">⏱️ ${restantesIniciales} turno${restantesIniciales === 1 ? '' : 's'}</span>`;
+
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px;">
                     <span style="font-weight: bold;">${h.nombre}</span>
                     <div style="display: flex; gap: 6px; align-items: center;">
+                        ${duracionBadgeHTML}
                         ${smiteBadgeHTML}
                         ${usosBadgeHTML}
                     </div>
@@ -3460,6 +3490,7 @@ async function init() {
                         if (habObj.toggleDuracionTurnos) {
                             delete togglesDuracionContador[habObj.nombre];
                             guardarTogglesDuracion();
+                            actualizarBadgeDuracionDOM(habObj.nombre);
                         }
                         guardarToggles();
                         mostrarToast(`${habObj.nombre} desactivado`);
@@ -3482,6 +3513,7 @@ async function init() {
                             // de activarlo (todavía no pasó ningún turno completo).
                             togglesDuracionContador[habObj.nombre] = 0;
                             guardarTogglesDuracion();
+                            actualizarBadgeDuracionDOM(habObj.nombre);
                         }
                         guardarToggles();
                         const rTog = consumirAccion(tipoAccion);
