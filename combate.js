@@ -9,6 +9,7 @@ import { ICONOS_PERSONAJE } from "./Scripts/Datos/Constantes.js";
 import {
     calcularProficiencia,
     formatMod,
+    parseMod,
     statAMod,
     generarModificadores,
     generarSalvaciones
@@ -128,9 +129,29 @@ function guardarHistorial() {
     localStorage.setItem(HISTORIAL_KEY, JSON.stringify(historial));
 }
 
-function agregarHistorial(nombre, delta) {
-    if (!delta) return;
-    historial.unshift({ nombre, delta, ts: Date.now() });
+// 'aliado' = personaje jugable o su familiar/montura invocado; 'rival' = enemigo de
+// la sección Enemigos o un "enemigo manual" viejo. Se usa para el punto de color del
+// historial (para diferenciar de un vistazo quién perdió/ganó vida).
+function tipoParticipante(p) {
+    return (p.origen === 'json' || p.origen === 'familiar') ? 'aliado' : 'rival';
+}
+
+// opts: { delta } cambio de vida actual (daño negativo / cura positivo),
+//       { deltaMax } cambio de vida máxima (entrada separada, sin colorear rojo/verde),
+//       { cayoACero } true si este cambio de vida actual dejó al participante en 0.
+function agregarHistorial(p, opts) {
+    opts = opts || {};
+    const delta = opts.delta || 0;
+    const deltaMax = opts.deltaMax || 0;
+    if (!delta && !deltaMax) return;
+    historial.unshift({
+        nombre: p.nombre,
+        delta,
+        deltaMax,
+        tipo: tipoParticipante(p),
+        cayoACero: !!opts.cayoACero,
+        ts: Date.now()
+    });
     historial = historial.slice(0, HISTORIAL_MAX);
     guardarHistorial();
     renderHistorial();
@@ -143,10 +164,21 @@ function renderHistorial() {
         return;
     }
     cont.innerHTML = historial.map(h => {
-        const clase = h.delta < 0 ? 'dano' : 'cura';
-        const signo = h.delta > 0 ? '+' : '';
+        const esVidaMax = !!h.deltaMax;
+        const clase = esVidaMax ? 'vidamax' : (h.delta < 0 ? 'dano' : 'cura');
+        const tipo = h.tipo === 'aliado' ? 'aliado' : (h.tipo === 'rival' ? 'rival' : '');
+        const dot = tipo ? `<span class="historial-dot ${tipo}" title="${tipo === 'aliado' ? 'Aliado' : 'Rival'}"></span>` : '';
         const hora = new Date(h.ts).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-        return `<div class="historial-item ${clase}">${h.nombre} ${signo}${h.delta} HP <span style="color:var(--text-muted); font-size:0.75rem;">(${hora})</span></div>`;
+        let texto;
+        if (esVidaMax) {
+            const signo = h.deltaMax > 0 ? '+' : '';
+            texto = `${h.nombre} Vida Máx. ${signo}${h.deltaMax}`;
+        } else {
+            const signo = h.delta > 0 ? '+' : '';
+            texto = `${h.nombre} ${signo}${h.delta} HP`;
+        }
+        const notaCaida = h.cayoACero ? ` <span class="historial-caida">☠️ ¡Llegó a 0!</span>` : '';
+        return `<div class="historial-item ${clase}">${dot}${texto}${notaCaida} <span style="color:var(--text-muted); font-size:0.75rem;">(${hora})</span></div>`;
     }).join('');
 }
 
@@ -192,12 +224,27 @@ function toggleCondicion(uid, key) {
 // ================== Stats de un personaje JSON ==================
 
 // Aplica raza + ASI a las stats base (mismo criterio que aplicarImprovements en script.js)
-function statsFinales(personaje) {
-    const stats = { ...personaje.stats };
-    const imp = personaje.improvements;
+// OJO: "improvements" vive en el nivel de arriba del JSON (data.improvements),
+// NO adentro de "personaje" (data.personaje NO tiene su propio .improvements) —
+// por eso esta función recibe el "data" completo, no solo "data.personaje".
+// Antes de esta corrección se le pasaba data.personaje y leía personaje.improvements
+// (siempre undefined), así que NINGUNA mejora de raza/feat/ASI se aplicaba nunca acá,
+// dejando los modificadores y salvaciones del Rastreador de Combate desactualizados
+// contra la ficha real (bug real: Puntos de Ki/DEX de Kael, entre otros).
+function statsFinales(data) {
+    const personaje = (data && data.personaje) || {};
+    const stats = { ...(personaje.stats || {}) };
+    const imp = data && data.improvements;
     if (imp) {
         (imp.race || []).forEach(r => {
             if (stats[r.atributo] != null) stats[r.atributo] += Number(r.valor) || 0;
+        });
+        // Feats: mismo criterio que aplicarImprovements() en script.js — faltaba acá.
+        (imp.feats || []).forEach(f => {
+            if (!f.atributos) return;
+            Object.entries(f.atributos).forEach(([stat, valor]) => {
+                if (stats[stat] != null) stats[stat] += Number(valor) || 0;
+            });
         });
         (imp.asi || []).forEach(a => {
             Object.entries(a.atributos || {}).forEach(([k, v]) => {
@@ -206,6 +253,35 @@ function statsFinales(personaje) {
         });
     }
     return stats;
+}
+
+// Bono plano a TODAS las salvaciones que dan los ítems de equipo actualmente
+// EQUIPADOS de este personaje (ej: Anillo de Protección +1 → +1 a salvaciones).
+// Lee el mismo estado de "qué está equipado" que guarda personaje.html en
+// localStorage (pj_<id>_armaduraEquipada / _escudoEquipado / _armasEquipadas),
+// igual criterio que calcularBonosEquipoActivo() en script.js, para que el
+// detalle del Rastreador de Combate coincida con la ficha real.
+function calcularBonoSalvacionesEquipoCompartido(personajeId, data) {
+    const prefix = `pj_${personajeId}_`;
+    const equipo = (data && data.equipo) || [];
+    const nombresEquipados = [];
+    const armadura = localStorage.getItem(prefix + 'armaduraEquipada');
+    if (armadura) nombresEquipados.push(armadura);
+    const escudo = localStorage.getItem(prefix + 'escudoEquipado');
+    if (escudo) nombresEquipados.push(escudo);
+    try {
+        const armas = JSON.parse(localStorage.getItem(prefix + 'armasEquipadas') || '[]');
+        if (Array.isArray(armas)) nombresEquipados.push(...armas);
+    } catch (e) { /* localStorage corrupto: se ignora, bono queda en 0 */ }
+
+    let bono = 0;
+    nombresEquipados.forEach(nombre => {
+        const item = equipo.find(e => e.nombre === nombre);
+        if (item && item.efectos) {
+            item.efectos.forEach(ef => { if (ef.tipo === 'salvaciones') bono += (ef.valor || 0); });
+        }
+    });
+    return bono;
 }
 
 // Cálculo de CA simplificado (armadura equipada por defecto + Unarmored Defense de
@@ -450,7 +526,7 @@ function getCA(p) {
     }
     const data = dataCache[p.personajeId];
     if (!data) return 0;
-    const stats = statsFinales(data.personaje);
+    const stats = statsFinales(data);
     return leerCACompartida(p.personajeId, data, stats);
 }
 
@@ -525,7 +601,7 @@ async function agregarPersonajesJson(ids) {
                 continue;
             }
         }
-        const stats = statsFinales(data.personaje);
+        const stats = statsFinales(data);
         const modDex = statAMod(stats['DEX'] ?? 10);
 
         const suma = await pedirIniciativa(data.personaje.nombre || meta.nombre, `DEX ${formatMod(modDex)}`);
@@ -593,8 +669,8 @@ function borrarCombate() {
 }
 
 // ================== Modales genéricos (reemplazan confirm()/alert()/prompt() nativos) ==================
-// Mismo criterio que enemigo.js/enemigo.html: sin X, no se cierran clickeando afuera, solo con
-// sus botones explícitos (ver también la exclusión en el listener de cierre-por-afuera más abajo).
+// Mismo criterio que enemigo.js/enemigo.html y que TODOS los modales del proyecto: sin X propia,
+// no se cierran clickeando afuera, solo con sus botones explícitos (Sí/No, Cerrar, etc.).
 
 // ----- Confirmación (Sí/No) -----
 const confirmarModal = document.getElementById('confirmar-modal');
@@ -802,11 +878,77 @@ async function render() {
         });
         card.appendChild(condRow);
 
+        // Salvaciones de muerte: solo para jugadores ('json') a 0 HP. Los dados se
+        // tiran en persona — esto solo lleva la cuenta de lo que ya salió (aciertos/
+        // fallos) hasta estabilizarse (3 aciertos) o morir (3 fallos).
+        if (p.origen === 'json' && actual === 0) {
+            card.appendChild(crearMuerteRow(p));
+        }
+
         cont.appendChild(card);
     });
 
     renderTurnoPanel(ordenados);
     renderHistorial();
+}
+
+// ================== Salvaciones de muerte (jugador a 0 HP) ==================
+// Estado guardado directo en el participante (p.muerteExitos/p.muerteFallos/...),
+// que ya viaja con el resto de "combate_participantes" vía guardarCombate(). No
+// se tira ningún dado acá: el DM tilda lo que salió tirando en persona.
+
+function crearMuerteRow(p) {
+    const row = document.createElement('div');
+    row.className = 'muerte-row';
+
+    const estado = document.createElement('span');
+    estado.className = 'muerte-estado' + (p.muerto ? ' muerto' : (p.estabilizado ? ' estable' : ''));
+    estado.textContent = p.muerto ? '☠️ Muerto' : (p.estabilizado ? '✅ Estabilizado' : 'Salv. de muerte:');
+    row.appendChild(estado);
+
+    if (!p.muerto && !p.estabilizado) {
+        row.appendChild(crearMuertePips(p, 'exitos', 'muerteExitos'));
+        row.appendChild(crearMuertePips(p, 'fallos', 'muerteFallos'));
+    }
+
+    return row;
+}
+
+function crearMuertePips(p, tipo, campo) {
+    const wrap = document.createElement('span');
+    wrap.className = 'muerte-pips';
+    const valor = p[campo] || 0;
+    for (let i = 0; i < 3; i++) {
+        const pip = document.createElement('span');
+        const lleno = i < valor;
+        pip.className = `muerte-pip ${tipo}` + (lleno ? ' lleno' : '');
+        pip.textContent = lleno ? (tipo === 'exitos' ? '✔' : '✘') : '○';
+        pip.title = tipo === 'exitos' ? 'Acierto de salvación de muerte' : 'Fallo de salvación de muerte';
+        pip.addEventListener('click', (e) => {
+            e.stopPropagation();
+            setMuertePip(p, campo, i);
+        });
+        wrap.appendChild(pip);
+    }
+    return wrap;
+}
+
+function setMuertePip(p, campo, index) {
+    const valorActual = p[campo] || 0;
+    // Clickear el último pip lleno lo vacía (permite corregir); clickear cualquier
+    // otro pip llena hasta ahí, como un selector de estrellas.
+    p[campo] = (valorActual === index + 1) ? index : index + 1;
+
+    if ((p.muerteExitos || 0) >= 3) {
+        p.estabilizado = true;
+        p.muerteExitos = 3;
+        p.muerteFallos = 0;
+    }
+    if ((p.muerteFallos || 0) >= 3) {
+        p.muerto = true;
+    }
+    guardarCombate();
+    render();
 }
 
 // ================== Modal de Vida ==================
@@ -827,7 +969,15 @@ function actualizarHpModalDOM() {
     const pct = maximo > 0 ? Math.max(0, Math.min(100, (actual / maximo) * 100)) : 0;
     const fill = document.getElementById('hp-bar-fill');
     fill.style.width = pct + '%';
-    fill.style.backgroundColor = pct <= 25 ? '#c62828' : (pct <= 50 ? '#f9a825' : '#2e7d32');
+    // Mismos 5 tramos que el tile de Vida de personaje.html/enemigo.html (ver claseColorVida
+    // en script.js): 100%-66% verde, 65%-36% amarillo, 35%-15% naranja, <15% rojo, 0 gris.
+    // Se usan las variables CSS (no un hex fijo) para que el color se resuelva solo según
+    // el tema activo, igual que el resto de la app.
+    fill.style.backgroundColor = actual <= 0 ? 'var(--gris-fill)'
+        : pct < 15 ? 'var(--rojo-fill)'
+        : pct <= 35 ? 'var(--naranja-fill)'
+        : pct <= 65 ? 'var(--amarillo-fill)'
+        : 'var(--vida-full-fill)';
 }
 
 function aplicarCambioHp(amount, maxAmount) {
@@ -837,10 +987,20 @@ function aplicarCambioHp(amount, maxAmount) {
         const nuevoMax = Math.max(1, maximo + maxAmount);
         const nuevoActual = Math.min(actual, nuevoMax);
         setVida(hpModalTarget, nuevoActual, nuevoMax);
+        agregarHistorial(hpModalTarget, { deltaMax: maxAmount });
     } else if (amount) {
         const nuevoActual = Math.max(0, Math.min(actual + amount, maximo));
         setVida(hpModalTarget, nuevoActual, maximo);
-        agregarHistorial(hpModalTarget.nombre, nuevoActual - actual);
+        // Si se cura desde 0, se borra cualquier salvación de muerte que tuviera tildada
+        // (volvió a estar consciente, arranca de cero si vuelve a caer más adelante).
+        if (nuevoActual > 0 && hpModalTarget.origen === 'json') {
+            hpModalTarget.muerteExitos = 0;
+            hpModalTarget.muerteFallos = 0;
+            hpModalTarget.estabilizado = false;
+            hpModalTarget.muerto = false;
+            guardarCombate();
+        }
+        agregarHistorial(hpModalTarget, { delta: nuevoActual - actual, cayoACero: nuevoActual === 0 && actual > 0 });
     }
     actualizarHpModalDOM();
     render();
@@ -972,7 +1132,7 @@ function renderModalDetalle() {
         return;
     }
 
-    const stats = statsFinales(data.personaje);
+    const stats = statsFinales(data);
     const nivel = nivelDePersonaje(data);
     const profBonus = parseInt(calcularProficiencia(nivel).replace('+', ''));
     const mods = generarModificadores(stats, data.personaje.clase);
@@ -981,6 +1141,12 @@ function renderModalDetalle() {
         .filter(r => r.otorgaSalvacionProficiente)
         .map(r => r.otorgaSalvacionProficiente);
     const saves = generarSalvaciones(stats, data.personaje.clase, profBonus, salvacionesExtra);
+    // Suma el bono plano de equipo (ej. Anillo de Protección +1) a cada salvación,
+    // igual que hace actualizarSalvacionesDOM() en script.js con la ficha real.
+    const bonoSalvEquipo = calcularBonoSalvacionesEquipoCompartido(p.personajeId, data);
+    if (bonoSalvEquipo) {
+        saves.forEach(s => { s.valor = formatMod(parseMod(s.valor) + bonoSalvEquipo); });
+    }
 
     const tituloMod = document.createElement('div');
     tituloMod.className = 'expand-titulo';
@@ -1158,15 +1324,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Cierre clickeando afuera: aplica a todos MENOS a los modales de detalle/confirmación/
-    // aviso/iniciativa (pedido explícito: que no se cierren solo por un misclick).
-    const MODALES_SIN_CIERRE_AFUERA = new Set(['detalle-modal', 'confirmar-modal', 'aviso-modal', 'iniciativa-modal']);
-    document.querySelectorAll('.modal').forEach(modal => {
-        if (MODALES_SIN_CIERRE_AFUERA.has(modal.id)) return;
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.style.display = 'none';
-        });
-    });
+    // Regla general del proyecto: NINGÚN modal se cierra clickeando afuera, en ninguna
+    // página (evita que un misclick en medio de un combate cierre algo sin querer) —
+    // solo la X o el botón de cancelar/cerrar propio de cada modal lo hacen. Antes de
+    // esta corrección, acá se excluía solo a detalle/confirmar/aviso/iniciativa y el
+    // resto (agregar personaje/enemigo, vida) sí se cerraba con un click afuera.
 
     document.getElementById('btn-confirmar-agregar-personajes').addEventListener('click', async () => {
         const ids = [...document.querySelectorAll('#lista-checks-personajes input:checked')].map(i => i.value);

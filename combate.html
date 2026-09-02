@@ -115,8 +115,27 @@
             border-left: 3px solid var(--border-color);
         }
 
-        .historial-item.dano { border-left-color: #c62828; }
-        .historial-item.cura { border-left-color: #2e7d32; }
+        .historial-item.dano { border-left-color: var(--rojo-fill); }
+        .historial-item.cura { border-left-color: var(--verde-fill); }
+        .historial-item.vidamax { border-left-color: var(--violeta-texto); }
+
+        /* Punto de color: quién es (aliado = jugador/familiar, rival = enemigo/manual).
+           Independiente del borde rojo/verde de daño/cura, que ya indica QUÉ pasó. */
+        .historial-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .historial-dot.aliado { background-color: var(--azul-fill); }
+        .historial-dot.rival { background-color: var(--naranja-fill); }
+
+        .historial-caida {
+            color: var(--rojo-fill);
+            font-weight: bold;
+        }
 
         .historial-vacio {
             color: var(--text-muted);
@@ -183,6 +202,55 @@
             border-color: var(--accent-color);
         }
 
+        /* Salvaciones de muerte (jugador a 0 HP) */
+        .muerte-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 14px 12px 14px;
+            font-size: 0.85rem;
+        }
+
+        .muerte-estado {
+            font-weight: bold;
+            color: var(--text-muted);
+        }
+
+        .muerte-estado.estable { color: var(--verde-fill); }
+        .muerte-estado.muerto { color: var(--rojo-fill); }
+
+        .muerte-pips {
+            display: inline-flex;
+            gap: 3px;
+        }
+
+        .muerte-pip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1.5px solid var(--border-color);
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            background-color: var(--bg-color);
+        }
+
+        .muerte-pip.exitos.lleno {
+            background-color: var(--verde-fill);
+            border-color: var(--verde-fill);
+            color: white;
+        }
+
+        .muerte-pip.fallos.lleno {
+            background-color: var(--rojo-fill);
+            border-color: var(--rojo-fill);
+            color: white;
+        }
+
         .combate-header {
             text-align: center;
             margin-bottom: 20px;
@@ -218,12 +286,12 @@
         }
 
         .combate-toolbar button.btn-borrar {
-            border-color: #c62828;
-            color: #c62828;
+            border-color: var(--rojo-fill);
+            color: var(--rojo-fill);
         }
 
         .combate-toolbar button.btn-borrar:hover {
-            background-color: #c62828;
+            background-color: var(--rojo-fill);
             color: white;
         }
 
@@ -287,7 +355,7 @@
         }
 
         .btn-quitar:hover {
-            color: #c62828;
+            color: var(--rojo-fill);
             background-color: rgba(198, 40, 40, 0.1);
         }
 
@@ -446,8 +514,8 @@
             color: white;
         }
 
-        .ranura-row .ranura-mas { background-color: #2e7d32; }
-        .ranura-row .ranura-menos { background-color: #c62828; }
+        .ranura-row .ranura-mas { background-color: var(--verde-fill); }
+        .ranura-row .ranura-menos { background-color: var(--rojo-fill); }
 
         .ranura-row .ranura-cantidad {
             min-width: 40px;
@@ -552,7 +620,7 @@
 
         .btn-cancelar { background-color: var(--text-muted); }
         .btn-confirmar { background-color: var(--accent-color); }
-        .btn-peligro { background-color: #c62828; }
+        .btn-peligro { background-color: var(--rojo-fill); }
 
         .volver-link {
             display: block;
@@ -565,24 +633,11 @@
 
         .volver-link:hover { color: var(--accent-color); }
 
-        /* ===== Ajustes de tema oscuro para los rojos/verdes fijos de esta página =====
-           Los que van sobre un fondo blanco/de color fijo (ej. botones ".btn-borrar:hover"
-           con fondo rojo sólido y texto blanco) ya funcionan igual en cualquier tema y no
-           necesitan nada acá — esto es solo para los que son texto/borde suelto sobre un
-           fondo que SÍ cambia con el tema (--card-bg, --bg-color). */
-        html[data-theme="dark"] .combate-toolbar button.btn-borrar {
-            border-color: #ef5350;
-            color: #ef5350;
-        }
-        html[data-theme="dark"] .btn-quitar:hover {
-            color: #ef5350;
-        }
-        html[data-theme="dark"] label[style^="color: #c62828"] {
-            color: #ef5350 !important;
-        }
-        html[data-theme="dark"] label[style^="color: #2e7d32"] {
-            color: #66bb6a !important;
-        }
+        /* Las etiquetas "Daño"/"Curación" del modal de Vida son texto suelto con color fijo
+           inline (ver más abajo en el <body>) — se resuelven con las mismas variables que el
+           resto de la app en vez de un hex fijo, así no hace falta un override aparte por tema. */
+        label[style^="color: #c62828"] { color: var(--rojo-fill) !important; }
+        label[style^="color: #2e7d32"] { color: var(--verde-fill) !important; }
     </style>
 </head>
 <body>
@@ -685,7 +740,7 @@
             <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Vida</h3>
             <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
             <div id="hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 20px;">
-                <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                <div id="hp-bar-fill" style="background-color: var(--vida-full-fill); height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div>

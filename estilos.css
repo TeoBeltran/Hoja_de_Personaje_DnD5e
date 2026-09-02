@@ -9,6 +9,19 @@
     --text-muted: #8d6e63;
     --border-color: #d7ccc8;
     --border-radius: 8px;
+
+    /* Colores "de identidad" reutilizados en toda la app (vida por %, proficiency,
+       botones de daño/cura, contadores de turno agotados, etc.) — variables para que el
+       tema oscuro pueda pastelizarlos sin tener que tocar cada regla que los usa. */
+    --violeta-fill: #6a1b9a;   /* fondo de badge/botón lleno con texto blanco encima */
+    --violeta-texto: #6a1b9a;  /* borde o texto directo sobre el fondo de la página/card */
+    --rojo-fill: #c62828;
+    --verde-fill: #2e7d32;
+    --amarillo-fill: #f9a825;
+    --naranja-fill: #ef6c00;
+    --gris-fill: #616161;
+    --azul-fill: #1976d2;
+    --vida-full-fill: #1b5e20; /* verde más oscuro que --verde-fill, a propósito (vida al máximo) */
 }
 
 /* ===== Tema oscuro (toggle 🌙/☀️ en cada página, guardado en localStorage["tema"]) =====
@@ -17,7 +30,12 @@
    --accent-color acá es un compromiso: se usa TANTO de fondo de botón con texto blanco
    (necesita ser bastante oscuro para que el blanco contraste) COMO de texto/borde sobre el
    fondo oscuro de página (necesita ser bastante claro para contrastar ahí) — un cobrizo medio
-   funciona razonablemente en los dos roles sin quedar perfecto en ninguno. */
+   funciona razonablemente en los dos roles sin quedar perfecto en ninguno.
+   Los "colores de identidad" de abajo siguen la misma idea que pidió el usuario explícitamente:
+   mismo tono/familia (rojo sigue siendo rojo, violeta sigue siendo violeta) pero una versión
+   más clara/pastel — un color oscuro y saturado sobre un fondo de página YA oscuro se pierde
+   y obliga a forzar la vista; una versión más clara del mismo tono se destaca sin quedar
+   "gritón" como sería usar el tono de tema claro tal cual. */
 html[data-theme="dark"] {
     --bg-color: #1b140f;
     --card-bg: #2a2018;
@@ -27,19 +45,51 @@ html[data-theme="dark"] {
     --text-color: #ece3d6;
     --text-muted: #a99885;
     --border-color: #4a3a2c;
+
+    --violeta-fill: #9161b8;
+    --violeta-texto: #d7aee8;
+    --rojo-fill: #e0645f;
+    --verde-fill: #5fb768;
+    --amarillo-fill: #f4c04d;
+    --naranja-fill: #f0964d;
+    --gris-fill: #9e9e9e;
+    --azul-fill: #64b5f6;
+    --vida-full-fill: #5fb768;
 }
 
 /* Colores de texto inyectados como estilo inline por script.js (línea celeste de
    acción/distancia/duración, texto de daño/curación en modales, "Percepción P." en rojo
-   oscuro) que no pasan por variables CSS: quedaban demasiado oscuros/poco visibles sobre el
-   nuevo fondo oscuro, así que se los reemplaza acá por versiones más claras. El selector
-   usa [style^="..."] (el color es siempre la primera propiedad en esos estilos inline
-   puntuales) para no pisar por accidente ningún "background-color" que contenga el mismo
-   texto (ej. "background-color: #2e7d32" también contiene la substring "color: #2e7d32"). */
+   oscuro, texto de Maestría de Arma en violeta) que no pasan por variables CSS: quedaban
+   demasiado oscuros/poco visibles sobre el nuevo fondo oscuro, así que se los reemplaza acá
+   por las mismas versiones pastel que usa el resto de la app (--rojo-fill/--verde-fill/
+   --violeta-texto). El selector usa [style^="..."] (el color es siempre la primera propiedad
+   en esos estilos inline puntuales) para no pisar por accidente ningún "background-color" que
+   contenga el mismo texto (ej. "background-color: #2e7d32" también contiene la substring
+   "color: #2e7d32"). */
 html[data-theme="dark"] [style^="color: #0277bd"] { color: #4fc3f7 !important; }
-html[data-theme="dark"] [style^="color: #2e7d32"] { color: #66bb6a !important; }
-html[data-theme="dark"] [style^="color: #c62828"] { color: #ef5350 !important; }
-html[data-theme="dark"] [style^="color: #8b0000"] { color: #ef5350 !important; }
+html[data-theme="dark"] [style^="color: #2e7d32"] { color: var(--verde-fill) !important; }
+html[data-theme="dark"] [style^="color: #c62828"] { color: var(--rojo-fill) !important; }
+html[data-theme="dark"] [style^="color: #8b0000"] { color: var(--rojo-fill) !important; }
+html[data-theme="dark"] [style^="color:#6a1b9a"] { color: var(--violeta-texto) !important; }
+html[data-theme="dark"] [style^="color: #6a1b9a"] { color: var(--violeta-texto) !important; }
+
+/* Badges/botones con fondo violeta lleno + texto blanco generados inline por script.js
+   (daño de hechizo/arma, cantidad de inventario, ítems de lista "¿Qué puedo usar?", etc.) —
+   dos variantes de selector porque algunos strings de estilo llevan espacio después de
+   los ":" y otros no. */
+html[data-theme="dark"] [style*="background-color: #6a1b9a"] { background-color: var(--violeta-fill) !important; }
+html[data-theme="dark"] [style*="background-color:#6a1b9a"] { background-color: var(--violeta-fill) !important; }
+
+/* Mismo criterio para badges verdes llenos ("✓ Equipado", bono de ataque de un arma
+   mágica, badges de bono de arma en enemigo.js). */
+html[data-theme="dark"] [style*="background-color: #2e7d32"] { background-color: var(--verde-fill) !important; }
+html[data-theme="dark"] [style*="background-color:#2e7d32"] { background-color: var(--verde-fill) !important; }
+
+/* Botón "Usar X" del modal de hechizo/habilidad/arma: script.js le pone #6a1b9a como color
+   de fondo "activo" por default (y gris #999 cuando está deshabilitado) — acá se apunta al
+   estado habilitado con :not(:disabled) en vez de intentar matchear el string de estilo, que
+   puede llegar serializado como rgb(...) según el navegador. */
+html[data-theme="dark"] #use-spell-btn:not(:disabled) { background-color: var(--violeta-fill) !important; }
 
 * {
     box-sizing: border-box;
@@ -280,11 +330,11 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn.proficient {
-    border: 2px solid #6a1b9a !important; /* Borde violeta */
+    border: 2px solid var(--violeta-texto) !important; /* Borde violeta */
 }
 
 .skill-btn.proficient .skill-mod {
-    background-color: #6a1b9a !important; /* Fondo del numerito violeta */
+    background-color: var(--violeta-fill) !important; /* Fondo del numerito violeta */
     color: white !important;
 }
 
@@ -292,12 +342,12 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
    doble dorado encima, para que se distinga de un vistazo sin agregar un color nuevo a la
    paleta. Requiere "proficiente" además de "experto" en el JSON (ver Estadisticas.js). */
 .skill-btn.experto {
-    border: 2px solid #6a1b9a !important;
+    border: 2px solid var(--violeta-texto) !important;
     box-shadow: 0 0 0 2px #c9a227 !important;
 }
 
 .skill-btn.experto .skill-mod {
-    background-color: #6a1b9a !important;
+    background-color: var(--violeta-fill) !important;
     color: #ffe9a8 !important; /* Numerito en dorado clarito sobre el fondo violeta */
 }
 
@@ -328,8 +378,8 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 
 /* Estilo específico para las etiquetas de hechizos en el título */
 .proficient {
-    color: #6a1b9a !important; /* Violeta */
-    border-color: #6a1b9a !important;
+    color: var(--violeta-texto) !important; /* Violeta */
+    border-color: var(--violeta-texto) !important;
 }
 
 /* Opcional: Para mejorar el espaciado en pantallas pequeñas */
@@ -455,7 +505,7 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
     bottom: 30px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background-color: #6a1b9a;
+    background-color: var(--violeta-fill);
     color: white;
     padding: 14px 28px;
     border-radius: var(--border-radius);
@@ -476,7 +526,7 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 
 /* Variante para advertencia (ranuras agotadas) */
 #toast.warning {
-    background-color: #c62828;
+    background-color: var(--rojo-fill);
 }
 
 @media print {
@@ -501,11 +551,11 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .hp-damage {
-    background-color: #c62828;
+    background-color: var(--rojo-fill);
 }
 
 .hp-heal {
-    background-color: #2e7d32;
+    background-color: var(--verde-fill);
 }
 
 /* Botón de Vida en el grid de estadísticas se ve clickeable */
@@ -520,11 +570,11 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 
 /* Estadística modificada (vida máx. o CA cambiados respecto al original) */
 .skill-btn.modificado {
-    border: 2px solid #6a1b9a !important;
+    border: 2px solid var(--violeta-texto) !important;
 }
 
 .skill-btn.modificado .skill-mod {
-    background-color: #6a1b9a !important;
+    background-color: var(--violeta-fill) !important;
     color: white !important;
 }
 
@@ -660,15 +710,16 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 
 /* Color del tile de Vida según % actual — jugadores (personaje.html) Y enemigos
    (enemigo.html), mismo criterio para los dos (resuelto en JS, acá solo el look de cada
-   clase): 50%-100% (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja,
-   <5% = rojo — sin zona neutra, siempre hay una clase puesta. Se van encima de
-   ".modificado" a propósito (definidas después en el archivo): en combate importa más
-   saber que la vida está crítica AHORA que si el máximo fue modificado en algún momento. */
+   clase): 100%-66% = verde, 65%-36% = amarillo, 35%-15% = naranja, <15% (pero >0) = rojo,
+   y exactamente 0 = gris (vida-cero) — sin zona neutra, siempre hay una clase puesta. Se
+   van encima de ".modificado" a propósito (definidas después en el archivo): en combate
+   importa más saber que la vida está crítica AHORA que si el máximo fue modificado en
+   algún momento. */
 .skill-btn.vida-full {
-    border: 2px solid #1b5e20 !important;
+    border: 2px solid var(--vida-full-fill) !important;
 }
 .skill-btn.vida-full .skill-mod {
-    background-color: #1b5e20 !important;
+    background-color: var(--vida-full-fill) !important;
     color: white !important;
 }
 .skill-btn.vida-full:hover {
@@ -685,10 +736,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn.vida-baja {
-    border: 2px solid #f9a825 !important;
+    border: 2px solid var(--amarillo-fill) !important;
 }
 .skill-btn.vida-baja .skill-mod {
-    background-color: #f9a825 !important;
+    background-color: var(--amarillo-fill) !important;
     color: #3e2723 !important;
 }
 .skill-btn.vida-baja:hover {
@@ -705,10 +756,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn.vida-critica {
-    border: 2px solid #ef6c00 !important;
+    border: 2px solid var(--naranja-fill) !important;
 }
 .skill-btn.vida-critica .skill-mod {
-    background-color: #ef6c00 !important;
+    background-color: var(--naranja-fill) !important;
     color: white !important;
 }
 .skill-btn.vida-critica:hover {
@@ -725,10 +776,10 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 .skill-btn.vida-muy-critica {
-    border: 2px solid #c62828 !important;
+    border: 2px solid var(--rojo-fill) !important;
 }
 .skill-btn.vida-muy-critica .skill-mod {
-    background-color: #c62828 !important;
+    background-color: var(--rojo-fill) !important;
     color: white !important;
 }
 .skill-btn.vida-muy-critica:hover {
@@ -741,6 +792,23 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 .skill-btn.vida-muy-critica:hover .skill-mod {
     background-color: #c62828 !important;
+    color: white !important;
+}
+
+.skill-btn.vida-cero {
+    border: 2px solid var(--gris-fill) !important;
+}
+.skill-btn.vida-cero .skill-mod {
+    background-color: var(--gris-fill) !important;
+    color: white !important;
+}
+.skill-btn.vida-cero:hover {
+    background-color: #e0e0e0 !important;
+    border-color: #616161 !important;
+    color: #2e1a10 !important;
+}
+.skill-btn.vida-cero:hover .skill-mod {
+    background-color: #616161 !important;
     color: white !important;
 }
 

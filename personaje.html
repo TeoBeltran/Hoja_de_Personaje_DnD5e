@@ -185,7 +185,7 @@
             <h3 id="hp-modal-title">Vida</h3>
             <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
             <div id="hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 20px;">
-                <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                <div id="hp-bar-fill" style="background-color: var(--vida-full-fill); height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                 <button class="hp-btn hp-damage" data-amount="-1">-1 HP</button>
@@ -238,7 +238,7 @@
                 <p style="text-align: center; margin-bottom: 10px;">Tirá los dados y sumá el total.</p>
                 <p style="text-align: center; margin-bottom: 5px;">Te curás:</p>
                 <div style="display: flex; justify-content: center; margin-bottom: 15px;">
-                    <input id="hd-curacion-input" type="number" min="0" value="0" style="font-size: 2rem; font-weight: bold; text-align: center; width: 120px; padding: 8px; border: 2px solid var(--accent-color); border-radius: var(--border-radius); color: var(--accent-color); background-color: #fbf9f4;">
+                    <input id="hd-curacion-input" type="number" min="0" value="0" style="font-size: 2rem; font-weight: bold; text-align: center; width: 120px; padding: 8px; border: 2px solid var(--accent-color); border-radius: var(--border-radius); color: var(--accent-color); background-color: var(--btn-bg);">
                 </div>
                 <p style="text-align: center; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px;">puntos de vida</p>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -433,27 +433,27 @@
             <h4 style="margin: 0 0 12px 0; color: var(--accent-color); text-align: center; text-transform: uppercase; letter-spacing: 1px; font-size: 1rem;">Mi Turno</h4>
 
             <div id="turno-grid" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px;">
-                <button class="turno-item" data-tipo="accion" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
+                <button class="turno-item" data-tipo="accion" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
                     <span>Acción <span id="extra-attack-badge" style="display: none; font-size: 0.75rem; font-weight: bold; padding: 1px 6px; background-color: #6a1b9a; color: white; border-radius: 4px; margin-left: 4px;">×2 si golpeás</span></span>
-                    <span class="turno-valor" data-tipo="accion" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: #2e7d32; color: white;">1 / 1</span>
+                    <span class="turno-valor" data-tipo="accion" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: var(--verde-fill); color: white;">1 / 1</span>
                 </button>
-                <button class="turno-item" data-tipo="bonus" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
+                <button class="turno-item" data-tipo="bonus" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
                     <span>Acción Adicional</span>
-                    <span class="turno-valor" data-tipo="bonus" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: #2e7d32; color: white;">1 / 1</span>
+                    <span class="turno-valor" data-tipo="bonus" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: var(--verde-fill); color: white;">1 / 1</span>
                 </button>
-                <button class="turno-item" data-tipo="reaccion" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
+                <button class="turno-item" data-tipo="reaccion" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
                     <span>Reacción</span>
-                    <span class="turno-valor" data-tipo="reaccion" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: #2e7d32; color: white;">1 / 1</span>
+                    <span class="turno-valor" data-tipo="reaccion" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: var(--verde-fill); color: white;">1 / 1</span>
                 </button>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: #f5f0e1; border: 1px dashed var(--border-color); border-radius: var(--border-radius); font-size: 0.9rem; color: var(--text-muted);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px dashed var(--border-color); border-radius: var(--border-radius); font-size: 0.9rem; color: var(--text-muted);">
                     <span>Movimiento</span>
                     <span style="font-weight: bold;">1 / 1</span>
                 </div>
-                <button class="turno-item" data-tipo="objeto" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
+                <button class="turno-item" data-tipo="objeto" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius); cursor: pointer; font-size: 0.95rem; color: var(--text-color);">
                     <span>Interacción c/Objeto</span>
-                    <span class="turno-valor" data-tipo="objeto" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: #2e7d32; color: white;">1 / 1</span>
+                    <span class="turno-valor" data-tipo="objeto" style="font-weight: bold; padding: 2px 10px; border-radius: 4px; background-color: var(--verde-fill); color: white;">1 / 1</span>
                 </button>
-                <div style="display: flex; justify-content: center; align-items: center; padding: 10px 12px; background-color: #fbf9f4; border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; color: var(--text-color);">
+                <div style="display: flex; justify-content: center; align-items: center; padding: 10px 12px; background-color: var(--btn-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius); font-size: 0.95rem; color: var(--text-color);">
                     <span>Revisar Habilidades</span>
                 </div>
             </div>
@@ -509,7 +509,7 @@
 
             <div id="familiar-hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 10px 0; color: var(--accent-color);"></div>
             <div id="familiar-hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 15px;">
-                <div id="familiar-hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                <div id="familiar-hp-bar-fill" style="background-color: var(--vida-full-fill); height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                 <button id="familiar-hp-menos1" class="hp-btn hp-damage">-1 HP</button>

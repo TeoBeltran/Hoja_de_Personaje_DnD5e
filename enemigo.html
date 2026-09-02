@@ -37,7 +37,7 @@
         }
 
         .header-acciones a:hover { color: var(--accent-color); }
-        .header-acciones .btn-borrar-enemigo:hover { color: #c62828; }
+        .header-acciones .btn-borrar-enemigo:hover { color: var(--rojo-fill); }
 
         #icono-enemigo {
             font-size: 1.8rem;
@@ -140,7 +140,7 @@
 
         .btn-cancelar { background-color: var(--text-muted); }
         .btn-confirmar { background-color: var(--accent-color); }
-        .btn-peligro { background-color: #c62828; }
+        .btn-peligro { background-color: var(--rojo-fill); }
 
         .lista-vacia {
             color: var(--text-muted);
@@ -250,7 +250,7 @@
         }
 
         .entrada-item-botones button:hover { color: var(--accent-color); }
-        .entrada-item-botones .entrada-borrar:hover { color: #c62828; }
+        .entrada-item-botones .entrada-borrar:hover { color: var(--rojo-fill); }
 
         .entrada-item p {
             margin: 0;
@@ -302,17 +302,10 @@
         }
         .turno-valor {
             font-weight: bold; padding: 2px 10px; border-radius: 4px;
-            background-color: #2e7d32; color: white;
+            background-color: var(--verde-fill); color: white;
         }
-        .turno-valor.agotado { background-color: #c62828; }
+        .turno-valor.agotado { background-color: var(--rojo-fill); }
         #turno-reset { width: 100%; padding: 10px; font-weight: bold; }
-
-        /* Ajuste de tema oscuro: estos dos son texto rojo suelto sobre un fondo que sí
-           cambia con el tema (card-bg/entrada-item), quedaban muy oscuros para leerse. */
-        html[data-theme="dark"] .header-acciones .btn-borrar-enemigo:hover,
-        html[data-theme="dark"] .entrada-item-botones .entrada-borrar:hover {
-            color: #ef5350;
-        }
     </style>
 </head>
 <body>
@@ -443,7 +436,7 @@
             <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align: center;">Vida</h3>
             <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
             <div id="hp-bar-container" style="background-color: #d7ccc8; border-radius: 10px; height: 20px; overflow: hidden; margin-bottom: 20px;">
-                <div id="hp-bar-fill" style="background-color: #2e7d32; height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                <div id="hp-bar-fill" style="background-color: var(--vida-full-fill); height: 100%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button class="hp-btn hp-damage" data-amount="-1">-1 HP</button>

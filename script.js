@@ -528,20 +528,24 @@ function mostrarToast(mensaje, tipo = 'normal') {
     }, 2000);
 }
 
-// Color del tile de Vida según % actual (mismo criterio en enemigo.js): 50%-100%
-// (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo.
+// Color del tile de Vida según % actual (mismo criterio en enemigo.js): 100%-66% =
+// verde, 65%-36% = amarillo, 35%-15% = naranja, <15% = rojo, y exactamente 0 = gris
+// (antes solo se pintaba rojo al llegar justo a 0 — quedaba sin colorear casi todo
+// el rango intermedio, y encima 0 se veía "rojo" en vez de destacarse como estado
+// aparte de inconsciente/derrotado).
 function claseColorVida(actual, maximo) {
     if (!maximo || maximo <= 0) return null;
+    if (actual <= 0) return 'vida-cero';
     const pct = (actual / maximo) * 100;
-    if (pct < 5) return 'vida-muy-critica';
-    if (pct < 20) return 'vida-critica';
-    if (pct < 50) return 'vida-baja';
-    return 'vida-full'; // 50% a 100% (incluido) es todo verde, no solo justo a full
+    if (pct < 15) return 'vida-muy-critica';
+    if (pct <= 35) return 'vida-critica';
+    if (pct <= 65) return 'vida-baja';
+    return 'vida-full'; // 66% a 100% es todo verde
 }
 
 function aplicarClaseColorVida(btn, actual, maximo) {
     if (!btn) return;
-    btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica');
+    btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica', 'vida-cero');
     const clase = claseColorVida(actual, maximo);
     if (clase) btn.classList.add(clase);
 }
@@ -564,9 +568,13 @@ function actualizarVidaDOM() {
     if (barFill) {
         const porcentaje = vidaMaxima > 0 ? (vidaActual / vidaMaxima) * 100 : 0;
         barFill.style.width = `${porcentaje}%`;
-        if (porcentaje > 50) barFill.style.backgroundColor = '#2e7d32';
-        else if (porcentaje > 25) barFill.style.backgroundColor = '#f9a825';
-        else barFill.style.backgroundColor = '#c62828';
+        // Mismos 5 tramos que el tile de Vida (claseColorVida) — usando las variables CSS
+        // en vez de un hex fijo, así el color se resuelve solo según el tema activo.
+        if (vidaActual <= 0) barFill.style.backgroundColor = 'var(--gris-fill)';
+        else if (porcentaje < 15) barFill.style.backgroundColor = 'var(--rojo-fill)';
+        else if (porcentaje <= 35) barFill.style.backgroundColor = 'var(--naranja-fill)';
+        else if (porcentaje <= 65) barFill.style.backgroundColor = 'var(--amarillo-fill)';
+        else barFill.style.backgroundColor = 'var(--vida-full-fill)';
     }
 }
 
@@ -598,9 +606,11 @@ function actualizarFamiliarVidaDOM() {
     if (barFill) {
         const porcentaje = familiarDataActual.vidaMaxima > 0 ? (familiarVidaActual / familiarDataActual.vidaMaxima) * 100 : 0;
         barFill.style.width = `${porcentaje}%`;
-        if (porcentaje > 50) barFill.style.backgroundColor = '#2e7d32';
-        else if (porcentaje > 25) barFill.style.backgroundColor = '#f9a825';
-        else barFill.style.backgroundColor = '#c62828';
+        if (familiarVidaActual <= 0) barFill.style.backgroundColor = 'var(--gris-fill)';
+        else if (porcentaje < 15) barFill.style.backgroundColor = 'var(--rojo-fill)';
+        else if (porcentaje <= 35) barFill.style.backgroundColor = 'var(--naranja-fill)';
+        else if (porcentaje <= 65) barFill.style.backgroundColor = 'var(--amarillo-fill)';
+        else barFill.style.backgroundColor = 'var(--vida-full-fill)';
     }
 }
 
@@ -980,10 +990,10 @@ function actualizarPesoInventarioDOM() {
     if (span) {
         span.textContent = `${pesoCargado} / ${pesoMaximo} lb`;
         if (pesoCargado > pesoMaximo) {
-            span.style.color = '#c62828';
+            span.style.color = 'var(--rojo-fill)';
         } else if (pesoCargado > pesoMaximo * (5/15)) {
             // Más de STR×5 → ya tiene penalidad
-            span.style.color = '#f9a825';
+            span.style.color = 'var(--amarillo-fill)';
         } else {
             span.style.color = 'var(--text-muted)';
         }
@@ -1170,7 +1180,7 @@ function actualizarTurnoDOM() {
         const tipo = span.dataset.tipo;
         const valor = turnoEstado[tipo];
         span.textContent = `${valor} / 1`;
-        span.style.backgroundColor = valor > 0 ? '#2e7d32' : '#c62828';
+        span.style.backgroundColor = valor > 0 ? 'var(--verde-fill)' : 'var(--rojo-fill)';
     });
     const badge = document.getElementById('extra-attack-badge');
     if (badge) {
@@ -1791,6 +1801,10 @@ function tomarDescanso(tipo) {
         if (togglesActivos[nombre]) {
             togglesActivos[nombre] = false;
             huboToggleApagado = true;
+            // Si tenía badge de "turnos restantes" (ver toggleDuracionTurnos), ocultarlo
+            // ahora mismo — si no, queda mostrando el último número aunque el toggle ya
+            // esté apagado, hasta el próximo refresh completo de la página.
+            actualizarBadgeDuracionDOM(nombre);
         }
     });
     if (huboToggleApagado) guardarToggles();
@@ -2539,7 +2553,7 @@ async function init() {
         useSpellBtn.dataset.arma = '';
         useSpellBtn.dataset.smite = '';
         useSpellBtn.dataset.postGolpeSolo = '';
-        useSpellBtn.style.backgroundColor = '#6a1b9a'; // Reset color
+        useSpellBtn.style.backgroundColor = 'var(--violeta-fill)'; // Reset color
 
         const tieneDano = !!item.dano;
         // "esPoolCompartido" = habilidad "contenedora" que solo existe para mostrar el contador
@@ -2558,7 +2572,7 @@ async function init() {
             if (armaEquipada) {
                 useSpellBtn.disabled = false;
                 useSpellBtn.textContent = `Usar ${item.nombre}`;
-                useSpellBtn.style.backgroundColor = '#6a1b9a';
+                useSpellBtn.style.backgroundColor = 'var(--violeta-fill)';
             } else {
                 useSpellBtn.disabled = true;
                 useSpellBtn.textContent = `🚫 Equipá ${item.nombre} primero`;
@@ -2688,7 +2702,7 @@ async function init() {
 
             if (eq) {
                 btnEqModal.textContent = '✓ Desequipar';
-                btnEqModal.style.backgroundColor = '#2e7d32';
+                btnEqModal.style.backgroundColor = 'var(--verde-fill)';
                 btnEqModal.style.color = 'white';
                 btnEqModal.disabled = false;
             } else {
@@ -2696,12 +2710,12 @@ async function init() {
                 const validacionStats = validarRequerimientosStats(item, statsGlobal);
                 if (!validacion.permitido) {
                     btnEqModal.textContent = `🚫 ${validacion.razon}`;
-                    btnEqModal.style.backgroundColor = '#c62828';
+                    btnEqModal.style.backgroundColor = 'var(--rojo-fill)';
                     btnEqModal.style.color = 'white';
                     btnEqModal.disabled = true;
                 } else if (!validacionStats.permitido) {
                     btnEqModal.textContent = `🚫 ${validacionStats.razon}`;
-                    btnEqModal.style.backgroundColor = '#c62828';
+                    btnEqModal.style.backgroundColor = 'var(--rojo-fill)';
                     btnEqModal.style.color = 'white';
                     btnEqModal.disabled = true;
                 } else {
@@ -3299,7 +3313,7 @@ async function init() {
             const restantesIniciales = activoConDuracion
                 ? Math.max(0, h.toggleDuracionTurnos - (togglesDuracionContador[h.nombre] || 0))
                 : 0;
-            const duracionBadgeHTML = `<span id="dur-badge-${slugHab}" style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: #5d4037; ${activoConDuracion ? '' : 'display: none;'}">⏱️ ${restantesIniciales} turno${restantesIniciales === 1 ? '' : 's'}</span>`;
+            const duracionBadgeHTML = `<span id="dur-badge-${slugHab}" style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: var(--accent-color); ${activoConDuracion ? '' : 'display: none;'}">⏱️ ${restantesIniciales} turno${restantesIniciales === 1 ? '' : 's'}</span>`;
 
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px;">

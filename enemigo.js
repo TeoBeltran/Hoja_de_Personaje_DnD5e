@@ -71,19 +71,21 @@ if (!record) {
     }
 
     // Colorea el tile de Vida según el % actual (mismo criterio que personaje.html):
-    // 50%-100% (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo.
+    // 100%-66% = verde, 65%-36% = amarillo, 35%-15% = naranja, <15% = rojo, y
+    // exactamente 0 = gris (estado aparte, no "rojo más fuerte").
     function claseColorVida(actual, maximo) {
         if (!maximo || maximo <= 0) return null;
+        if (actual <= 0) return 'vida-cero';
         var pct = (actual / maximo) * 100;
-        if (pct < 5) return 'vida-muy-critica';
-        if (pct < 20) return 'vida-critica';
-        if (pct < 50) return 'vida-baja';
-        return 'vida-full'; // 50% a 100% (incluido) es todo verde, no solo justo a full
+        if (pct < 15) return 'vida-muy-critica';
+        if (pct <= 35) return 'vida-critica';
+        if (pct <= 65) return 'vida-baja';
+        return 'vida-full'; // 66% a 100% es todo verde
     }
 
     function aplicarClaseColorVida(btn, actual, maximo) {
         if (!btn) return;
-        btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica');
+        btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica', 'vida-cero');
         var clase = claseColorVida(actual, maximo);
         if (clase) btn.classList.add(clase);
     }
@@ -131,7 +133,7 @@ if (!record) {
             badges += '<span class="skill-mod" style="background-color:#2e7d32;color:white;">' + fmtMod(item.bonoAtaque) + ' al ataque</span>';
         }
         if (item.alcance) {
-            badges += '<span class="skill-mod" style="background-color:#5d4037;color:white;">' + escapeHTML(item.alcance) + '</span>';
+            badges += '<span class="skill-mod" style="background-color:var(--accent-color);color:white;">' + escapeHTML(item.alcance) + '</span>';
         }
         normalizarDanos(item).forEach(function (d) {
             var texto = formatoDano(d);
@@ -139,7 +141,7 @@ if (!record) {
         });
         if (CATEGORIAS_CON_CONSUMO[seccionClave]) {
             var consumo = normalizarConsumo(item);
-            badges += '<span class="skill-mod" style="background-color:#e65100;color:white;">Consume ' + consumo + ' ' + CATEGORIAS_CON_CONSUMO[seccionClave] + '</span>';
+            badges += '<span class="skill-mod" style="background-color:var(--naranja-fill);color:white;">Consume ' + consumo + ' ' + CATEGORIAS_CON_CONSUMO[seccionClave] + '</span>';
         }
         return badges;
     }
@@ -291,12 +293,19 @@ if (!record) {
         hpDisplay.textContent = actual + ' / ' + max;
         var pct = max > 0 ? (actual / max) * 100 : 0;
         hpBarFill.style.width = pct + '%';
-        if (pct <= 25) {
-            hpBarFill.style.backgroundColor = '#c62828';
-        } else if (pct <= 50) {
-            hpBarFill.style.backgroundColor = '#f9a825';
+        // Mismos 5 tramos que el tile de Vida (claseColorVida más arriba) y que combate.js:
+        // 100%-66% verde, 65%-36% amarillo, 35%-15% naranja, <15% rojo, 0 gris. Se usan las
+        // variables CSS (no un hex fijo) para que el color se resuelva solo según el tema activo.
+        if (actual <= 0) {
+            hpBarFill.style.backgroundColor = 'var(--gris-fill)';
+        } else if (pct < 15) {
+            hpBarFill.style.backgroundColor = 'var(--rojo-fill)';
+        } else if (pct <= 35) {
+            hpBarFill.style.backgroundColor = 'var(--naranja-fill)';
+        } else if (pct <= 65) {
+            hpBarFill.style.backgroundColor = 'var(--amarillo-fill)';
         } else {
-            hpBarFill.style.backgroundColor = '#2e7d32';
+            hpBarFill.style.backgroundColor = 'var(--vida-full-fill)';
         }
     }
 
