@@ -101,6 +101,7 @@ function siguienteTurno(ordenados) {
         if (idxSiguiente >= ordenados.length) {
             idxSiguiente = 0;
             turnoState.ronda += 1;
+            agregarDivisorRonda(turnoState.ronda);
         }
     }
     turnoState.uidActual = ordenados[idxSiguiente].uid;
@@ -137,21 +138,34 @@ function tipoParticipante(p) {
 }
 
 // opts: { delta } cambio de vida actual (daño negativo / cura positivo),
-//       { deltaMax } cambio de vida máxima (entrada separada, sin colorear rojo/verde),
+//       { deltaMax } cambio de bono TEMPORAL de vida máxima (ver aplicarBonoVidaMaxTemp),
+//       { deltaCA } cambio de bono TEMPORAL de CA (ver aplicarBonoCATemp),
 //       { cayoACero } true si este cambio de vida actual dejó al participante en 0.
+// Nunca vienen combinados (cada acción del usuario dispara un solo tipo por vez).
 function agregarHistorial(p, opts) {
     opts = opts || {};
     const delta = opts.delta || 0;
     const deltaMax = opts.deltaMax || 0;
-    if (!delta && !deltaMax) return;
+    const deltaCA = opts.deltaCA || 0;
+    if (!delta && !deltaMax && !deltaCA) return;
     historial.unshift({
         nombre: p.nombre,
         delta,
         deltaMax,
+        deltaCA,
         tipo: tipoParticipante(p),
         cayoACero: !!opts.cayoACero,
         ts: Date.now()
     });
+    historial = historial.slice(0, HISTORIAL_MAX);
+    guardarHistorial();
+    renderHistorial();
+}
+
+// Entrada neutral (sin daño/cura/bono de nadie) que marca el paso de una ronda a la
+// siguiente, para poder ubicar de un vistazo qué pasó en qué ronda mirando el log.
+function agregarDivisorRonda(numeroRonda) {
+    historial.unshift({ divisorRonda: numeroRonda, ts: Date.now() });
     historial = historial.slice(0, HISTORIAL_MAX);
     guardarHistorial();
     renderHistorial();
@@ -164,15 +178,22 @@ function renderHistorial() {
         return;
     }
     cont.innerHTML = historial.map(h => {
-        const esVidaMax = !!h.deltaMax;
-        const clase = esVidaMax ? 'vidamax' : (h.delta < 0 ? 'dano' : 'cura');
+        if (h.divisorRonda) {
+            return `<div class="historial-divisor">Ronda ${h.divisorRonda}</div>`;
+        }
+        const esCA = !!h.deltaCA;
+        const esVidaMax = !esCA && !!h.deltaMax;
+        const clase = esCA ? 'ca' : (esVidaMax ? 'vidamax' : (h.delta < 0 ? 'dano' : 'cura'));
         const tipo = h.tipo === 'aliado' ? 'aliado' : (h.tipo === 'rival' ? 'rival' : '');
         const dot = tipo ? `<span class="historial-dot ${tipo}" title="${tipo === 'aliado' ? 'Aliado' : 'Rival'}"></span>` : '';
         const hora = new Date(h.ts).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
         let texto;
-        if (esVidaMax) {
+        if (esCA) {
+            const signo = h.deltaCA > 0 ? '+' : '';
+            texto = `${h.nombre} CA (temp.) ${signo}${h.deltaCA}`;
+        } else if (esVidaMax) {
             const signo = h.deltaMax > 0 ? '+' : '';
-            texto = `${h.nombre} Vida Máx. ${signo}${h.deltaMax}`;
+            texto = `${h.nombre} Vida Máx. (temp.) ${signo}${h.deltaMax}`;
         } else {
             const signo = h.delta > 0 ? '+' : '';
             texto = `${h.nombre} ${signo}${h.delta} HP`;
@@ -491,7 +512,11 @@ function listarEnemigosDisponibles() {
 // ficha normal de un personaje (o cambiás la vida de un enemigo desde su propia
 // ficha), el rastreador de combate lo va a reflejar solo.
 
-function getVida(p) {
+// getVida/getCA devuelven el valor EFECTIVO (base + bono temporal de combate, ver
+// "Bonos temporales de combate" más abajo) — maximoBase se devuelve aparte para que quien
+// escriba un cambio de vida actual (aplicarCambioHp) nunca persista el máximo ya inflado
+// por el bono en la key permanente del personaje/enemigo.
+function getVidaBase(p) {
     if (p.origen === 'manual') return { actual: p.vidaActual, maximo: p.vidaMaxima };
     if (p.origen === 'enemigo') {
         const rec = leerEnemigo(p.enemigoId);
@@ -506,14 +531,22 @@ function getVida(p) {
     }
     const data = dataCache[p.personajeId];
     if (!data) {
-        console.log(`[combate] getVida(${p.personajeId}): todavía no hay data cacheada, devuelvo 0/0`);
+        console.log(`[combate] getVidaBase(${p.personajeId}): todavía no hay data cacheada, devuelvo 0/0`);
         return { actual: 0, maximo: 0 };
     }
     const r = leerVidaCompartida(p.personajeId, data);
     return { actual: r.vidaActual, maximo: r.vidaMaxima };
 }
 
-function getCA(p) {
+function getVida(p) {
+    const base = getVidaBase(p);
+    const bono = p.bonoVidaMaxTemp || 0;
+    const maximo = Math.max(1, base.maximo + bono);
+    const actual = Math.max(0, Math.min(base.actual, maximo));
+    return { actual, maximo, maximoBase: base.maximo };
+}
+
+function getCABase(p) {
     if (p.origen === 'manual') return p.ca;
     if (p.origen === 'enemigo') {
         const rec = leerEnemigo(p.enemigoId);
@@ -530,9 +563,17 @@ function getCA(p) {
     return leerCACompartida(p.personajeId, data, stats);
 }
 
-function setVida(p, actual, maximo) {
-    const maxSeguro = isNaN(maximo) ? 1 : Math.max(0, maximo);
-    const actSeguro = isNaN(actual) ? 0 : Math.max(0, Math.min(actual, maxSeguro));
+function getCA(p) {
+    return getCABase(p) + (p.bonoCATemp || 0);
+}
+
+// El segundo parámetro SIEMPRE es el máximo BASE (nunca el efectivo con bono incluido) —
+// así un cambio de vida actual (daño/cura) nunca termina "horneando" el bono temporal de
+// combate dentro del máximo permanente del personaje/enemigo.
+function setVida(p, actual, maximoBase) {
+    const maxSeguro = isNaN(maximoBase) ? 1 : Math.max(0, maximoBase);
+    const maximoEfectivo = Math.max(1, maxSeguro + (p.bonoVidaMaxTemp || 0));
+    const actSeguro = isNaN(actual) ? 0 : Math.max(0, Math.min(actual, maximoEfectivo));
     if (p.origen === 'manual') {
         p.vidaActual = actSeguro;
         p.vidaMaxima = maxSeguro;
@@ -553,8 +594,8 @@ function setVida(p, actual, maximo) {
     }
 }
 
-function setCA(p, valor) {
-    const seguro = isNaN(valor) ? 10 : valor;
+function setCA(p, valorBase) {
+    const seguro = isNaN(valorBase) ? 10 : valorBase;
     if (p.origen === 'manual') {
         p.ca = seguro;
         guardarCombate();
@@ -567,6 +608,66 @@ function setCA(p, valor) {
     } else if (p.origen === 'json') {
         guardarCACompartida(p.personajeId, seguro);
     }
+}
+
+// ================== Bonos temporales de combate (Vida Máxima y CA) ==================
+// Capa aparte de la vida máxima/CA "real" del personaje o enemigo: pensada para efectos de
+// combate (Aid, Shield of Faith, un debuff que baja el máximo, etc.) que NO deben quedar
+// grabados en la ficha permanente y que se borran solos con cualquier descanso. Vive en el
+// propio objeto participante (dentro de combate_participantes), no en las keys pj_<id>_* /
+// enemigo_<id> — así nunca corrompe el valor real, y basta con sacar al personaje del combate
+// (o "🗑️ Nuevo combate") para que desaparezca. Para personajes 'json' TAMBIÉN se borra al
+// tomar cualquier descanso corto/largo desde su propia ficha (ver limpiarBonosTemporalesCombate
+// en script.js) — los enemigos/manuales no tienen concepto de descanso, así que su bono queda
+// hasta que el DM lo saque a mano (con el mismo campo "Restar") o se reinicie el combate.
+
+// Escribe SOLO la vida actual, sin tocar la key/campo de vida máxima para nada (ni para
+// "reescribirla igual") — a diferencia de setVida(), que por cómo guarda 'json' (las dos keys
+// juntas en un solo helper) siempre terminaba creando una key pj_<id>_vidaMaxima nueva con el
+// valor calculado apenas se tocaba algo acá, aunque no hubiese cambiado. Eso es justo lo que
+// NO tiene que pasar con un bono temporal: si el personaje sube de nivel después y su Vida base
+// del JSON cambia, no debe quedar tapada por una copia vieja guardada sin necesidad.
+function setVidaActualSolo(p, actual) {
+    const actSeguro = isNaN(actual) ? 0 : Math.max(0, actual);
+    if (p.origen === 'manual') {
+        p.vidaActual = actSeguro;
+        guardarCombate();
+    } else if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (rec) {
+            rec.vidaActual = actSeguro;
+            guardarEnemigo(rec);
+        }
+    } else if (p.origen === 'familiar') {
+        const data = dataCache[p.personajeId];
+        const activo = data && leerFamiliarActivo(p.personajeId, data);
+        if (activo) guardarFamiliarVida(p.personajeId, activo.def.id, actSeguro);
+    } else {
+        localStorage.setItem(`pj_${p.personajeId}_vidaActual`, String(actSeguro));
+    }
+}
+
+function aplicarBonoVidaMaxTemp(p, delta) {
+    if (!delta) return;
+    const antes = getVida(p);
+    p.bonoVidaMaxTemp = (p.bonoVidaMaxTemp || 0) + delta;
+    const despues = getVida(p);
+    // Solo hace falta persistir la vida actual si el bono nuevo (uno negativo, un debuff)
+    // obligó a recortarla porque quedó por encima del máximo efectivo nuevo. Si el bono sube
+    // el máximo (o baja pero la vida actual ya estaba por debajo), no hay nada que reescribir
+    // — así un "Sumar" nunca toca ninguna key permanente del personaje/enemigo.
+    if (despues.actual !== antes.actual) {
+        setVidaActualSolo(p, despues.actual);
+    }
+    guardarCombate();
+    agregarHistorial(p, { deltaMax: delta });
+}
+
+function aplicarBonoCATemp(p, delta) {
+    if (!delta) return;
+    p.bonoCATemp = (p.bonoCATemp || 0) + delta;
+    guardarCombate();
+    agregarHistorial(p, { deltaCA: delta });
 }
 
 // ================== Carga de datos de personajes JSON en el combate ==================
@@ -845,10 +946,17 @@ async function render() {
         const statsRow = document.createElement('div');
         statsRow.className = 'combatiente-stats';
 
-        const btnVida = crearStatBtn('Vida', `${actual}/${maximo}`);
+        // Si hay un bono TEMPORAL de combate activo (ver §"Bonos temporales de combate" en
+        // combate.js), se lo marca al lado del número para que se note de un vistazo por qué
+        // difiere del valor real de la ficha — sin abrir el modal.
+        const bonoVidaMax = p.bonoVidaMaxTemp || 0;
+        const vidaTexto = `${actual}/${maximo}` + (bonoVidaMax ? ` <span class="stat-bono">(${bonoVidaMax > 0 ? '+' : ''}${bonoVidaMax})</span>` : '');
+        const btnVida = crearStatBtn('Vida', vidaTexto);
         btnVida.addEventListener('click', (e) => { e.stopPropagation(); abrirModalHp(p); });
 
-        const btnCA = crearStatBtn('CA', getCA(p), p.origen !== 'familiar');
+        const bonoCA = p.bonoCATemp || 0;
+        const caTexto = `${getCA(p)}` + (bonoCA ? ` <span class="stat-bono">(${bonoCA > 0 ? '+' : ''}${bonoCA})</span>` : '');
+        const btnCA = crearStatBtn('CA', caTexto, p.origen !== 'familiar');
         if (p.origen !== 'familiar') {
             btnCA.addEventListener('click', (e) => { e.stopPropagation(); abrirModalCa(p); });
         }
@@ -958,6 +1066,8 @@ function abrirModalHp(p) {
     actualizarHpModalDOM();
     document.getElementById('hp-input-danio').value = '0';
     document.getElementById('hp-input-cura').value = '0';
+    document.getElementById('hp-max-input-sumar').value = '0';
+    document.getElementById('hp-max-input-restar').value = '0';
     document.getElementById('hp-modal').style.display = 'flex';
 }
 
@@ -978,30 +1088,54 @@ function actualizarHpModalDOM() {
         : pct <= 35 ? 'var(--naranja-fill)'
         : pct <= 65 ? 'var(--amarillo-fill)'
         : 'var(--vida-full-fill)';
+
+    // Bloque de Vida Máxima temporal: no aplica a familiares (su máximo viene fijo de la
+    // definición del compañero, no hay dónde persistir un bono en cada render).
+    const bloqueMax = document.getElementById('hp-max-temp-bloque');
+    if (hpModalTarget.origen === 'familiar') {
+        bloqueMax.style.display = 'none';
+    } else {
+        bloqueMax.style.display = '';
+        const bono = hpModalTarget.bonoVidaMaxTemp || 0;
+        const info = document.getElementById('hp-max-bono-info');
+        info.textContent = bono
+            ? `Bono temporal activo: ${bono > 0 ? '+' : ''}${bono} (se borra solo en cualquier descanso)`
+            : 'Sin bono temporal activo — se borra solo en cualquier descanso.';
+        document.getElementById('hp-quitar-bono').style.display = bono ? '' : 'none';
+    }
 }
 
-function aplicarCambioHp(amount, maxAmount) {
-    if (!hpModalTarget) return;
-    const { actual, maximo } = getVida(hpModalTarget);
-    if (maxAmount) {
-        const nuevoMax = Math.max(1, maximo + maxAmount);
-        const nuevoActual = Math.min(actual, nuevoMax);
-        setVida(hpModalTarget, nuevoActual, nuevoMax);
-        agregarHistorial(hpModalTarget, { deltaMax: maxAmount });
-    } else if (amount) {
-        const nuevoActual = Math.max(0, Math.min(actual + amount, maximo));
-        setVida(hpModalTarget, nuevoActual, maximo);
-        // Si se cura desde 0, se borra cualquier salvación de muerte que tuviera tildada
-        // (volvió a estar consciente, arranca de cero si vuelve a caer más adelante).
-        if (nuevoActual > 0 && hpModalTarget.origen === 'json') {
-            hpModalTarget.muerteExitos = 0;
-            hpModalTarget.muerteFallos = 0;
-            hpModalTarget.estabilizado = false;
-            hpModalTarget.muerto = false;
-            guardarCombate();
-        }
-        agregarHistorial(hpModalTarget, { delta: nuevoActual - actual, cayoACero: nuevoActual === 0 && actual > 0 });
+function aplicarCambioHp(amount) {
+    if (!hpModalTarget || !amount) return;
+    const { actual, maximo, maximoBase } = getVida(hpModalTarget);
+    const nuevoActual = Math.max(0, Math.min(actual + amount, maximo));
+    setVida(hpModalTarget, nuevoActual, maximoBase);
+    // Si se cura desde 0, se borra cualquier salvación de muerte que tuviera tildada
+    // (volvió a estar consciente, arranca de cero si vuelve a caer más adelante).
+    if (nuevoActual > 0 && hpModalTarget.origen === 'json') {
+        hpModalTarget.muerteExitos = 0;
+        hpModalTarget.muerteFallos = 0;
+        hpModalTarget.estabilizado = false;
+        hpModalTarget.muerto = false;
+        guardarCombate();
     }
+    agregarHistorial(hpModalTarget, { delta: nuevoActual - actual, cayoACero: nuevoActual === 0 && actual > 0 });
+    actualizarHpModalDOM();
+    render();
+}
+
+function aplicarCambioVidaMaxTemp(delta) {
+    if (!hpModalTarget || !delta) return;
+    aplicarBonoVidaMaxTemp(hpModalTarget, delta);
+    actualizarHpModalDOM();
+    render();
+}
+
+function quitarBonoVidaMaxTemp() {
+    if (!hpModalTarget) return;
+    const bono = hpModalTarget.bonoVidaMaxTemp || 0;
+    if (!bono) return;
+    aplicarBonoVidaMaxTemp(hpModalTarget, -bono);
     actualizarHpModalDOM();
     render();
 }
@@ -1011,6 +1145,8 @@ function aplicarCambioHp(amount, maxAmount) {
 function abrirModalCa(p) {
     caModalTargetUid = p.uid;
     actualizarCaModalDOM();
+    document.getElementById('ca-input-sumar').value = '0';
+    document.getElementById('ca-input-restar').value = '0';
     document.getElementById('ca-modal').style.display = 'flex';
 }
 
@@ -1024,12 +1160,28 @@ function actualizarCaModalDOM() {
     if (!p) return;
     document.getElementById('ca-modal-title').textContent = `Clase de Armadura - ${p.nombre}`;
     document.getElementById('ca-display').textContent = getCA(p);
+    const bono = p.bonoCATemp || 0;
+    const info = document.getElementById('ca-bono-info');
+    info.textContent = bono
+        ? `Bono temporal activo: ${bono > 0 ? '+' : ''}${bono} (se borra solo en cualquier descanso)`
+        : 'Sin bono temporal activo — se borra solo en cualquier descanso.';
+    document.getElementById('ca-quitar-bono').style.display = bono ? '' : 'none';
 }
 
-function aplicarCambioCa(amount) {
+function aplicarCambioCaTemp(delta) {
+    const p = participanteActualCa();
+    if (!p || !delta) return;
+    aplicarBonoCATemp(p, delta);
+    actualizarCaModalDOM();
+    render();
+}
+
+function quitarBonoCaTemp() {
     const p = participanteActualCa();
     if (!p) return;
-    setCA(p, getCA(p) + amount);
+    const bono = p.bonoCATemp || 0;
+    if (!bono) return;
+    aplicarBonoCATemp(p, -bono);
     actualizarCaModalDOM();
     render();
 }
@@ -1342,14 +1494,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ids.length) await agregarEnemigosExistentes(ids);
     });
 
-    document.querySelectorAll('#hp-modal .hp-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const amount = btn.dataset.amount ? parseInt(btn.dataset.amount) : 0;
-            const maxAmount = btn.dataset.maxAmount ? parseInt(btn.dataset.maxAmount) : 0;
-            aplicarCambioHp(amount, maxAmount);
-        });
-    });
-
     // Daño/Curación del modal de Vida: se tipean los dos montos y se aplican juntos como un
     // solo cambio neto (cura - daño), para que el historial registre una única entrada.
     const hpInputDanio = document.getElementById('hp-input-danio');
@@ -1357,7 +1501,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('hp-aplicar-btn').addEventListener('click', () => {
         const danio = Math.max(0, parseInt(hpInputDanio.value) || 0);
         const cura = Math.max(0, parseInt(hpInputCura.value) || 0);
-        aplicarCambioHp(cura - danio, 0);
+        aplicarCambioHp(cura - danio);
         hpInputDanio.value = '0';
         hpInputCura.value = '0';
         hpInputDanio.focus();
@@ -1371,8 +1515,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('#ca-modal [data-ca-amount]').forEach(btn => {
-        btn.addEventListener('click', () => aplicarCambioCa(parseInt(btn.dataset.caAmount)));
+    // Vida Máxima TEMPORAL: mismo patrón de 2 inputs (Sumar/Restar) + Aplicar como Daño/Curación,
+    // pero es un bono aparte (ver aplicarBonoVidaMaxTemp) que nunca toca el máximo real.
+    const hpMaxInputSumar = document.getElementById('hp-max-input-sumar');
+    const hpMaxInputRestar = document.getElementById('hp-max-input-restar');
+    document.getElementById('hp-max-aplicar-btn').addEventListener('click', () => {
+        const sumar = Math.max(0, parseInt(hpMaxInputSumar.value) || 0);
+        const restar = Math.max(0, parseInt(hpMaxInputRestar.value) || 0);
+        aplicarCambioVidaMaxTemp(sumar - restar);
+        hpMaxInputSumar.value = '0';
+        hpMaxInputRestar.value = '0';
     });
+    [hpMaxInputSumar, hpMaxInputRestar].forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('hp-max-aplicar-btn').click();
+            }
+        });
+    });
+    document.getElementById('hp-quitar-bono').addEventListener('click', quitarBonoVidaMaxTemp);
+
+    // CA: mismo patrón de 2 inputs (Sumar/Restar) para el bono TEMPORAL — reemplaza los viejos
+    // botones ±1 (que antes escribían directo sobre la CA real, permanente, del personaje/enemigo).
+    const caInputSumar = document.getElementById('ca-input-sumar');
+    const caInputRestar = document.getElementById('ca-input-restar');
+    document.getElementById('ca-aplicar-btn').addEventListener('click', () => {
+        const sumar = Math.max(0, parseInt(caInputSumar.value) || 0);
+        const restar = Math.max(0, parseInt(caInputRestar.value) || 0);
+        aplicarCambioCaTemp(sumar - restar);
+        caInputSumar.value = '0';
+        caInputRestar.value = '0';
+    });
+    [caInputSumar, caInputRestar].forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('ca-aplicar-btn').click();
+            }
+        });
+    });
+    document.getElementById('ca-quitar-bono').addEventListener('click', quitarBonoCaTemp);
     document.getElementById('ca-reset').addEventListener('click', restaurarCaOriginal);
 });

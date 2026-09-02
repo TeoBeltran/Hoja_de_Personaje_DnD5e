@@ -1755,9 +1755,34 @@ function usarHabilidad(nombre) {
     }
 }
 
+// Si este personaje está participando en el Rastreador de Combate (combate.html), cualquier
+// bono TEMPORAL de Vida Máxima o CA que se le haya aplicado desde ahí (ver "Bonos temporales de
+// combate" en combate.js — Aid, Shield of Faith, un debuff, etc.) se borra en CUALQUIER descanso,
+// corto o largo, sin que haga falta tener el Rastreador abierto: se edita directo el mismo
+// localStorage['combate_participantes'] que usa combate.js, y éste lo va a reflejar solo la
+// próxima vez que se renderice. No aplica a enemigos/manuales (no tienen descanso, ver §12 del
+// CONTEXT — sus bonos temporales los saca el DM a mano desde el Rastreador).
+function limpiarBonosTemporalesCombate() {
+    try {
+        const raw = localStorage.getItem('combate_participantes');
+        if (!raw) return;
+        const lista = JSON.parse(raw);
+        if (!Array.isArray(lista)) return;
+        let cambio = false;
+        lista.forEach(p => {
+            if (p.origen === 'json' && p.personajeId === personajeId) {
+                if (p.bonoVidaMaxTemp) { p.bonoVidaMaxTemp = 0; cambio = true; }
+                if (p.bonoCATemp) { p.bonoCATemp = 0; cambio = true; }
+            }
+        });
+        if (cambio) localStorage.setItem('combate_participantes', JSON.stringify(lista));
+    } catch (e) { /* ignore: si el JSON guardado está corrupto, no hay nada que limpiar */ }
+}
+
 function tomarDescanso(tipo) {
     // tipo = 'corto' o 'largo'
     let recuperaCorto = (tipo === 'corto');
+    limpiarBonosTemporalesCombate();
     
     // Recuperar ranuras
     Object.keys(ranurasState).forEach(nivel => {

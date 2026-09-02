@@ -118,6 +118,28 @@
         .historial-item.dano { border-left-color: var(--rojo-fill); }
         .historial-item.cura { border-left-color: var(--verde-fill); }
         .historial-item.vidamax { border-left-color: var(--violeta-texto); }
+        .historial-item.ca { border-left-color: var(--azul-fill); }
+
+        /* Divisor neutral de ronda: una línea gris centrada, para poder ubicar de un vistazo
+           dónde terminó una ronda y empezó la siguiente al mirar el log para atrás. */
+        .historial-divisor {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin: 2px 0;
+        }
+        .historial-divisor::before,
+        .historial-divisor::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--border-color);
+        }
 
         /* Punto de color: quién es (aliado = jugador/familiar, rival = enemigo/manual).
            Independiente del borde rojo/verde de daño/cura, que ya indica QUÉ pasó. */
@@ -237,6 +259,21 @@
             cursor: pointer;
             color: var(--text-muted);
             background-color: var(--bg-color);
+        }
+
+        /* Antes de tildarlos, un pip de "acierto" y uno de "fallo" se veían idénticos (mismo
+           círculo gris con un "○"), así que había que fijarse bien en cuál de las dos filas
+           estabas tocando. Se pintan de un pastel MUY suave (nunca tan fuerte como el estado
+           "lleno") de la familia de color que van a tomar al marcarse, para que se distingan
+           de un vistazo sin que compita visualmente con el pip ya tildado. */
+        .muerte-pip.exitos:not(.lleno) {
+            background-color: var(--verde-pastel-bg);
+            border-color: var(--verde-pastel-bg);
+        }
+
+        .muerte-pip.fallos:not(.lleno) {
+            background-color: var(--rojo-pastel-bg);
+            border-color: var(--rojo-pastel-bg);
         }
 
         .muerte-pip.exitos.lleno {
@@ -418,6 +455,15 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 2px;
+        }
+
+        /* Marca chica al lado de Vida/CA cuando hay un bono TEMPORAL de combate activo (ver
+           "Bonos temporales de combate" en combate.js) — para notar de un vistazo que ese número
+           no es el de la ficha real, sin tener que abrir el modal. */
+        .stat-bono {
+            font-size: 0.7rem;
+            font-weight: normal;
+            color: var(--text-muted);
         }
 
         .combatiente-familiar {
@@ -753,9 +799,26 @@
                 </div>
             </div>
             <button type="button" id="hp-aplicar-btn" class="btn-confirmar" style="width: 100%; padding: 10px; border: none; border-radius: var(--border-radius); font-weight: bold; cursor: pointer; color: white; margin-top: 14px;">Aplicar</button>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px;">
-                <button type="button" class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
-                <button type="button" class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
+
+            <!-- Vida Máxima TEMPORAL: bono aparte del máximo real (Aid, un debuff, etc.) que se
+                 borra solo en cualquier descanso corto o largo — nunca toca la ficha permanente. -->
+            <div id="hp-max-temp-bloque" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color); margin-bottom: 4px;">Vida Máxima temporal</div>
+                <div id="hp-max-bono-info" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;"></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label for="hp-max-input-sumar" style="color: #2e7d32;">Sumar</label>
+                        <input type="number" id="hp-max-input-sumar" min="0" value="0">
+                    </div>
+                    <div>
+                        <label for="hp-max-input-restar" style="color: #c62828;">Restar</label>
+                        <input type="number" id="hp-max-input-restar" min="0" value="0">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-top: 10px;">
+                    <button type="button" id="hp-max-aplicar-btn" class="hp-btn" style="background-color: var(--accent-color); color: white;">Aplicar</button>
+                    <button type="button" id="hp-quitar-bono" class="hp-btn" style="display:none;">Quitar bono</button>
+                </div>
             </div>
         </div>
     </div>
@@ -765,10 +828,24 @@
         <div class="modal-content">
             <span class="close-btn" data-close="ca-modal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:1.5rem; color: var(--text-muted);">&times;</span>
             <h3 id="ca-modal-title" style="color: var(--accent-color); margin-top: 0; text-align:center;">Clase de Armadura</h3>
-            <div id="ca-display" style="text-align: center; font-size: 3rem; font-weight: bold; margin: 20px 0; color: var(--accent-color);"></div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                <button class="hp-btn hp-damage" data-ca-amount="-1">-1</button>
-                <button class="hp-btn hp-heal" data-ca-amount="1">+1</button>
+            <div id="ca-display" style="text-align: center; font-size: 3rem; font-weight: bold; margin: 12px 0 4px 0; color: var(--accent-color);"></div>
+            <div id="ca-bono-info" style="text-align:center; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px;"></div>
+
+            <!-- CA TEMPORAL: mismo patrón que Vida Máxima temporal (Shield of Faith, un debuff de
+                 CA, etc.) — se borra sola en cualquier descanso, nunca toca la CA real guardada. -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <label for="ca-input-sumar" style="color: #2e7d32;">Sumar</label>
+                    <input type="number" id="ca-input-sumar" min="0" value="0">
+                </div>
+                <div>
+                    <label for="ca-input-restar" style="color: #c62828;">Restar</label>
+                    <input type="number" id="ca-input-restar" min="0" value="0">
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-top: 10px; margin-bottom: 10px;">
+                <button type="button" id="ca-aplicar-btn" class="hp-btn" style="background-color: var(--accent-color); color: white;">Aplicar</button>
+                <button type="button" id="ca-quitar-bono" class="hp-btn" style="display:none;">Quitar bono</button>
             </div>
             <button id="ca-reset" class="hp-btn" style="width: 100%; background-color: var(--accent-color); color: white;">Restaurar valor original</button>
         </div>
