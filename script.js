@@ -528,6 +528,26 @@ function mostrarToast(mensaje, tipo = 'normal') {
     }, 2000);
 }
 
+// Color del tile de Vida según % actual (mismo criterio en enemigo.js): a full = verde
+// oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Nada especial entre 50% y 100%
+// sin estar full.
+function claseColorVida(actual, maximo) {
+    if (!maximo || maximo <= 0) return null;
+    const pct = (actual / maximo) * 100;
+    if (pct < 5) return 'vida-muy-critica';
+    if (pct < 20) return 'vida-critica';
+    if (pct < 50) return 'vida-baja';
+    if (actual >= maximo) return 'vida-full';
+    return null;
+}
+
+function aplicarClaseColorVida(btn, actual, maximo) {
+    if (!btn) return;
+    btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica');
+    const clase = claseColorVida(actual, maximo);
+    if (clase) btn.classList.add(clase);
+}
+
 function actualizarVidaDOM() {
     const btnVida = document.getElementById('vida-btn');
     if (btnVida) {
@@ -538,6 +558,7 @@ function actualizarVidaDOM() {
         } else {
             btnVida.classList.remove('modificado');
         }
+        aplicarClaseColorVida(btnVida, vidaActual, vidaMaxima);
     }
     const display = document.getElementById('hp-display');
     const barFill = document.getElementById('hp-bar-fill');
@@ -2169,6 +2190,7 @@ async function init() {
             btn.id = 'vida-btn';
             btn.innerHTML = `<span>${i.nombre}</span><span class="skill-mod">${vidaActual}/${vidaMaxima}</span>`;
             if (vidaMaxima !== vidaMaximaOriginal) btn.classList.add('modificado');
+            aplicarClaseColorVida(btn, vidaActual, vidaMaxima);
             btn.addEventListener('click', () => {
                 document.getElementById('hp-modal').style.display = 'flex';
                 actualizarVidaDOM();

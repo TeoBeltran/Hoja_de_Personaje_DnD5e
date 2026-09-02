@@ -615,3 +615,77 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
     color: var(--text-color) !important;
 }
 
+/* Color del tile de Vida según % actual — jugadores (personaje.html) Y enemigos
+   (enemigo.html), mismo criterio para los dos. Se pintan en este orden de prioridad
+   (menos a más grave se resuelve en JS, acá solo el look de cada clase):
+   a full = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Se van encima de
+   ".modificado" a propósito (definidas después en el archivo): en combate importa más
+   saber que la vida está crítica AHORA que si el máximo fue modificado en algún momento. */
+.skill-btn.vida-full {
+    border: 2px solid #1b5e20 !important;
+}
+.skill-btn.vida-full .skill-mod {
+    background-color: #1b5e20 !important;
+    color: white !important;
+}
+.skill-btn.vida-full:hover {
+    background-color: #a5d6a7 !important;
+    border-color: #1b5e20 !important;
+    color: var(--text-color) !important;
+}
+.skill-btn.vida-full:hover .skill-mod {
+    background-color: #1b5e20 !important;
+    color: white !important;
+}
+
+.skill-btn.vida-baja {
+    border: 2px solid #f9a825 !important;
+}
+.skill-btn.vida-baja .skill-mod {
+    background-color: #f9a825 !important;
+    color: #3e2723 !important;
+}
+.skill-btn.vida-baja:hover {
+    background-color: #fff59d !important;
+    border-color: #f9a825 !important;
+    color: var(--text-color) !important;
+}
+.skill-btn.vida-baja:hover .skill-mod {
+    background-color: #f9a825 !important;
+    color: #3e2723 !important;
+}
+
+.skill-btn.vida-critica {
+    border: 2px solid #ef6c00 !important;
+}
+.skill-btn.vida-critica .skill-mod {
+    background-color: #ef6c00 !important;
+    color: white !important;
+}
+.skill-btn.vida-critica:hover {
+    background-color: #ffcc80 !important;
+    border-color: #ef6c00 !important;
+    color: var(--text-color) !important;
+}
+.skill-btn.vida-critica:hover .skill-mod {
+    background-color: #ef6c00 !important;
+    color: white !important;
+}
+
+.skill-btn.vida-muy-critica {
+    border: 2px solid #c62828 !important;
+}
+.skill-btn.vida-muy-critica .skill-mod {
+    background-color: #c62828 !important;
+    color: white !important;
+}
+.skill-btn.vida-muy-critica:hover {
+    background-color: #ffcdd2 !important;
+    border-color: #c62828 !important;
+    color: var(--text-color) !important;
+}
+.skill-btn.vida-muy-critica:hover .skill-mod {
+    background-color: #c62828 !important;
+    color: white !important;
+}
+

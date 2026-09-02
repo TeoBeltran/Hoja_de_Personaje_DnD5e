@@ -257,8 +257,8 @@
                     <label for="en-ca">CA</label>
                     <input type="number" id="en-ca" min="0" required>
 
-                    <label for="en-velocidad">Velocidad</label>
-                    <input type="text" id="en-velocidad" placeholder="ej: 30ft" required>
+                    <label for="en-velocidad">Velocidad (en pies)</label>
+                    <input type="number" id="en-velocidad" min="0" placeholder="ej: 30" required>
 
                     <label for="en-iniciativa">Iniciativa</label>
                     <input type="number" id="en-iniciativa" required>
@@ -498,7 +498,7 @@
                 icono: obtenerIconoElegido(),
                 vida: parseInt(document.getElementById('en-vida').value) || 0,
                 ca: parseInt(document.getElementById('en-ca').value) || 0,
-                velocidad: document.getElementById('en-velocidad').value.trim(),
+                velocidad: Math.max(0, parseInt(document.getElementById('en-velocidad').value) || 0),
                 iniciativa: parseInt(document.getElementById('en-iniciativa').value) || 0,
                 accionesPorTurno: Math.max(1, parseInt(document.getElementById('en-acciones-turno').value) || 1),
                 legendariasHabilitadas: enLegendariasCheck.checked,
@@ -515,7 +515,7 @@
 
             document.getElementById('confirm-resumen').innerHTML =
                 `¿Confirmás crear a ${datosPendientes.icono} <strong>${datosPendientes.nombre}</strong>?<br>` +
-                `Vida ${datosPendientes.vida} · CA ${datosPendientes.ca} · Velocidad ${datosPendientes.velocidad || '—'} · Iniciativa ${fmtMod(datosPendientes.iniciativa)}<br>` +
+                `Vida ${datosPendientes.vida} · CA ${datosPendientes.ca} · Velocidad ${datosPendientes.velocidad}ft · Iniciativa ${fmtMod(datosPendientes.iniciativa)}<br>` +
                 `Acciones/turno: ${datosPendientes.accionesPorTurno}` +
                 (datosPendientes.legendariasHabilitadas ? ` · Acciones legendarias: ${datosPendientes.legendariasPorRonda}/ronda` : '') + `<br>` +
                 `STR ${fmtMod(datosPendientes.mods.STR)} · DEX ${fmtMod(datosPendientes.mods.DEX)} · CON ${fmtMod(datosPendientes.mods.CON)} · ` +
@@ -581,7 +581,7 @@
   "icono": string (UN solo emoji, ej "🐉"),
   "vidaMaxima": number,
   "caBase": number,
-  "velocidad": string (ej "30ft"),
+  "velocidad": number (en pies, SOLO el número, ej 30 — no "30ft"),
   "iniciativa": number (el modificador ya calculado, ej 2),
   "accionesPorTurno": number (default 1; más de 1 solo si puede repetir "Acción" en su turno, ej multiataque),
   "legendariasHabilitadas": boolean,
@@ -681,7 +681,7 @@ Acá te describo el/los monstruo(s) que quiero:
                 vidaActual: vidaMaxima,
                 caBase,
                 caActual: caBase,
-                velocidad: obj.velocidad ? String(obj.velocidad) : '',
+                velocidad: (!isNaN(parseInt(obj.velocidad)) && parseInt(obj.velocidad) >= 0) ? parseInt(obj.velocidad) : 30,
                 iniciativa: parseInt(obj.iniciativa) || 0,
                 accionesPorTurno,
                 legendariasHabilitadas,
@@ -741,15 +741,8 @@ Acá te describo el/los monstruo(s) que quiero:
             });
         });
 
-        // Cierre clickeando afuera del modal.
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.style.display = 'none';
-                    datosPendientes = null;
-                }
-            });
-        });
+        // A propósito NO hay cierre clickeando afuera del modal: solo la X / "Cancelar"
+        // lo cierran, para que un misclick no lo cierre por accidente.
 
         // Al cargar la página: si ya había sesión guardada, saltear el login directo.
         if (estaAutenticado()) {

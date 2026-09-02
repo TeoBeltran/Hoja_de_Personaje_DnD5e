@@ -46,6 +46,14 @@ if (!record) {
             };
             cambio = true;
         }
+        // Velocidad pasó de texto libre (ej. "40ft") a número en pies, para poder
+        // editarla con el mismo stepper ±1/±5 que Vida/CA. Se extrae el primer
+        // número que aparezca en el texto viejo (default 30 si no hay ninguno).
+        if (typeof record.velocidad !== 'number') {
+            var match = String(record.velocidad || '').match(/\d+/);
+            record.velocidad = match ? parseInt(match[0]) : 30;
+            cambio = true;
+        }
         if (cambio) localStorage.setItem('enemigo_' + id, JSON.stringify(record));
     })();
 
@@ -60,6 +68,26 @@ if (!record) {
 
     function escapeHTML(str) {
         return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // Colorea el tile de Vida según el % actual (mismo criterio que personaje.html):
+    // a full = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Ninguna clase
+    // (look normal) entre 50% y 100% sin estar full.
+    function claseColorVida(actual, maximo) {
+        if (!maximo || maximo <= 0) return null;
+        var pct = (actual / maximo) * 100;
+        if (pct < 5) return 'vida-muy-critica';
+        if (pct < 20) return 'vida-critica';
+        if (pct < 50) return 'vida-baja';
+        if (actual >= maximo) return 'vida-full';
+        return null;
+    }
+
+    function aplicarClaseColorVida(btn, actual, maximo) {
+        if (!btn) return;
+        btn.classList.remove('vida-full', 'vida-baja', 'vida-critica', 'vida-muy-critica');
+        var clase = claseColorVida(actual, maximo);
+        if (clase) btn.classList.add(clase);
     }
 
     var SECCIONES = {
@@ -135,6 +163,7 @@ if (!record) {
         btnVida.className = 'skill-btn';
         btnVida.id = 'btn-vida';
         btnVida.innerHTML = '<span>Vida</span><span class="skill-mod">' + record.vidaActual + '/' + record.vidaMaxima + '</span>';
+        aplicarClaseColorVida(btnVida, record.vidaActual, record.vidaMaxima);
         btnVida.addEventListener('click', abrirModalHp);
         grid.appendChild(btnVida);
 
@@ -149,22 +178,22 @@ if (!record) {
         var btnVel = document.createElement('button');
         btnVel.type = 'button';
         btnVel.className = 'skill-btn';
-        btnVel.innerHTML = '<span>Velocidad</span><span class="skill-mod">' + (record.velocidad || '—') + '</span>';
-        btnVel.addEventListener('click', function () { abrirModalValor('velocidad', 'Velocidad', 'text'); });
+        btnVel.innerHTML = '<span>Velocidad</span><span class="skill-mod">' + record.velocidad + 'ft</span>';
+        btnVel.addEventListener('click', function () { abrirModalValor('velocidad', 'Velocidad', { min: 0, sufijo: 'ft' }); });
         grid.appendChild(btnVel);
 
         var btnIni = document.createElement('button');
         btnIni.type = 'button';
         btnIni.className = 'skill-btn';
         btnIni.innerHTML = '<span>Iniciativa</span><span class="skill-mod">' + fmtMod(record.iniciativa) + '</span>';
-        btnIni.addEventListener('click', function () { abrirModalValor('iniciativa', 'Iniciativa', 'number'); });
+        btnIni.addEventListener('click', function () { abrirModalValor('iniciativa', 'Iniciativa', {}); });
         grid.appendChild(btnIni);
 
         var btnAcciones = document.createElement('button');
         btnAcciones.type = 'button';
         btnAcciones.className = 'skill-btn';
         btnAcciones.innerHTML = '<span>Acciones/Turno</span><span class="skill-mod">' + record.accionesPorTurno + '</span>';
-        btnAcciones.addEventListener('click', function () { abrirModalValor('accionesPorTurno', 'Acciones por turno', 'number'); });
+        btnAcciones.addEventListener('click', function () { abrirModalValor('accionesPorTurno', 'Acciones por turno', { min: 1 }); });
         grid.appendChild(btnAcciones);
 
         var btnLegendarias = document.createElement('button');
@@ -216,16 +245,24 @@ if (!record) {
                 (item.desc ? '<p>' + escapeHTML(item.desc).replace(/\n/g, '<br>') + '</p>' : '') +
                 (item.efectoAdicional ? '<p><strong>Efecto adicional:</strong> ' + escapeHTML(item.efectoAdicional).replace(/\n/g, '<br>') + '</p>' : '');
 
-            div.querySelector('.entrada-editar').addEventListener('click', function () {
+            div.querySelector('.entrada-editar').addEventListener('click', function (e) {
+                e.stopPropagation();
                 abrirEditarEntrada(clave, idx);
             });
 
-            div.querySelector('.entrada-borrar').addEventListener('click', function () {
+            div.querySelector('.entrada-borrar').addEventListener('click', function (e) {
+                e.stopPropagation();
                 abrirConfirmar('¿Borrar "' + item.nombre + '"?', function () {
                     record[clave].splice(idx, 1);
                     guardarRecord();
                     renderSeccion(clave);
                 });
+            });
+
+            // Tocar la card (fuera de los botones ✏️/🗑️) abre el mismo modal de detalle
+            // que usa el menú de turno, con el botón "Usar" — igual que en la hoja de jugador.
+            div.addEventListener('click', function () {
+                mostrarDetalle(item, clave, idx);
             });
 
             cont.appendChild(div);
@@ -322,43 +359,55 @@ if (!record) {
         renderStats();
     });
 
-    // ===== Modal genérico Velocidad / Iniciativa / Acciones por turno =====
+    // ===== Modal genérico (stepper ±1/±5) para Velocidad / Iniciativa / Acciones por turno =====
+    // Mismo patrón que Vida/CA: cada click aplica y guarda al toque, no hay "Guardar" aparte.
 
     var valorModal = document.getElementById('valor-modal');
     var valorModalTitle = document.getElementById('valor-modal-title');
-    var valorInput = document.getElementById('valor-input');
-    var formValor = document.getElementById('form-valor');
+    var valorDisplay = document.getElementById('valor-display');
     var campoValorActual = null;
+    var valorMinActual = null;   // null = sin mínimo (permite negativos, ej. Iniciativa)
+    var valorSufijoActual = '';  // ej. "ft" para Velocidad
 
-    function abrirModalValor(campo, etiqueta, tipo) {
-        campoValorActual = campo;
-        valorModalTitle.textContent = etiqueta;
-        valorInput.type = tipo;
-        if (tipo === 'number') valorInput.min = 1;
-        valorInput.value = record[campo];
-        valorModal.style.display = 'flex';
-        valorInput.focus();
+    function actualizarValorModalDOM() {
+        if (!campoValorActual) return;
+        var val = record[campoValorActual];
+        var texto = (campoValorActual === 'iniciativa') ? fmtMod(val) : String(val);
+        valorDisplay.textContent = texto + valorSufijoActual;
     }
 
-    formValor.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!campoValorActual) return;
+    function abrirModalValor(campo, etiqueta, opts) {
+        campoValorActual = campo;
+        valorModalTitle.textContent = etiqueta;
+        valorMinActual = (opts && opts.min !== undefined) ? opts.min : null;
+        valorSufijoActual = (opts && opts.sufijo) || '';
+        actualizarValorModalDOM();
+        valorModal.style.display = 'flex';
+    }
 
-        if (campoValorActual === 'accionesPorTurno') {
-            var nuevoMax = Math.max(1, parseInt(valorInput.value) || 1);
-            var estabaAlMax = record.turnoActual.accion >= record.accionesPorTurno;
-            record.accionesPorTurno = nuevoMax;
-            record.turnoActual.accion = estabaAlMax ? nuevoMax : Math.min(record.turnoActual.accion, nuevoMax);
-        } else if (valorInput.type === 'number') {
-            record[campoValorActual] = parseInt(valorInput.value) || 0;
-        } else {
-            record[campoValorActual] = valorInput.value.trim();
-        }
+    Array.prototype.forEach.call(valorModal.querySelectorAll('[data-valor-amount]'), function (btn) {
+        btn.addEventListener('click', function () {
+            if (!campoValorActual) return;
+            var delta = parseInt(btn.dataset.valorAmount);
 
-        guardarRecord();
-        renderStats();
-        actualizarTurnoPanelDOM();
-        valorModal.style.display = 'none';
+            if (campoValorActual === 'accionesPorTurno') {
+                var maxViejo = record.accionesPorTurno;
+                var estabaAlMax = record.turnoActual.accion >= maxViejo;
+                var nuevoMax = Math.max(1, maxViejo + delta);
+                record.accionesPorTurno = nuevoMax;
+                record.turnoActual.accion = estabaAlMax ? nuevoMax : Math.min(record.turnoActual.accion, nuevoMax);
+            } else {
+                var actual = parseInt(record[campoValorActual]) || 0;
+                var nuevo = actual + delta;
+                if (valorMinActual !== null) nuevo = Math.max(valorMinActual, nuevo);
+                record[campoValorActual] = nuevo;
+            }
+
+            guardarRecord();
+            actualizarValorModalDOM();
+            renderStats();
+            actualizarTurnoPanelDOM();
+        });
     });
 
     // ===== Modal para cambiar el ícono (desplegable + opción personalizada) =====
@@ -400,34 +449,53 @@ if (!record) {
         iconoModal.style.display = 'none';
     });
 
-    // ===== Modal para configurar Acciones Legendarias =====
+    // ===== Modal para configurar Acciones Legendarias (checkbox + stepper ±1/±5) =====
+    // Igual que el resto: cada click/toggle aplica y guarda al toque, no hay "Guardar" aparte.
 
     var legendariasModal = document.getElementById('legendarias-modal');
     var legCheck = document.getElementById('leg-check');
     var legCantCont = document.getElementById('leg-cant-cont');
-    var legCant = document.getElementById('leg-cant');
-    var formLegendarias = document.getElementById('form-legendarias');
+    var legCantDisplay = document.getElementById('leg-cant-display');
+
+    function actualizarLegendariasModalDOM() {
+        legCheck.checked = !!record.legendariasHabilitadas;
+        legCantCont.style.display = legCheck.checked ? 'block' : 'none';
+        legCantDisplay.textContent = record.legendariasPorRonda || 0;
+    }
 
     function abrirModalLegendarias() {
-        legCheck.checked = !!record.legendariasHabilitadas;
-        legCant.value = record.legendariasPorRonda || 3;
-        legCantCont.style.display = legCheck.checked ? 'block' : 'none';
+        actualizarLegendariasModalDOM();
         legendariasModal.style.display = 'flex';
     }
 
     legCheck.addEventListener('change', function () {
-        legCantCont.style.display = legCheck.checked ? 'block' : 'none';
-    });
-
-    formLegendarias.addEventListener('submit', function (e) {
-        e.preventDefault();
         record.legendariasHabilitadas = legCheck.checked;
-        record.legendariasPorRonda = legCheck.checked ? Math.max(1, parseInt(legCant.value) || 1) : 0;
+        if (legCheck.checked && !record.legendariasPorRonda) {
+            record.legendariasPorRonda = 3;
+        }
+        if (!legCheck.checked) {
+            record.legendariasPorRonda = 0;
+        }
         record.turnoActual.legendaria = record.legendariasPorRonda;
         guardarRecord();
+        actualizarLegendariasModalDOM();
         renderStats();
         actualizarTurnoPanelDOM();
-        legendariasModal.style.display = 'none';
+    });
+
+    Array.prototype.forEach.call(legendariasModal.querySelectorAll('[data-leg-amount]'), function (btn) {
+        btn.addEventListener('click', function () {
+            var delta = parseInt(btn.dataset.legAmount);
+            var maxViejo = record.legendariasPorRonda || 0;
+            var estabaAlMax = record.turnoActual.legendaria >= maxViejo;
+            var nuevo = Math.max(1, maxViejo + delta);
+            record.legendariasPorRonda = nuevo;
+            record.turnoActual.legendaria = estabaAlMax ? nuevo : Math.min(record.turnoActual.legendaria, nuevo);
+            guardarRecord();
+            actualizarLegendariasModalDOM();
+            renderStats();
+            actualizarTurnoPanelDOM();
+        });
     });
 
     // ===== Modal único para agregar/editar una entrada (el tipo lo elige un desplegable) =====
@@ -593,13 +661,23 @@ if (!record) {
         entradaModal.style.display = 'none';
     });
 
+    // Categorías cuyas entradas consumen un pool del menú de turno, mapeadas a la key
+    // de ese pool en turnoActual. "habilidades" queda afuera a propósito: son pasivas,
+    // no consumen nada, así que su modal de detalle no muestra el botón "Usar".
+    var MAPA_POOL_POR_SECCION = {
+        acciones: 'accion',
+        accionesBonus: 'bonus',
+        reacciones: 'reaccion',
+        accionesLegendarias: 'legendaria'
+    };
+
     // ===== Modal: lista de entradas de una categoría (se abre desde el menú de turno) =====
 
     var listaModal = document.getElementById('lista-modal');
     var listaModalTitulo = document.getElementById('lista-modal-titulo');
     var listaModalContenido = document.getElementById('lista-modal-contenido');
 
-    function abrirListaModalTurno(seccionClave, poolKey) {
+    function abrirListaModalTurno(seccionClave) {
         listaModalTitulo.textContent = SECCIONES[seccionClave].titulo;
         listaModalContenido.innerHTML = '';
         var items = record[seccionClave] || [];
@@ -622,7 +700,7 @@ if (!record) {
                     '</span>';
                 btn.addEventListener('click', function () {
                     listaModal.style.display = 'none';
-                    consumirYMostrarDetalle(seccionClave, idx, poolKey);
+                    mostrarDetalle(item, seccionClave, idx);
                 });
                 listaModalContenido.appendChild(btn);
             });
@@ -631,7 +709,10 @@ if (!record) {
         listaModal.style.display = 'flex';
     }
 
-    // ===== Modal: detalle de una entrada (solo lectura, para consultar en combate) =====
+    // ===== Modal: detalle de una entrada, con botón "Usar" (igual que la hoja de jugador) =====
+    // Se abre TANTO al tocar una card inline como al elegir una entrada desde el menú de
+    // turno — en ningún caso consume nada solo por abrirse; el consumo pasa a ser explícito,
+    // recién al tocar "Usar" adentro.
 
     var detalleModal = document.getElementById('detalle-modal');
     var detalleNombre = document.getElementById('detalle-nombre');
@@ -639,8 +720,12 @@ if (!record) {
     var detalleDesc = document.getElementById('detalle-desc');
     var detalleEfectoCont = document.getElementById('detalle-efecto-cont');
     var detalleEfecto = document.getElementById('detalle-efecto');
+    var detalleModalAcciones = document.getElementById('detalle-modal-acciones');
+    var detalleUsarBtn = document.getElementById('detalle-usar-btn');
+    var detalleContexto = null; // { seccionClave, idx } de la entrada mostrada actualmente
 
-    function mostrarDetalle(item, seccionClave) {
+    function mostrarDetalle(item, seccionClave, idx) {
+        detalleContexto = { seccionClave: seccionClave, idx: idx };
         detalleNombre.textContent = item.nombre;
         detalleBadges.innerHTML = construirBadgesHTML(item, seccionClave);
         detalleDesc.innerHTML = item.desc ? escapeHTML(item.desc).replace(/\n/g, '<br>') : '<em style="color:var(--text-muted);">Sin descripción.</em>';
@@ -650,20 +735,36 @@ if (!record) {
         } else {
             detalleEfectoCont.style.display = 'none';
         }
+
+        // "Usar" solo tiene sentido si esta categoría gasta un pool del menú de turno
+        // (Habilidades/Pasivas son a voluntad, no consumen nada).
+        if (MAPA_POOL_POR_SECCION[seccionClave]) {
+            detalleUsarBtn.style.display = 'block';
+            detalleModalAcciones.classList.remove('una-columna');
+        } else {
+            detalleUsarBtn.style.display = 'none';
+            detalleModalAcciones.classList.add('una-columna');
+        }
+
         detalleModal.style.display = 'flex';
     }
 
-    // Descuenta del pool correspondiente (turnoActual) el "consumo" de la entrada elegida desde
-    // el menú de turno, y muestra su detalle para que el DM pueda leerlo/resolver el ataque.
-    function consumirYMostrarDetalle(seccionClave, idx, poolKey) {
-        var item = (record[seccionClave] || [])[idx];
-        if (!item) return;
-        var costo = CATEGORIAS_CON_CONSUMO[seccionClave] ? normalizarConsumo(item) : 1;
-        record.turnoActual[poolKey] = Math.max(0, (record.turnoActual[poolKey] || 0) - costo);
-        guardarRecord();
-        actualizarTurnoPanelDOM();
-        mostrarDetalle(item, seccionClave);
-    }
+    detalleUsarBtn.addEventListener('click', function () {
+        if (!detalleContexto) return;
+        var seccionClave = detalleContexto.seccionClave;
+        var idx = detalleContexto.idx;
+        var poolKey = MAPA_POOL_POR_SECCION[seccionClave];
+        if (poolKey) {
+            var item = (record[seccionClave] || [])[idx];
+            if (item) {
+                var costo = CATEGORIAS_CON_CONSUMO[seccionClave] ? normalizarConsumo(item) : 1;
+                record.turnoActual[poolKey] = Math.max(0, (record.turnoActual[poolKey] || 0) - costo);
+                guardarRecord();
+                actualizarTurnoPanelDOM();
+            }
+        }
+        detalleModal.style.display = 'none';
+    });
 
     // ===== Modal de confirmación genérico (reemplaza confirm()/alert() nativos) =====
 
@@ -741,20 +842,20 @@ if (!record) {
     });
 
     var MAPA_TURNO = {
-        accion: { seccion: 'acciones', pool: 'accion' },
-        bonus: { seccion: 'accionesBonus', pool: 'bonus' },
-        reaccion: { seccion: 'reacciones', pool: 'reaccion' },
-        legendaria: { seccion: 'accionesLegendarias', pool: 'legendaria' }
+        accion: 'acciones',
+        bonus: 'accionesBonus',
+        reaccion: 'reacciones',
+        legendaria: 'accionesLegendarias'
     };
 
     Array.prototype.forEach.call(document.querySelectorAll('.turno-item'), function (btn) {
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
             var tipo = btn.dataset.tipo;
-            var mapa = MAPA_TURNO[tipo];
-            if (!mapa) return;
+            var seccionClave = MAPA_TURNO[tipo];
+            if (!seccionClave) return;
             turnoPanel.style.display = 'none';
-            abrirListaModalTurno(mapa.seccion, mapa.pool);
+            abrirListaModalTurno(seccionClave);
         });
     });
 
@@ -771,25 +872,15 @@ if (!record) {
         turnoPanel.style.display = 'none';
     });
 
-    // ===== Cierre de modales (mismo patrón que enemigos.html/combate.html) =====
-    // El modal de confirmación NO tiene botón de cerrar ni se cierra clickeando afuera
-    // a propósito: obliga a elegir Sí o No explícitamente (mismo criterio que ya usaba
-    // #detalle-modal en combate.html para no cerrarse por accidente).
+    // ===== Cierre de modales =====
+    // Ningún modal de esta hoja se cierra clickeando afuera — solo con su botón de
+    // cerrar/cancelar (la X, o "Cerrar"/"Cancelar"/"No"). Es a propósito: un misclick
+    // durante el combate no debe cerrar nada por accidente.
 
     Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (el) {
         el.addEventListener('click', function () {
             document.getElementById(el.dataset.close).style.display = 'none';
             campoValorActual = null;
-        });
-    });
-
-    Array.prototype.forEach.call(document.querySelectorAll('.modal'), function (modal) {
-        if (modal.id === 'confirmar-modal') return;
-        modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                campoValorActual = null;
-            }
         });
     });
 
