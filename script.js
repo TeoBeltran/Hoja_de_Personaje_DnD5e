@@ -528,17 +528,15 @@ function mostrarToast(mensaje, tipo = 'normal') {
     }, 2000);
 }
 
-// Color del tile de Vida según % actual (mismo criterio en enemigo.js): a full = verde
-// oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Nada especial entre 50% y 100%
-// sin estar full.
+// Color del tile de Vida según % actual (mismo criterio en enemigo.js): 50%-100%
+// (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo.
 function claseColorVida(actual, maximo) {
     if (!maximo || maximo <= 0) return null;
     const pct = (actual / maximo) * 100;
     if (pct < 5) return 'vida-muy-critica';
     if (pct < 20) return 'vida-critica';
     if (pct < 50) return 'vida-baja';
-    if (actual >= maximo) return 'vida-full';
-    return null;
+    return 'vida-full'; // 50% a 100% (incluido) es todo verde, no solo justo a full
 }
 
 function aplicarClaseColorVida(btn, actual, maximo) {

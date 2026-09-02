@@ -75,6 +75,15 @@
                 <div class="personaje-nombre">Combate</div>
             `;
             grid.appendChild(combate);
+
+            const enemigos = document.createElement('a');
+            enemigos.href = 'enemigos.html';
+            enemigos.className = 'personaje-card personaje-card-extras';
+            enemigos.innerHTML = `
+                <div class="personaje-icon">🐉</div>
+                <div class="personaje-nombre">Enemigos</div>
+            `;
+            grid.appendChild(enemigos);
         }
 
         function mostrarGrid() {

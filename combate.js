@@ -330,13 +330,54 @@ function guardarFamiliarVida(personajeId, id, vidaActual) {
     localStorage.setItem(`pj_${personajeId}_familiar`, JSON.stringify({ id, vidaActual }));
 }
 
-// ================== Vida / CA: acceso genérico (json, manual o familiar) ==================
+// ================== Enemigos existentes (creados antes en Enemigos) ==================
+// Un enemigo agregado al combate NO se "copia": el participante solo guarda su id
+// (`enemigoId`) y todo lo demás (vida, CA, mods, habilidades/acciones) se lee y
+// escribe en vivo contra la MISMA key `enemigo_<id>` que usa enemigo.html, igual
+// criterio que ya se usa para los personajes 'json'. Así, cambiar la vida desde acá
+// también se ve reflejado si el DM abre la ficha del enemigo, y viceversa.
+
+function leerEnemigo(id) {
+    try {
+        const raw = localStorage.getItem(`enemigo_${id}`);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function guardarEnemigo(record) {
+    localStorage.setItem(`enemigo_${record.id}`, JSON.stringify(record));
+}
+
+function listarEnemigosDisponibles() {
+    const lista = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('enemigo_')) {
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                if (data && data.id && data.nombre) lista.push(data);
+            } catch (e) { /* key corrupta, se ignora */ }
+        }
+    }
+    lista.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+    return lista;
+}
+
+// ================== Vida / CA: acceso genérico (json, enemigo, manual o familiar) ==================
 // Se leen SIEMPRE en vivo desde localStorage al momento de renderizar (no se guarda
 // una "foto" fija al agregar al combate). Así, si equipás una armadura nueva en la
-// ficha normal de un personaje, el rastreador de combate lo va a reflejar solo.
+// ficha normal de un personaje (o cambiás la vida de un enemigo desde su propia
+// ficha), el rastreador de combate lo va a reflejar solo.
 
 function getVida(p) {
     if (p.origen === 'manual') return { actual: p.vidaActual, maximo: p.vidaMaxima };
+    if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (!rec) return { actual: 0, maximo: 0 };
+        return { actual: rec.vidaActual, maximo: rec.vidaMaxima };
+    }
     if (p.origen === 'familiar') {
         const data = dataCache[p.personajeId];
         const activo = data && leerFamiliarActivo(p.personajeId, data);
@@ -354,6 +395,10 @@ function getVida(p) {
 
 function getCA(p) {
     if (p.origen === 'manual') return p.ca;
+    if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        return rec ? rec.caActual : 0;
+    }
     if (p.origen === 'familiar') {
         const data = dataCache[p.personajeId];
         const activo = data && leerFamiliarActivo(p.personajeId, data);
@@ -372,6 +417,13 @@ function setVida(p, actual, maximo) {
         p.vidaActual = actSeguro;
         p.vidaMaxima = maxSeguro;
         guardarCombate();
+    } else if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (rec) {
+            rec.vidaActual = actSeguro;
+            rec.vidaMaxima = maxSeguro;
+            guardarEnemigo(rec);
+        }
     } else if (p.origen === 'familiar') {
         const data = dataCache[p.personajeId];
         const activo = data && leerFamiliarActivo(p.personajeId, data);
@@ -386,6 +438,12 @@ function setCA(p, valor) {
     if (p.origen === 'manual') {
         p.ca = seguro;
         guardarCombate();
+    } else if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (rec) {
+            rec.caActual = seguro;
+            guardarEnemigo(rec);
+        }
     } else if (p.origen === 'json') {
         guardarCACompartida(p.personajeId, seguro);
     }
@@ -419,21 +477,15 @@ async function agregarPersonajesJson(ids) {
                 data = await resp.json();
                 dataCache[id] = data;
             } catch (e) {
-                alert(`No pude cargar personajes/${id}.json`);
+                mostrarAviso(`No pude cargar personajes/${id}.json`);
                 continue;
             }
         }
         const stats = statsFinales(data.personaje);
         const modDex = statAMod(stats['DEX'] ?? 10);
 
-        const respuesta = prompt(
-            `Iniciativa de ${data.personaje.nombre || meta.nombre}\n` +
-            `Modificador de DEX: ${formatMod(modDex)}\n\n` +
-            `¿Cuánto querés sumarle? (tu tirada de d20, o el total que quieras agregar)`,
-            '0'
-        );
-        if (respuesta === null) continue; // canceló para este personaje
-        const suma = parseInt(respuesta) || 0;
+        const suma = await pedirIniciativa(data.personaje.nombre || meta.nombre, `DEX ${formatMod(modDex)}`);
+        if (suma === null) continue; // omitió para este personaje
         const iniciativa = modDex + suma;
 
         participantes.push({
@@ -451,17 +503,24 @@ async function agregarPersonajesJson(ids) {
     await render();
 }
 
-function agregarEnemigoManual({ nombre, vida, ca, iniciativa }) {
-    participantes.push({
-        uid: crypto.randomUUID(),
-        origen: 'manual',
-        nombre,
-        icono: '⚔️',
-        vidaActual: vida,
-        vidaMaxima: vida,
-        ca,
-        iniciativa
-    });
+async function agregarEnemigosExistentes(ids) {
+    for (const id of ids) {
+        const rec = leerEnemigo(id);
+        if (!rec) continue;
+
+        const suma = await pedirIniciativa(rec.nombre, `Iniciativa ${formatMod(rec.iniciativa || 0)}`);
+        if (suma === null) continue; // omitió para este enemigo
+        const iniciativa = (parseInt(rec.iniciativa) || 0) + suma;
+
+        participantes.push({
+            uid: crypto.randomUUID(),
+            origen: 'enemigo',
+            enemigoId: id,
+            nombre: rec.nombre,
+            icono: rec.icono || '👹',
+            iniciativa
+        });
+    }
     guardarCombate();
     render();
 }
@@ -473,17 +532,100 @@ function quitarParticipante(uid) {
 }
 
 function borrarCombate() {
-    if (!confirm('¿Borrar todo el combate actual? (esto NO borra la vida, ranuras ni usos de las fichas, solo la lista, el turno, el historial y las condiciones de este combate)')) return;
-    participantes = [];
-    localStorage.removeItem(COMBATE_KEY);
-    turnoState = { ronda: 1, uidActual: null };
-    localStorage.removeItem(TURNO_KEY);
-    historial = [];
-    localStorage.removeItem(HISTORIAL_KEY);
-    condiciones = {};
-    localStorage.removeItem(CONDICIONES_KEY);
-    render();
+    abrirConfirmar(
+        '¿Borrar todo el combate actual? (esto NO borra la vida, ranuras ni usos de las fichas, solo la lista, el turno, el historial y las condiciones de este combate)',
+        () => {
+            participantes = [];
+            localStorage.removeItem(COMBATE_KEY);
+            turnoState = { ronda: 1, uidActual: null };
+            localStorage.removeItem(TURNO_KEY);
+            historial = [];
+            localStorage.removeItem(HISTORIAL_KEY);
+            condiciones = {};
+            localStorage.removeItem(CONDICIONES_KEY);
+            render();
+        }
+    );
 }
+
+// ================== Modales genéricos (reemplazan confirm()/alert()/prompt() nativos) ==================
+// Mismo criterio que enemigo.js/enemigo.html: sin X, no se cierran clickeando afuera, solo con
+// sus botones explícitos (ver también la exclusión en el listener de cierre-por-afuera más abajo).
+
+// ----- Confirmación (Sí/No) -----
+const confirmarModal = document.getElementById('confirmar-modal');
+const confirmarMensaje = document.getElementById('confirmar-mensaje');
+const confirmarSiBtn = document.getElementById('confirmar-si');
+const confirmarNoBtn = document.getElementById('confirmar-no');
+let confirmarCallback = null;
+
+function abrirConfirmar(mensaje, onSi) {
+    confirmarMensaje.textContent = mensaje;
+    confirmarCallback = onSi;
+    confirmarModal.style.display = 'flex';
+}
+
+confirmarSiBtn.addEventListener('click', () => {
+    const cb = confirmarCallback;
+    confirmarModal.style.display = 'none';
+    confirmarCallback = null;
+    if (cb) cb();
+});
+
+confirmarNoBtn.addEventListener('click', () => {
+    confirmarModal.style.display = 'none';
+    confirmarCallback = null;
+});
+
+// ----- Aviso (informativo, un solo botón) -----
+const avisoModal = document.getElementById('aviso-modal');
+const avisoMensaje = document.getElementById('aviso-mensaje');
+
+function mostrarAviso(mensaje) {
+    avisoMensaje.textContent = mensaje;
+    avisoModal.style.display = 'flex';
+}
+
+document.getElementById('aviso-cerrar').addEventListener('click', () => {
+    avisoModal.style.display = 'none';
+});
+
+// ----- Iniciativa (reemplaza prompt(), resuelve una Promise con el número sumado o null si se omite) -----
+const iniciativaModal = document.getElementById('iniciativa-modal');
+const iniciativaTitulo = document.getElementById('iniciativa-modal-title');
+const iniciativaInfo = document.getElementById('iniciativa-modal-info');
+const iniciativaInput = document.getElementById('iniciativa-input');
+const iniciativaOmitirBtn = document.getElementById('iniciativa-omitir');
+const iniciativaAgregarBtn = document.getElementById('iniciativa-agregar');
+let iniciativaResolve = null;
+
+function pedirIniciativa(nombre, modificadorTexto) {
+    return new Promise(resolve => {
+        iniciativaTitulo.textContent = `Iniciativa de ${nombre}`;
+        iniciativaInfo.textContent = `Modificador: ${modificadorTexto}`;
+        iniciativaInput.value = '0';
+        iniciativaResolve = resolve;
+        iniciativaModal.style.display = 'flex';
+        iniciativaInput.focus();
+        iniciativaInput.select();
+    });
+}
+
+function resolverIniciativa(valor) {
+    iniciativaModal.style.display = 'none';
+    const resolve = iniciativaResolve;
+    iniciativaResolve = null;
+    if (resolve) resolve(valor);
+}
+
+iniciativaAgregarBtn.addEventListener('click', () => resolverIniciativa(parseInt(iniciativaInput.value) || 0));
+iniciativaOmitirBtn.addEventListener('click', () => resolverIniciativa(null));
+iniciativaInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        resolverIniciativa(parseInt(iniciativaInput.value) || 0);
+    }
+});
 
 // ================== Render ==================
 
@@ -553,6 +695,19 @@ async function render() {
             <span class="combatiente-icono">${p.icono || '🎲'}</span>
             <span class="combatiente-nombre">${p.nombre}</span>
         `;
+        if (p.origen === 'json' || p.origen === 'enemigo') {
+            const linkFicha = document.createElement('a');
+            linkFicha.className = 'btn-abrir-ficha';
+            linkFicha.textContent = '🔗';
+            linkFicha.title = 'Abrir ficha completa';
+            linkFicha.target = '_blank';
+            linkFicha.rel = 'noopener';
+            linkFicha.href = p.origen === 'json'
+                ? `personaje.html?p=${p.personajeId}`
+                : `enemigo.html?id=${p.enemigoId}`;
+            linkFicha.addEventListener('click', (e) => e.stopPropagation());
+            header.appendChild(linkFicha);
+        }
         if (p.origen !== 'familiar') {
             const btnQuitar = document.createElement('button');
             btnQuitar.className = 'btn-quitar';
@@ -677,6 +832,16 @@ function restaurarCaOriginal() {
     const p = participanteActualCa();
     if (!p) return;
     if (p.origen === 'manual') return; // no hay "original" calculado para uno manual
+    if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (rec) {
+            rec.caActual = rec.caBase;
+            guardarEnemigo(rec);
+        }
+        actualizarCaModalDOM();
+        render();
+        return;
+    }
     localStorage.removeItem(`pj_${p.personajeId}_caActual`);
     actualizarCaModalDOM();
     render();
@@ -702,6 +867,40 @@ function renderModalDetalle() {
 
     if (p.origen === 'manual') {
         body.innerHTML = `<div class="sin-datos">Enemigo cargado a mano, no tiene ficha con más datos.</div>`;
+        return;
+    }
+
+    if (p.origen === 'enemigo') {
+        const rec = leerEnemigo(p.enemigoId);
+        if (!rec) {
+            body.innerHTML = `<div class="sin-datos">No se encontró la ficha de este enemigo (¿se borró desde Enemigos?).</div>`;
+            return;
+        }
+        let html = `<div class="expand-titulo">Modificadores</div><div class="expand-grid">`;
+        ['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].forEach(k => {
+            const val = (rec.mods && rec.mods[k]) || 0;
+            html += `<div class="expand-stat"><span class="es-nombre">${k}</span><span class="es-valor">${formatMod(val)}</span></div>`;
+        });
+        html += `</div>`;
+
+        const secciones = [
+            ['habilidades', 'Habilidades / Pasivas'],
+            ['acciones', 'Acciones'],
+            ['accionesBonus', 'Acciones Adicionales'],
+            ['reacciones', 'Reacciones'],
+            ['accionesLegendarias', 'Acciones Legendarias']
+        ];
+        secciones.forEach(([clave, titulo]) => {
+            const lista = rec[clave] || [];
+            if (!lista.length) return;
+            html += `<div class="expand-titulo">${titulo}</div>`;
+            lista.forEach(it => {
+                html += `<div class="expand-ataque"><strong>${it.nombre}</strong>${it.desc ? ' — ' + it.desc : ''}</div>`;
+            });
+        });
+
+        html += `<div class="sin-datos" style="margin-top:10px;">Para ver el detalle completo (daños, bonos, efectos) abrí la ficha del enemigo con el botón 🔗 de su card.</div>`;
+        body.innerHTML = html;
         return;
     }
 
@@ -858,6 +1057,29 @@ function abrirModalAgregarPersonaje() {
     document.getElementById('modal-agregar-personaje').style.display = 'flex';
 }
 
+// ================== Modal: agregar enemigo existente ==================
+
+function abrirModalAgregarEnemigo() {
+    const yaAgregados = new Set(participantes.filter(p => p.origen === 'enemigo').map(p => p.enemigoId));
+    const cont = document.getElementById('lista-checks-enemigos');
+    cont.innerHTML = '';
+    const disponibles = listarEnemigosDisponibles();
+    if (!disponibles.length) {
+        cont.innerHTML = `<div class="sin-datos">Todavía no creaste ningún enemigo. Andá a Extras → 🐉 Enemigos y cargá uno primero.</div>`;
+    } else {
+        disponibles.forEach(en => {
+            const label = document.createElement('label');
+            const disabled = yaAgregados.has(en.id);
+            label.innerHTML = `
+                <input type="checkbox" value="${en.id}" ${disabled ? 'disabled' : ''}>
+                ${en.icono || '👹'} ${en.nombre}${disabled ? ' (ya está en el combate)' : ''}
+            `;
+            cont.appendChild(label);
+        });
+    }
+    document.getElementById('modal-agregar-enemigo').style.display = 'flex';
+}
+
 // ================== Eventos ==================
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -874,10 +1096,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btn-agregar-personaje').addEventListener('click', abrirModalAgregarPersonaje);
-    document.getElementById('btn-agregar-enemigo').addEventListener('click', () => {
-        document.getElementById('form-enemigo').reset();
-        document.getElementById('modal-agregar-enemigo').style.display = 'flex';
-    });
+    document.getElementById('btn-agregar-enemigo').addEventListener('click', abrirModalAgregarEnemigo);
     document.getElementById('btn-borrar-combate').addEventListener('click', borrarCombate);
 
     // Cierre por X / botón "Salir": aplica a TODOS los modales, incluido el de detalle.
@@ -887,10 +1106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Cierre clickeando afuera: aplica a todos MENOS al modal de detalle
-    // (pedido explícito: que no se cierre solo por un misclick).
+    // Cierre clickeando afuera: aplica a todos MENOS a los modales de detalle/confirmación/
+    // aviso/iniciativa (pedido explícito: que no se cierren solo por un misclick).
+    const MODALES_SIN_CIERRE_AFUERA = new Set(['detalle-modal', 'confirmar-modal', 'aviso-modal', 'iniciativa-modal']);
     document.querySelectorAll('.modal').forEach(modal => {
-        if (modal.id === 'detalle-modal') return;
+        if (MODALES_SIN_CIERRE_AFUERA.has(modal.id)) return;
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.style.display = 'none';
         });
@@ -902,15 +1122,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ids.length) await agregarPersonajesJson(ids);
     });
 
-    document.getElementById('form-enemigo').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const nombre = document.getElementById('enemigo-nombre').value.trim();
-        const vida = parseInt(document.getElementById('enemigo-vida').value) || 0;
-        const ca = parseInt(document.getElementById('enemigo-ca').value) || 0;
-        const iniciativa = parseInt(document.getElementById('enemigo-iniciativa').value) || 0;
-        if (!nombre) return;
-        agregarEnemigoManual({ nombre, vida, ca, iniciativa });
+    document.getElementById('btn-confirmar-agregar-enemigos').addEventListener('click', async () => {
+        const ids = [...document.querySelectorAll('#lista-checks-enemigos input:checked')].map(i => i.value);
         document.getElementById('modal-agregar-enemigo').style.display = 'none';
+        if (ids.length) await agregarEnemigosExistentes(ids);
     });
 
     document.querySelectorAll('#hp-modal .hp-btn').forEach(btn => {

@@ -616,9 +616,9 @@ details.skills-container > .contenido-plegable > .skills-grid:first-child {
 }
 
 /* Color del tile de Vida según % actual — jugadores (personaje.html) Y enemigos
-   (enemigo.html), mismo criterio para los dos. Se pintan en este orden de prioridad
-   (menos a más grave se resuelve en JS, acá solo el look de cada clase):
-   a full = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Se van encima de
+   (enemigo.html), mismo criterio para los dos (resuelto en JS, acá solo el look de cada
+   clase): 50%-100% (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja,
+   <5% = rojo — sin zona neutra, siempre hay una clase puesta. Se van encima de
    ".modificado" a propósito (definidas después en el archivo): en combate importa más
    saber que la vida está crítica AHORA que si el máximo fue modificado en algún momento. */
 .skill-btn.vida-full {

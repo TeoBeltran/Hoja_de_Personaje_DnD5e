@@ -71,16 +71,14 @@ if (!record) {
     }
 
     // Colorea el tile de Vida según el % actual (mismo criterio que personaje.html):
-    // a full = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo. Ninguna clase
-    // (look normal) entre 50% y 100% sin estar full.
+    // 50%-100% (incluido full) = verde oscuro, <50% = amarillo, <20% = naranja, <5% = rojo.
     function claseColorVida(actual, maximo) {
         if (!maximo || maximo <= 0) return null;
         var pct = (actual / maximo) * 100;
         if (pct < 5) return 'vida-muy-critica';
         if (pct < 20) return 'vida-critica';
         if (pct < 50) return 'vida-baja';
-        if (actual >= maximo) return 'vida-full';
-        return null;
+        return 'vida-full'; // 50% a 100% (incluido) es todo verde, no solo justo a full
     }
 
     function aplicarClaseColorVida(btn, actual, maximo) {
