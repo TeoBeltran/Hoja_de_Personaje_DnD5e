@@ -28,6 +28,7 @@ const PERSONAJES_DISPONIBLES = [
     { id: 'chiaragorn', nombre: 'Chiaragorn' },
     { id: 'lyralei', nombre: 'Lyralei' },
     { id: 'cedric', nombre: 'Cedric' },
+    { id: 'aldren', nombre: 'Aldren' },
     { id: 'kael', nombre: 'Kael' },
     { id: 'varis', nombre: 'Varis' }
 ];
@@ -155,6 +156,7 @@ function agregarHistorial(p, opts) {
         deltaCA,
         tipo: tipoParticipante(p),
         cayoACero: !!opts.cayoACero,
+        muerteMasiva: !!opts.muerteMasiva,
         ts: Date.now()
     });
     historial = historial.slice(0, HISTORIAL_MAX);
@@ -198,7 +200,9 @@ function renderHistorial() {
             const signo = h.delta > 0 ? '+' : '';
             texto = `${h.nombre} ${signo}${h.delta} HP`;
         }
-        const notaCaida = h.cayoACero ? ` <span class="historial-caida">☠️ ¡Llegó a 0!</span>` : '';
+        const notaCaida = h.muerteMasiva
+            ? ` <span class="historial-caida">💀 ¡MUERTE INSTANTÁNEA (daño masivo)!</span>`
+            : (h.cayoACero ? ` <span class="historial-caida">☠️ ¡Llegó a 0!</span>` : '');
         return `<div class="historial-item ${clase}">${dot}${texto}${notaCaida} <span style="color:var(--text-muted); font-size:0.75rem;">(${hora})</span></div>`;
     }).join('');
 }
@@ -769,6 +773,58 @@ function borrarCombate() {
     );
 }
 
+// ================== Descanso corto/largo para TODA la campaña ==================
+// A diferencia del resto del Rastreador (que solo toca a quien está EN el combate actual),
+// esto pega sobre TODOS los personajes jugables de PERSONAJES_DISPONIBLES, estén o no en este
+// combate — para el caso típico de "el grupo entero descansa" entre encuentros. Ranuras de
+// hechizo, usos de habilidad, Hit Dice, toggles activos y mecánicas puntuales (Mage Armor,
+// Circle of the Land) son cosas MUY específicas de cada personaje (su clase, su nivel, qué
+// rasgos tiene) — esa lógica ya existe y está probada en tomarDescanso() de script.js, así que
+// en vez de reimplementarla acá (con el riesgo de que las dos copias se desincronicen, como ya
+// pasó una vez con statsFinales — ver §11 del CONTEXT) se marca un "descanso pendiente" por
+// personaje en localStorage, que personaje.html aplica solo —con tomarDescanso(), la función
+// real— la próxima vez que ese jugador abra su ficha (ver aplicarDescansoPendienteSiCorresponde
+// al final de init() en script.js). Lo único que SÍ se actualiza automáticamente para no
+// depender de que alguien abra su ficha es el bono TEMPORAL de combate y, en descanso largo,
+// la vida — pero SOLO para quien ya está en este combate, así el DM lo ve reflejado al toque.
+function marcarDescansoPendiente(personajeId, tipo) {
+    // Un 'largo' pendiente no se debe degradar a 'corto' si se pide un corto después (un largo
+    // ya incluye todo lo que da uno corto y más); al revés sí se puede subir de corto a largo.
+    const actual = localStorage.getItem(`pj_${personajeId}_descansoPendiente`);
+    if (actual === 'largo' && tipo === 'corto') return;
+    localStorage.setItem(`pj_${personajeId}_descansoPendiente`, tipo);
+}
+
+async function tomarDescansoGlobal(tipo) {
+    await asegurarDataCargada();
+
+    PERSONAJES_DISPONIBLES.forEach(pj => marcarDescansoPendiente(pj.id, tipo));
+
+    // Actualización inmediata para quien YA está en este combate: el bono temporal de combate
+    // se borra siempre (mismo criterio que un descanso individual), y en descanso largo la vida
+    // se repone a full de una, sin esperar a que abran su ficha.
+    participantes.forEach(p => {
+        if (p.origen !== 'json') return;
+        p.bonoVidaMaxTemp = 0;
+        p.bonoCATemp = 0;
+        if (tipo === 'largo') {
+            const data = dataCache[p.personajeId];
+            if (data) {
+                const { vidaMaxima } = leerVidaCompartida(p.personajeId, data);
+                guardarVidaCompartida(p.personajeId, vidaMaxima, vidaMaxima);
+            }
+        }
+    });
+    guardarCombate();
+    render();
+
+    const cuantos = PERSONAJES_DISPONIBLES.length;
+    mostrarAviso(
+        `Descanso ${tipo} aplicado a los ${cuantos} personajes de la campaña, estén o no en este combate. `
+        + `Ranuras, usos de habilidad y Hit Dice de cada uno se van a ver actualizados la próxima vez que abran su ficha.`
+    );
+}
+
 // ================== Modales genéricos (reemplazan confirm()/alert()/prompt() nativos) ==================
 // Mismo criterio que enemigo.js/enemigo.html y que TODOS los modales del proyecto: sin X propia,
 // no se cierran clickeando afuera, solo con sus botones explícitos (Sí/No, Cerrar, etc.).
@@ -1011,7 +1067,9 @@ function crearMuerteRow(p) {
 
     const estado = document.createElement('span');
     estado.className = 'muerte-estado' + (p.muerto ? ' muerto' : (p.estabilizado ? ' estable' : ''));
-    estado.textContent = p.muerto ? '☠️ Muerto' : (p.estabilizado ? '✅ Estabilizado' : 'Salv. de muerte:');
+    estado.textContent = p.muerto
+        ? (p.muerteMasiva ? '💀 Muerto (daño masivo)' : '☠️ Muerto')
+        : (p.estabilizado ? '✅ Estabilizado' : 'Salv. de muerte:');
     row.appendChild(estado);
 
     if (!p.muerto && !p.estabilizado) {
@@ -1105,21 +1163,50 @@ function actualizarHpModalDOM() {
     }
 }
 
+// Regla de "daño masivo" (instant death) de D&D: si un golpe deja a alguien en 0 HP y el daño
+// que sobra después de restar lo que tenía (o, si ya estaba en 0, el daño nuevo entero) supera
+// su vida máxima EFECTIVA (base + bono temporal de combate), muere directo, sin salvaciones de
+// muerte que tirar. Solo se chequea para personajes 'json' — son los únicos con salvaciones de
+// muerte en esta app; un enemigo que llega a 0 ya lo maneja el DM a criterio.
+// Ejemplo del propio pedido: 20/40 HP, entra un golpe de 70 → 20 para llegar a 0, sobran 50;
+// 50 > 40 (máximo) → muere en el acto.
+function esDanoMasivo(p, actualAntes, maximoEfectivo, amount) {
+    if (p.origen !== 'json' || amount >= 0) return false;
+    const dano = -amount;
+    const sobrante = actualAntes > 0 ? Math.max(0, dano - actualAntes) : dano;
+    return sobrante > maximoEfectivo;
+}
+
 function aplicarCambioHp(amount) {
     if (!hpModalTarget || !amount) return;
     const { actual, maximo, maximoBase } = getVida(hpModalTarget);
     const nuevoActual = Math.max(0, Math.min(actual + amount, maximo));
+    const muerteMasiva = nuevoActual === 0 && esDanoMasivo(hpModalTarget, actual, maximo, amount);
     setVida(hpModalTarget, nuevoActual, maximoBase);
-    // Si se cura desde 0, se borra cualquier salvación de muerte que tuviera tildada
-    // (volvió a estar consciente, arranca de cero si vuelve a caer más adelante).
     if (nuevoActual > 0 && hpModalTarget.origen === 'json') {
+        // Se curó por encima de 0: vuelve a estar consciente, se borra cualquier estado de
+        // muerte/salvaciones que tuviera tildado (incluida una muerte instantánea previa —
+        // mismo criterio "blando" que ya usaba esta app con 3 fallos de salvación: una cura
+        // alcanza para revivir, esta app no distingue eso de un hechizo de resurrección real).
         hpModalTarget.muerteExitos = 0;
         hpModalTarget.muerteFallos = 0;
         hpModalTarget.estabilizado = false;
         hpModalTarget.muerto = false;
+        hpModalTarget.muerteMasiva = false;
+        guardarCombate();
+    } else if (muerteMasiva) {
+        hpModalTarget.muerto = true;
+        hpModalTarget.muerteMasiva = true;
+        hpModalTarget.muerteExitos = 0;
+        hpModalTarget.muerteFallos = 3;
+        hpModalTarget.estabilizado = false;
         guardarCombate();
     }
-    agregarHistorial(hpModalTarget, { delta: nuevoActual - actual, cayoACero: nuevoActual === 0 && actual > 0 });
+    agregarHistorial(hpModalTarget, {
+        delta: nuevoActual - actual,
+        cayoACero: nuevoActual === 0 && actual > 0 && !muerteMasiva,
+        muerteMasiva
+    });
     actualizarHpModalDOM();
     render();
 }
@@ -1468,6 +1555,19 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-agregar-personaje').addEventListener('click', abrirModalAgregarPersonaje);
     document.getElementById('btn-agregar-enemigo').addEventListener('click', abrirModalAgregarEnemigo);
     document.getElementById('btn-borrar-combate').addEventListener('click', borrarCombate);
+
+    document.getElementById('btn-descanso-corto-todos').addEventListener('click', () => {
+        abrirConfirmar(
+            `¿Aplicar un descanso CORTO a los ${PERSONAJES_DISPONIBLES.length} personajes de la campaña (estén o no en este combate)?`,
+            () => tomarDescansoGlobal('corto')
+        );
+    });
+    document.getElementById('btn-descanso-largo-todos').addEventListener('click', () => {
+        abrirConfirmar(
+            `¿Aplicar un descanso LARGO a los ${PERSONAJES_DISPONIBLES.length} personajes de la campaña (estén o no en este combate)? Se restaura su vida, Hit Dice, ranuras y habilidades.`,
+            () => tomarDescansoGlobal('largo')
+        );
+    });
 
     // Cierre por X / botón "Salir": aplica a TODOS los modales, incluido el de detalle.
     document.querySelectorAll('[data-close]').forEach(el => {

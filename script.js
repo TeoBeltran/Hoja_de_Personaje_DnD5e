@@ -1779,6 +1779,21 @@ function limpiarBonosTemporalesCombate() {
     } catch (e) { /* ignore: si el JSON guardado está corrupto, no hay nada que limpiar */ }
 }
 
+// Si desde el Rastreador de Combate (combate.html) se declaró un descanso GRUPAL ("Descanso
+// corto/largo (TODOS)" — ver tomarDescansoGlobal en combate.js) mientras este personaje no
+// tenía la ficha abierta, queda una marca en pj_<id>_descansoPendiente. Se revisa acá, al
+// final de init() (con ranurasOriginales/habilidadesInfo/vidaMaxima/hitDiceMaximo y demás ya
+// cargados desde el JSON), y si hay una marca se aplica con la MISMA tomarDescanso() de siempre
+// — así el resultado es idéntico a que el jugador hubiera tocado el botón él mismo (incluye el
+// toast y, si corresponde, el modal de Hit Dice o el de elegir Land) — y se borra la marca para
+// no volver a aplicarla en la próxima carga.
+function aplicarDescansoPendienteSiCorresponde() {
+    const pendiente = localStorage.getItem(STORAGE_PREFIX + 'descansoPendiente');
+    if (pendiente !== 'corto' && pendiente !== 'largo') return;
+    localStorage.removeItem(STORAGE_PREFIX + 'descansoPendiente');
+    tomarDescanso(pendiente);
+}
+
 function tomarDescanso(tipo) {
     // tipo = 'corto' o 'largo'
     let recuperaCorto = (tipo === 'corto');
@@ -4190,6 +4205,10 @@ async function init() {
     if (efectosCerrar) {
         efectosCerrar.addEventListener('click', cerrarEfectosYContinuar);
     }
+
+    // Al final de todo, con el personaje ya completamente cargado: si había un descanso
+    // grupal pendiente del Rastreador de Combate, se aplica solo acá.
+    aplicarDescansoPendienteSiCorresponde();
 }
 
 document.addEventListener('DOMContentLoaded', init);
