@@ -185,8 +185,8 @@
     },
     {
       "nombre": "🖤 Eldritch Claw Tattoo",
-      "desc": "Mientras tengas el tatuaje en la piel, este Golpe Desarmado cuenta como <strong>mágico</strong> para superar resistencias e inmunidades a daño no mágico, y sumás <strong>+1</strong> a la tirada de ataque y al daño.",
-      "disparadores": { "arma": "Golpe Desarmado (Unarmed Strike)" }
+      "desc": "(Retirado — reemplazado por Bracers of Defense + Amulet of Health, ver Equipo. Se deja documentado, sin efecto.) Mientras tengas el tatuaje en la piel, este Golpe Desarmado cuenta como <strong>mágico</strong> para superar resistencias e inmunidades a daño no mágico, y sumás <strong>+1</strong> a la tirada de ataque y al daño.",
+      "oculto": true
     },
     {
       "nombre": "Extra Attack",
@@ -228,13 +228,12 @@
     },
     {
       "nombre": "Eldritch Maul (Tattoo)",
-      "usos": "1/1",
+      "usos": "0/0",
       "recupera": "largo",
       "accion": "Acción Bonus",
       "duracion": "1 minuto",
-      "desc": "Empoderás el tatuaje durante 1 minuto (se activa y desactiva como Acción Bonus, el botón cambia solo). Mientras esté activo: tus ataques cuerpo a cuerpo (con arma o Golpe Desarmado) pueden alcanzar un objetivo hasta 15 ft de vos, como tentáculos de tinta, y hacen 1d6 de daño de fuerza extra al golpear.",
-      "toggleBonoDano": { "formula": "1d6", "tipoDano": "fuerza", "notaExtra": "También podés alcanzar objetivos hasta 15 ft con este ataque mientras esté activo." },
-      "disparadoresSiActivo": { "arma": true }
+      "oculto": true,
+      "desc": "(Retirado junto con el tatuaje — ver Equipo. Se deja documentado, sin efecto.) Empoderás el tatuaje durante 1 minuto (se activa y desactiva como Acción Bonus, el botón cambia solo). Mientras esté activo: tus ataques cuerpo a cuerpo (con arma o Golpe Desarmado) pueden alcanzar un objetivo hasta 15 ft de vos, como tentáculos de tinta, y hacen 1d6 de daño de fuerza extra al golpear."
     },
     {
       "nombre": "Martial Arts",
@@ -344,8 +343,6 @@
       "valor": 0,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "bonoAtaque": 1,
-      "bonoDano": 1,
       "desc": "Martial Arts (d6): usa DEX para ataque y daño. No ocupa manos, siempre disponible."
     },
     {
@@ -392,7 +389,40 @@
       "peso": 0,
       "valor": 300,
       "magico": true,
-      "desc": "Tatuaje mágico (requiere sintonía). Mientras lo tengas en la piel, tus golpes desarmados cuentan como mágicos para superar resistencias e inmunidades a daño no mágico, y sumás +1 a las tiradas de ataque y de daño con golpes desarmados.<br><br>También tiene una habilidad activa: Eldritch Maul (ver Habilidades de Uso)."
+      "desc": "(Retirado — reemplazado por Bracers of Defense + Amulet of Health. Ya no otorga ningún bono ni la activa Eldritch Maul; se deja en el inventario como objeto/recuerdo.) Tatuaje mágico (requiere sintonía). Mientras lo tengas en la piel, tus golpes desarmados cuentan como mágicos para superar resistencias e inmunidades a daño no mágico, y sumás +1 a las tiradas de ataque y de daño con golpes desarmados."
+    },
+    {
+      "nombre": "Bracers of Defense",
+      "imagen": "Bracers.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2500,
+      "magico": true,
+      "desc": "Brazaletes mágicos raros (requieren sintonía). Mientras no lleves armadura ni escudo, otorgan +2 a la Clase de Armadura. No es armadura: no interfiere con Unarmored Defense (se suma aparte).<br><br>(La app no chequea si tenés armadura puesta al aplicar este bono — para Kael no es un problema porque nunca usa armadura, pero si algún día equipara una, este +2 seguiría sumando igual.)",
+      "efectos": [
+        {
+          "tipo": "CA",
+          "valor": 2
+        }
+      ]
+    },
+    {
+      "nombre": "Amulet of Health",
+      "imagen": "Amulet.png",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Amuleto mágico raro (requiere sintonía). Mientras lo lleves puesto, tu puntaje de Constitución es 19 (no hace nada si tu CON real ya es 19 o más).<br><br>Esto ya se refleja solo en el modificador de CON y en tu salvación de CON. <strong>Ojo:</strong> tu Vida Máxima (59/59) NO se recalcula sola — la app no tiene una fórmula automática de HP, es un número fijo — así que si querés que la suba de CON también te sume vida, hay que actualizar ese número a mano (con CON 15→19, el modificador sube +2, así que a nivel 8 serían +16 HP: 59 → 75, a criterio tuyo).",
+      "efectos": [
+        {
+          "tipo": "atributoMinimo",
+          "atributo": "CON",
+          "valor": 19
+        }
+      ]
     },
     {
       "nombre": "Cloak of Displacement",

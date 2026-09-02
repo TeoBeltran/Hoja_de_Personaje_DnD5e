@@ -752,6 +752,36 @@ function extraerBonusHorneado(danoStr) {
     return { base: danoStr, bonus: 0 };
 }
 
+// Objetos mágicos que suben una característica mientras están equipados (ej: Amulet of Health
+// fijando CON en 19). Mecanismo genérico nuevo: "efectos: [{tipo:'atributoMinimo', atributo, valor}]"
+// en cualquier ítem de equipo. Se aplica una sola vez, ANTES de calcular modificadores/salvaciones/
+// skills (ver init()), así el bono ya queda reflejado en todo lo que se derive de la característica
+// (modificador, salvación). OJO: la Vida Máxima de esta app es un string fijo en "estadisticas"
+// (no una fórmula automática, ver §8 de CONTEXT.md), así que un cambio de CON acá NO le suma HP
+// solo — si corresponde reflejarlo, hay que ajustar la Vida a mano.
+// Lee las mismas 3 keys de localStorage que restaura el bloque de equipo más abajo en init(), en
+// vez de esperar a que ese bloque corra, porque los modificadores se calculan antes en la secuencia.
+function aplicarBonosAtributoDeEquipo(stats, equipo, storagePrefix) {
+    if (!stats || !equipo) return;
+    const idsEquipados = [
+        localStorage.getItem(storagePrefix + 'armaduraEquipada'),
+        localStorage.getItem(storagePrefix + 'escudoEquipado'),
+    ].filter(Boolean);
+    const armasGuardadas = localStorage.getItem(storagePrefix + 'armasEquipadas');
+    if (armasGuardadas) {
+        try { idsEquipados.push(...JSON.parse(armasGuardadas)); } catch (e) { /* ignorar, datos corruptos */ }
+    }
+    idsEquipados.forEach(nombre => {
+        const it = equipo.find(e => e.nombre === nombre);
+        if (!it || !Array.isArray(it.efectos)) return;
+        it.efectos.forEach(ef => {
+            if (ef.tipo === 'atributoMinimo' && stats[ef.atributo] != null) {
+                stats[ef.atributo] = Math.max(stats[ef.atributo], ef.valor);
+            }
+        });
+    });
+}
+
 function calcularBonosEquipoActivo() {
     const bonos = { CA: 0, salvaciones: 0, bonoAtaqueHechizo: 0, bonoCDHechizo: 0, atkMeleeExtra: 0, atkFinesseExtra: 0 };
     const notas = [];
@@ -1995,6 +2025,10 @@ async function init() {
 
         // Aplicar ASIs ANTES de generar modificadores/salvaciones/skills
         aplicarASIs(data.habilidadesUso);
+
+        // Objetos mágicos equipados que suben una característica (ej: Amulet of Health) —
+        // también ANTES de generar modificadores/salvaciones/skills, ver aplicarBonosAtributoDeEquipo().
+        aplicarBonosAtributoDeEquipo(statsGlobal, data.equipo, STORAGE_PREFIX);
 
         data.modificadores = generarModificadores(statsGlobal, data.personaje.clase);
         // Rasgos que otorgan competencia extra en una salvación puntual (ej: Iron Mind → WIS),
