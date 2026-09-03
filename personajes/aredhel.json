@@ -5,54 +5,164 @@
     "raza": "Elfo (Eladrin)",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 15,
-        "CON": 15,
-        "INT": 8,
-        "WIS": 8,
-        "CHA": 15
+      "STR": 8,
+      "DEX": 15,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 8,
+      "CHA": 15
     }
   },
   "improvements": {
     "race": [
-      { "atributo": "DEX", "valor": 2, "motivo": "Eladrin (Elfo)" },
-      { "atributo": "CHA", "valor": 1, "motivo": "Eladrin (Elfo) - ASI racial flexible" }
+      {
+        "atributo": "DEX",
+        "valor": 2,
+        "motivo": "Eladrin (Elfo)"
+      },
+      {
+        "atributo": "CHA",
+        "valor": 1,
+        "motivo": "Eladrin (Elfo) - ASI racial flexible"
+      }
     ],
     "feats": [],
     "asi": [
-      { "nivel": 4, "atributos": { "CHA": 2 } },
-      { "nivel": 8, "atributos": { "CHA": 1, "CON": 1 } }
+      {
+        "nivel": 4,
+        "atributos": {
+          "CHA": 2
+        }
+      },
+      {
+        "nivel": 8,
+        "atributos": {
+          "CHA": 1,
+          "CON": 1
+        }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "67/67" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "15" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "8"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "15"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": true },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": false },
-    { "nombre": "Engaño", "proficiente": true },
-    { "nombre": "Historia", "proficiente": true },
-    { "nombre": "Interpretación", "proficiente": true },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": true },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": true, "experto": true },
-    { "nombre": "Persuasión", "proficiente": true, "experto": true },
-    { "nombre": "Perspicacia", "proficiente": true },
-    { "nombre": "Religión", "proficiente": false },
-    { "nombre": "Sigilo", "proficiente": true },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": true
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": true
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Entertainer",
@@ -188,8 +298,14 @@
       "magico": true,
       "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
       "efectos": [
-        { "tipo": "CA", "valor": 1 },
-        { "tipo": "salvaciones", "valor": 1 }
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
       ]
     },
     {
@@ -202,8 +318,14 @@
       "magico": true,
       "desc": "Medallón mágico grabado con notas musicales. Mientras esté equipado otorga +1 a las tiradas de ataque con hechizos de bardo y +1 a la CD de salvación de tus hechizos de bardo.",
       "efectos": [
-        { "tipo": "bonoAtaqueHechizo", "valor": 1 },
-        { "tipo": "bonoCDHechizo", "valor": 1 }
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoCDHechizo",
+          "valor": 1
+        }
       ]
     },
     {
@@ -219,10 +341,26 @@
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 3",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 4",
+        "cantidad": "2",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {
@@ -245,7 +383,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Vicious Mockery",
         "dano": "1d4",
-        "escala": { "5": "2d4", "11": "3d4", "17": "4d4" },
+        "escala": {
+          "5": "2d4",
+          "11": "3d4",
+          "17": "4d4"
+        },
         "tipoDano": "psíquico",
         "accion": "Acción",
         "distancia": "60 ft",
@@ -285,7 +427,11 @@
         "distancia": "60 ft",
         "desc": "Una criatura recupera 1d4 + modificador de CHA de HP.",
         "efectos": [
-          { "tipo": "notificacionYAbreVida", "descripcion": "Healing Word", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+          {
+            "tipo": "notificacionYAbreVida",
+            "descripcion": "Healing Word",
+            "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente."
+          }
         ]
       },
       {
@@ -322,7 +468,11 @@
         "duracion": "Concentración, 1 minuto",
         "desc": "Energía sanadora irradia de vos en un aura de 30 ft que se mueve con vos. Como Acción Bonus, mientras dure, podés hacer que la energía cure 2d6 HP a una criatura dentro del aura (podés elegirte a vos misma).",
         "efectos": [
-          { "tipo": "notificacionYAbreVida", "descripcion": "Aura of Vitality", "mensaje": "Aplicá los 2d6 de curación a la criatura elegida dentro del aura. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+          {
+            "tipo": "notificacionYAbreVida",
+            "descripcion": "Aura of Vitality",
+            "mensaje": "Aplicá los 2d6 de curación a la criatura elegida dentro del aura. Al cerrar este modal se abre el de vida para que la sumes manualmente."
+          }
         ]
       },
       {
@@ -366,10 +516,35 @@
     ]
   },
   "inventario": [
-    { "nombre": "Diplomat's Pack", "peso": 0, "cantidad": 1, "desc": "Incluye cofre, 2 estuches para mapas y pergaminos, ropa fina, tinta, pluma, lámpara, aceite x2, papel x5, perfume, cera de sellar, jabón." },
-    { "nombre": "Viola (Viol)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de cuerda, uno de tus instrumentos de Bardo." },
-    { "nombre": "Flauta (Flute)", "peso": 1, "cantidad": 1, "desc": "Instrumento musical de viento, uno de tus instrumentos de Bardo." },
-    { "nombre": "Favor de un/a Admirador/a", "peso": 0, "cantidad": 1, "desc": "Carta de amor, mechón de pelo o baratija (a elección) — favor de un admirador secreto que conociste actuando. Parte del trasfondo Entertainer." },
-    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+    {
+      "nombre": "Diplomat's Pack",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Incluye cofre, 2 estuches para mapas y pergaminos, ropa fina, tinta, pluma, lámpara, aceite x2, papel x5, perfume, cera de sellar, jabón."
+    },
+    {
+      "nombre": "Viola (Viol)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Instrumento musical de cuerda, uno de tus instrumentos de Bardo."
+    },
+    {
+      "nombre": "Flauta (Flute)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Instrumento musical de viento, uno de tus instrumentos de Bardo."
+    },
+    {
+      "nombre": "Favor de un/a Admirador/a",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Carta de amor, mechón de pelo o baratija (a elección) — favor de un admirador secreto que conociste actuando. Parte del trasfondo Entertainer."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 0,
+      "desc": "Piezas de Oro."
+    }
   ]
 }

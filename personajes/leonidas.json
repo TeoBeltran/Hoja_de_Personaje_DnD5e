@@ -5,75 +5,157 @@
     "raza": "Hada",
     "tamano": "diminuto",
     "stats": {
-        "STR": 10,
-        "DEX": 14,
-        "CON": 14,
-        "INT": 8,
-        "WIS": 15,
-        "CHA": 10
+      "STR": 10,
+      "DEX": 14,
+      "CON": 14,
+      "INT": 8,
+      "WIS": 15,
+      "CHA": 10
     }
   },
   "improvements": {
     "race": [
-        {
-            "atributo": "DEX",
-            "valor": 3,
-            "motivo": "Fairy"
-        }
+      {
+        "atributo": "DEX",
+        "valor": 3,
+        "motivo": "Fairy"
+      }
     ],
     "feats": [
-        {
-            "nivel": 1,
-            "nombre": "Fey Touched",
-            "atributos": {
-                "WIS": 1
-            }
+      {
+        "nivel": 1,
+        "nombre": "Fey Touched",
+        "atributos": {
+          "WIS": 1
         }
+      }
     ],
     "asi": [
-        {
-            "nivel": 4,
-            "atributos": {
-                "WIS": 2
-            }
-        },
-        {
-            "nivel": 8,
-            "atributos": {
-                "WIS": 2
-            }
+      {
+        "nivel": 4,
+        "atributos": {
+          "WIS": 2
         }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "59/59" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "11" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "7"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": false },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": false },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": false },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": true },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": false },
-    { "nombre": "Persuasión", "proficiente": true },
-    { "nombre": "Perspicacia", "proficiente": true },
-    { "nombre": "Religión", "proficiente": true },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": true
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": false
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Shelter of the Faithful",
@@ -85,24 +167,35 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Disciple of Life", "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo." },
-    { "nombre": "Blessed Healer", "desc": "Cuando lanzás un hechizo de curación de nivel 1 o mayor sobre otra criatura, vos también recuperás HP igual a 2 + el nivel del hechizo." },
-    { "nombre": "Volar", "desc": "Podés moverte 30 ft de distancia mientras volás." },
-    { "nombre": "Spiritual Weapon: bono WIS", "desc": "Spiritual Weapon suma WIS al daño.", "bonoDano": "WIS", "aplicaA": "hechizo:Spiritual Weapon" },
     {
-      "nombre": "Divine Strike",
-      "desc": "Una vez en cada uno de tus turnos, cuando golpeás a una criatura con un ataque de arma, podés infundir el golpe con energía divina: hace 1d8 de daño radiante extra.",
-      "disparadores": { "arma": true },
-      "bonoCondicional": { "formula": "1d8", "tipoDano": "radiante", "nota": "Solo 1 vez por turno" }
+      "nombre": "Disciple of Life",
+      "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo."
+    },
+    {
+      "nombre": "Blessed Healer",
+      "desc": "Cuando lanzás un hechizo de curación de nivel 1 o mayor sobre otra criatura, vos también recuperás HP igual a 2 + el nivel del hechizo."
+    },
+    {
+      "nombre": "Volar",
+      "desc": "Podés moverte 30 ft de distancia mientras volás."
+    },
+    {
+      "nombre": "Spiritual Weapon: bono WIS",
+      "desc": "Spiritual Weapon suma WIS al daño.",
+      "bonoDano": "WIS",
+      "aplicaA": "hechizo:Spiritual Weapon"
     }
   ],
   "habilidadesUso": [
     {
       "nombre": "Channel Divinity",
       "usos": "2/2",
-      "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
+      "usosPorNivel": {
+        "1": 1,
+        "6": 2,
+        "18": 3
+      },
       "recupera": "corto",
-      "esPoolCompartido": true,
       "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Turn Undead, Harness Divine Power o Preserve Life)."
     },
     {
@@ -110,8 +203,7 @@
       "accion": "Acción",
       "distancia": "30 ft",
       "duracion": "1 minuto",
-      "desc": "Cuando veas o escuches un No-Muerto a 30 ft, hace tirada de salvación de WIS. Si falla, queda asustado durante 1 minuto o hasta recibir daño. Consume 1 uso de Channel Divinity.",
-      "consumeUsoDe": "Channel Divinity"
+      "desc": "Cuando veas o escuches un No-Muerto a 30 ft, hace tirada de salvación de WIS. Si falla, queda asustado durante 1 minuto o hasta recibir daño. Consume 1 uso de Channel Divinity."
     },
     {
       "nombre": "Channel Divinity: Harness Divine Power",
@@ -119,21 +211,15 @@
       "distancia": "Propio",
       "desc": "Tocá tu símbolo sagrado (cruz) y recuperás un spell slot. El nivel del slot recuperado no puede ser mayor a la mitad de tu proficiency bonus (redondeado hacia arriba). Consume 1 uso de Channel Divinity.",
       "consumeUsoDe": "Channel Divinity",
-      "restaurarRanura": { "maxNivelFormula": "mitadProficienciaArriba" }
+      "restaurarRanura": {
+        "maxNivelFormula": "mitadProficienciaArriba"
+      }
     },
     {
       "nombre": "Channel Divinity: Preserve Life",
       "accion": "Acción",
       "distancia": "30 ft",
-      "desc": "Presentá tu símbolo sagrado y curá un total de HP igual a tu nivel de Clérigo × 5. Podés repartir esos puntos entre cualquier cantidad de criaturas a 30 ft (incluído vos). No funciona con criaturas a 0 HP. Consume 1 uso de Channel Divinity.",
-      "consumeUsoDe": "Channel Divinity",
-      "efectos": [
-        {
-          "tipo": "notificacionYAbreVida",
-          "descripcion": "Channel Divinity: Preserve Life",
-          "mensaje": "Repartí <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel × 5</strong> de HP entre las criaturas que elijas. Al cerrar este modal se abre el de vida para que apliques tu parte manualmente."
-        }
-      ]
+      "desc": "Presentá tu símbolo sagrado y curá un total de HP igual a tu nivel de Clérigo × 5. Podés repartir esos puntos entre cualquier cantidad de criaturas a 30 ft (incluído vos). No funciona con criaturas a 0 HP. Consume 1 uso de Channel Divinity."
     },
     {
       "nombre": "Fairy Magic: Faerie Fire",
@@ -186,7 +272,6 @@
   "equipo": [
     {
       "nombre": "Breastplate +1",
-      "imagen": "Breastplate.png",
       "esArmadura": true,
       "tipoArmadura": "media",
       "armaduraBase": 16,
@@ -198,7 +283,6 @@
     },
     {
       "nombre": "Martillo de Guerra (1 mano)",
-      "imagen": "Hammer.png",
       "dano": "1d8",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -211,7 +295,6 @@
     },
     {
       "nombre": "Martillo de Guerra (2 manos)",
-      "imagen": "Hammer.png",
       "dano": "1d10",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -224,7 +307,6 @@
     },
     {
       "nombre": "Martillo Liviano (1 mano)",
-      "imagen": "Hammer.png",
       "dano": "1d4",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -237,7 +319,6 @@
     },
     {
       "nombre": "Amuleto del Devoto (Amulet of the Devout) +1",
-      "imagen": "Amulet.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -245,17 +326,39 @@
       "magico": true,
       "desc": "Amuleto mágico con tu símbolo sagrado. Mientras esté equipado, otorga +1 a las tiradas de ataque con hechizos de clérigo y +1 a la CD de tus conjuros de clérigo.",
       "efectos": [
-        { "tipo": "bonoAtaqueHechizo", "valor": 1 },
-        { "tipo": "bonoCDHechizo", "valor": 1 }
+        {
+          "tipo": "bonoAtaqueHechizo",
+          "valor": 1
+        },
+        {
+          "tipo": "bonoCDHechizo",
+          "valor": 1
+        }
       ]
     }
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 3",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 4",
+        "cantidad": "1",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {
@@ -277,7 +380,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Sacred Flame",
         "dano": "1d8",
-        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
         "tipoDano": "radiante",
         "accion": "Acción",
         "distancia": "60 ft",
@@ -295,7 +402,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Toll the Dead",
         "dano": "1d8",
-        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
         "tipoDano": "necrótico",
         "accion": "Acción",
         "distancia": "60 ft",
@@ -326,9 +437,18 @@
           }
         },
         "efectos": [
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" },
-          { "tipo": "notificacionYAbreVida", "descripcion": "Cure Wounds", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Blessed Healer",
+            "descripcion": "Blessed Healer (te curás a vos mismo)"
+          },
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Disciple of Life",
+            "descripcion": "Disciple of Life (curación extra al objetivo)"
+          }
         ]
       },
       {
@@ -365,9 +485,18 @@
         "distancia": "60 ft",
         "desc": "Una criatura elegida recupera 1d4 + WIS HP. Cada slot superior al 1 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra.",
         "efectos": [
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra al objetivo)" },
-          { "tipo": "notificacionYAbreVida", "descripcion": "Healing Word", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Blessed Healer",
+            "descripcion": "Blessed Healer (te curás a vos mismo)"
+          },
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Disciple of Life",
+            "descripcion": "Disciple of Life (curación extra al objetivo)"
+          }
         ]
       },
       {
@@ -405,9 +534,18 @@
         "distancia": "60 ft",
         "desc": "Hasta 6 criaturas elegidas recuperan 1d4 + WIS HP. Cada slot superior al 3 suma 1d4. Si Disciple of Life: cura 2 + nivel del hechizo extra a cada una.",
         "efectos": [
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Blessed Healer", "descripcion": "Blessed Healer (te curás a vos mismo)" },
-          { "tipo": "autoCuracion", "formula": "2 + nivelHechizo", "rasgoRequerido": "Disciple of Life", "descripcion": "Disciple of Life (curación extra a cada criatura)" },
-          { "tipo": "notificacionYAbreVida", "descripcion": "Mass Healing Word", "mensaje": "Aplicá la curación mostrada arriba a cada criatura elegida. Al cerrar este modal se abre el de vida para que apliques la tuya (si te elegiste) manualmente." }
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Blessed Healer",
+            "descripcion": "Blessed Healer (te curás a vos mismo)"
+          },
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Disciple of Life",
+            "descripcion": "Disciple of Life (curación extra a cada criatura)"
+          }
         ]
       },
       {
@@ -435,36 +573,28 @@
         "distancia": "Toque",
         "duracion": "8 horas",
         "desc": "Si el objetivo cae a 0 HP por primera vez durante la duración, en vez de caer inconsciente baja a 1 HP. Si es afectado por un efecto que lo mataría instantáneamente, lo niega una vez."
-      },
-      {
-        "nivel": "NIVEL 4",
-        "nombre": "Freedom of Movement",
-        "accion": "Acción",
-        "distancia": "Toque",
-        "duracion": "8 horas",
-        "desc": "Tocás a una criatura voluntaria. Durante la duración, su movimiento no se ve afectado por terreno difícil, y hechizos y efectos que la restrinjan o reduzcan su velocidad no le afectan. También puede gastar 5 ft de movimiento para liberarse automáticamente de ataduras no mágicas o de estar agarrada."
       }
     ]
   },
   "inventario": [
-      {
-          "nombre": "Leña",
-          "peso": 1,
-          "cantidad": 0,
-          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-      },
-      {
-          "nombre": "Oro",
-          "peso": 0.02,
-          "cantidad": 50,
-          "desc": "Piezas de Oro."
-      },
-      {
-        "nombre": "Greater Healing Potion",
-        "peso": 0.25,
-        "cantidad": 3,
-        "accion": "Acción",
-        "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
-      }
+    {
+      "nombre": "Leña",
+      "peso": 1,
+      "cantidad": 0,
+      "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 50,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Greater Healing Potion",
+      "peso": 0.25,
+      "cantidad": 3,
+      "accion": "Acción",
+      "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
+    }
   ]
 }

@@ -262,6 +262,20 @@ function evaluarFormula(formula, contexto) {
     }
 }
 
+// Resuelve placeholders dinámicos {token} dentro del campo "desc" de una habilidadUso (ej:
+// Puntos de Ki, Deflect Attacks, Slow Fall, Stunning Strike), usando los stats ya calculados
+// del personaje. Análogo a los placeholders que ya existen dentro de efecto.mensaje (ver
+// procesarEfectos), pero aplicado directamente al texto que se muestra en la card/modal.
+function resolverDescDinamicaHabilidad(desc) {
+    if (!desc) return '';
+    const dcKi = 8 + proficienciaActual + modWisGlobal;
+    return desc
+        .split('{nivelPersonaje}').join(nivelPersonajeGlobal)
+        .split('{modDEX}').join(formatMod(modDexGlobal))
+        .split('{danoCaidaSlowFall}').join(5 * nivelPersonajeGlobal)
+        .split('{dcKi}').join(dcKi);
+}
+
 // Verifica si el personaje tiene un rasgo dado (por nombre)
 function tieneRasgo(nombreRasgo) {
     if (!rasgosGlobal) return false;
@@ -411,6 +425,7 @@ function procesarEfectos(item, contexto) {
             mensaje = (efecto.mensaje || '').replace(/\{(\w+)\}/g, (match, key) => {
                 if (key === 'nivelPersonaje') return contexto.nivelPersonaje || 0;
                 if (key === 'nivelHechizo') return contexto.nivelHechizo || 0;
+                if (key === 'dcKi') return 8 + proficienciaActual + modWisGlobal;
                 if (['STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA'].includes(key)) {
                     return statAMod(statsGlobal[key] || 10);
                 }
@@ -2278,6 +2293,18 @@ async function init() {
                 i.valor = `${nivelPersonaje}/${nivelPersonaje}`;
             } else if (i.nombre === "CA") {
                 i.valor = String(calcularCA());
+            } else if (i.nombre === "Vida") {
+                // Fórmula "natural" de vida: dado de golpe (máximo, nivel 1) + suma de las
+                // tiradas de dado de golpe de cada nivel siguiente (data.vidaFormula.tiradas,
+                // una entrada por nivel a partir del 2do) + (mod. de CON × nivel). El mod. de
+                // CON usado acá ya tiene aplicados ASIs y objetos mágicos (ej: Amulet of Health),
+                // porque aplicarBonosAtributoDeEquipo() corrió antes, más arriba en init().
+                const dadoNum = parseInt((hitDiceDado || 'd8').replace('d', ''), 10) || 8;
+                const tiradas = (data.vidaFormula && data.vidaFormula.tiradas) || [];
+                const sumaTiradas = tiradas.reduce((a, b) => a + b, 0);
+                const modConFinal = statAMod(statsGlobal.CON || 10);
+                const vidaCalculada = dadoNum + sumaTiradas + modConFinal * nivelPersonaje;
+                i.valor = `${vidaCalculada}/${vidaCalculada}`;
             }
         }
 
@@ -2415,6 +2442,8 @@ async function init() {
     };
 
     data.equipo.forEach(i => {
+        if (i.oculto) return;
+
         const btn = document.createElement('button');
         btn.className = 'skill-btn';
         btn.dataset.itemNombre = i.nombre;
@@ -2459,6 +2488,11 @@ async function init() {
             const labelBadge = esEscudo ? `+${i.armaduraBase} CA` : `CA: ${i.armaduraBase}`;
             const tipoLabel = i.tipoArmadura ? ` (${i.tipoArmadura})` : '';
             armaduraHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5; margin-right: 6px;">${labelBadge}${tipoLabel}</span>`;
+        } else if (Array.isArray(i.efectos) && i.efectos.some(e => e.tipo === 'CA')) {
+            // Accesorios que suman CA sin ser armadura (ej: Bracers of Defense, Ring/Cloak of
+            // Protection): mismo badge violeta que usa la armadura, para que se vea igual de claro.
+            const bonoCA = i.efectos.filter(e => e.tipo === 'CA').reduce((s, e) => s + (e.valor || 0), 0);
+            armaduraHTML = `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a; background-color: #f3e5f5; margin-right: 6px;">+${bonoCA} CA</span>`;
         }
 
         let manosHTML = '';
@@ -2592,12 +2626,22 @@ async function init() {
             const labelBadge = esEscudo ? `+${item.armaduraBase} CA` : `CA: ${item.armaduraBase}`;
             const tipoLabel = item.tipoArmadura ? ` (${item.tipoArmadura})` : '';
             partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">${labelBadge}${tipoLabel}</span>`);
+        } else if (Array.isArray(item.efectos) && item.efectos.some(e => e.tipo === 'CA')) {
+            // Accesorios que suman CA sin ser armadura (ej: Bracers of Defense, Ring/Cloak of
+            // Protection): mismo badge violeta que usa la armadura, para que se vea igual de claro.
+            const bonoCA = item.efectos.filter(e => e.tipo === 'CA').reduce((s, e) => s + (e.valor || 0), 0);
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #6a1b9a; border-radius: 4px; color: #6a1b9a;">+${bonoCA} CA</span>`);
         }
 
         // Usos (habilidades)
         if (item.usos) {
             const valorUsos = habilidadesUsoState[item.nombre] || item.usos;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${valorUsos}</span>`);
+        }
+
+        // Costo en Ki (badge celeste), mismo campo que usa la card de la lista
+        if (item.costoKi) {
+            partes.push(`<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: #4fc3f7;">${item.costoKi}</span>`);
         }
 
         cont.innerHTML = partes.join('');
@@ -2821,7 +2865,7 @@ async function init() {
     function abrirModalGenericoItem(item, tipo) {
         itemContextoActual = item;
         modalTitle.innerHTML = item.nombre;
-        modalDesc.innerHTML = (item.desc || '').replace(/\n/g, '<br>');
+        modalDesc.innerHTML = (tipo === 'habilidad' ? resolverDescDinamicaHabilidad(item.desc) : (item.desc || '')).replace(/\n/g, '<br>');
 
         const modalEquipar = document.getElementById('modal-equipar');
         if (modalEquipar) modalEquipar.style.display = 'none';
@@ -2862,6 +2906,7 @@ async function init() {
         const resultado = [];
 
         (data.equipo || []).forEach(i => {
+            if (i.oculto) return;
             if (!i.dano || !i.tipo) return; // solo armas de ataque, no armaduras/accesorios
             if (clasificarTipoAccion(i.accion) !== tipoBuscado) return;
             // Se listan todas las armas que declaran este tipo de acción, estén equipadas o no
@@ -3389,17 +3434,23 @@ async function init() {
                 : 0;
             const duracionBadgeHTML = `<span id="dur-badge-${slugHab}" style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: var(--accent-color); ${activoConDuracion ? '' : 'display: none;'}">⏱️ ${restantesIniciales} turno${restantesIniciales === 1 ? '' : 's'}</span>`;
 
+            // Badge celeste de costo en Ki (ej: "1", "0-1"), solo si la habilidad lo declara
+            const costoBadgeHTML = h.costoKi
+                ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; color: white; background-color: #4fc3f7;">${h.costoKi}</span>`
+                : '';
+
             btn.innerHTML = `
                 <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px;">
                     <span style="font-weight: bold;">${h.nombre}</span>
                     <div style="display: flex; gap: 6px; align-items: center;">
                         ${duracionBadgeHTML}
                         ${smiteBadgeHTML}
+                        ${costoBadgeHTML}
                         ${usosBadgeHTML}
                     </div>
                 </div>
                 ${infoLineaHabHTML}
-                <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${h.desc.replace(/\n/g, '<br>')}</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted); text-align: left;">${resolverDescDinamicaHabilidad(h.desc).replace(/\n/g, '<br>')}</span>
             `;
 
             // Marcar agotada al cargar si corresponde (solo si tiene usos)

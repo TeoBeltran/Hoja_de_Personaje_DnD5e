@@ -5,43 +5,132 @@
     "raza": "Human/Turami",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 14,
-        "CON": 16,
-        "INT": 20,
-        "WIS": 10,
-        "CHA": 8
+      "STR": 8,
+      "DEX": 14,
+      "CON": 16,
+      "INT": 20,
+      "WIS": 10,
+      "CHA": 8
     }
   },
+  "vidaFormula": {
+    "tiradas": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ]
+  },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "67/67" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "13" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "8"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "13"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": true },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": true },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": true },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": true },
-    { "nombre": "Percepción", "proficiente": true },
-    { "nombre": "Persuasión", "proficiente": true },
-    { "nombre": "Perspicacia", "proficiente": false },
-    { "nombre": "Religión", "proficiente": true },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": true
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": true
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Guild Artisan",
@@ -53,21 +142,47 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Magical Tinkering", "desc": "Podés infundir un objeto pequeño y no mágico con uno de varios efectos menores (luz, sonido grabado, sensor, etc.) usando tu herramienta." },
-    { "nombre": "Infuse Item", "desc": "Aprendiste fórmulas de infusión que te permiten convertir objetos comunes en objetos mágicos temporales durante un descanso largo. Podés tener varias infusiones activas a la vez según tu nivel." },
-    { "nombre": "The Right Tool for the Job", "desc": "Con un set de Herramientas de Herrero, podés gastar 1 hora para crear un set de herramientas distinto (que reemplaza al anterior)." },
-    { "nombre": "Tool Expertise", "desc": "Duplicás tu bonificador de competencia en pruebas de habilidad hechas con herramientas en las que sos competente." },
-    { "nombre": "Battle Smith: Battle Ready", "desc": "Sos competente con armas marciales y podés usar INT en vez de STR/DEX para el ataque y daño de armas cuerpo a cuerpo." },
-    { "nombre": "Battle Smith: Steel Defender", "desc": "Como parte de crear tu arma de artesano especial, invocás un Steel Defender: un compañero mecánico que combate a tu lado. Usa tu bonificador de competencia y comparte tu turno." },
-    { "nombre": "Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1." }
+    {
+      "nombre": "Magical Tinkering",
+      "desc": "Podés infundir un objeto pequeño y no mágico con uno de varios efectos menores (luz, sonido grabado, sensor, etc.) usando tu herramienta."
+    },
+    {
+      "nombre": "Infuse Item",
+      "desc": "Aprendiste fórmulas de infusión que te permiten convertir objetos comunes en objetos mágicos temporales durante un descanso largo. Podés tener varias infusiones activas a la vez según tu nivel."
+    },
+    {
+      "nombre": "The Right Tool for the Job",
+      "desc": "Con un set de Herramientas de Herrero, podés gastar 1 hora para crear un set de herramientas distinto (que reemplaza al anterior)."
+    },
+    {
+      "nombre": "Tool Expertise",
+      "desc": "Duplicás tu bonificador de competencia en pruebas de habilidad hechas con herramientas en las que sos competente."
+    },
+    {
+      "nombre": "Battle Smith: Battle Ready",
+      "desc": "Sos competente con armas marciales y podés usar INT en vez de STR/DEX para el ataque y daño de armas cuerpo a cuerpo."
+    },
+    {
+      "nombre": "Battle Smith: Steel Defender",
+      "desc": "Como parte de crear tu arma de artesano especial, invocás un Steel Defender: un compañero mecánico que combate a tu lado. Usa tu bonificador de competencia y comparte tu turno."
+    },
+    {
+      "nombre": "Extra Attack",
+      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1."
+    }
   ],
   "habilidadesUso": [
-    { "nombre": "Infuse Item", "usos": "4/4", "recupera": "largo", "accion": "Especial", "desc": "Podés tener hasta 4 infusiones activas a la vez (una por fórmula conocida). Se eligen/cambian al terminar un descanso largo." }
+    {
+      "nombre": "Infuse Item",
+      "usos": "4/4",
+      "recupera": "largo",
+      "accion": "Especial",
+      "desc": "Podés tener hasta 4 infusiones activas a la vez (una por fórmula conocida). Se eligen/cambian al terminar un descanso largo."
+    }
   ],
   "equipo": [
     {
       "nombre": "Cota de Escamas (Scale Mail)",
-      "imagen": "Scale_Mail.png",
       "esArmadura": true,
       "tipoArmadura": "mediana",
       "armaduraBase": 14,
@@ -78,7 +193,6 @@
     },
     {
       "nombre": "Ballesta Ligera (Crossbow, light)",
-      "imagen": "Crossbow.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "ranged",
@@ -91,7 +205,6 @@
     },
     {
       "nombre": "Martillo Liviano (Light Hammer)",
-      "imagen": "Hammer.png",
       "dano": "1d4",
       "tipoDano": "contundente",
       "tipo": "melee",
@@ -105,15 +218,27 @@
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {
         "nivel": "CANTRIPS",
         "nombre": "Fire Bolt",
         "dano": "1d10",
-        "escala": { "5": "2d10", "11": "3d10", "17": "4d10" },
+        "escala": {
+          "5": "2d10",
+          "11": "3d10",
+          "17": "4d10"
+        },
         "tipoDano": "fuego",
         "accion": "Acción",
         "distancia": "120 ft",
@@ -157,10 +282,7 @@
         "tipoDano": "curación",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Una criatura tocada recupera 1d8 + modificador de INT de HP.",
-        "efectos": [
-          { "tipo": "notificacionYAbreVida", "descripcion": "Cure Wounds", "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente." }
-        ]
+        "desc": "Una criatura tocada recupera 1d8 + modificador de INT de HP."
       },
       {
         "nivel": "NIVEL 1",
@@ -207,12 +329,47 @@
     ]
   },
   "inventario": [
-    { "nombre": "Ropa de viajero", "peso": 4, "cantidad": 1, "desc": "Vestimenta cómoda para viajar." },
-    { "nombre": "Virote de ballesta", "peso": 0.075, "cantidad": 20, "desc": "Munición para ballesta." },
-    { "nombre": "Dungeoneer's Pack", "peso": 0, "cantidad": 1, "desc": "Incluye mochila, barra de hierro, martillo, piolet, linterna sorda, aceite x2, raciones (10 días), odre, cuerda de cáñamo (50 ft)." },
-    { "nombre": "Bolsa (Pouch)", "peso": 1, "cantidad": 1, "desc": "Bolsa pequeña para monedas y objetos menores." },
-    { "nombre": "Herramientas de Herrero (Smith's Tools)", "peso": 8, "cantidad": 1, "desc": "Set de herramientas para trabajar metales." },
-    { "nombre": "Herramientas de Ladrón (Thieves' Tools)", "peso": 1, "cantidad": 1, "desc": "Set de ganzúas y herramientas para forzar cerraduras y desactivar trampas." },
-    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." }
+    {
+      "nombre": "Ropa de viajero",
+      "peso": 4,
+      "cantidad": 1,
+      "desc": "Vestimenta cómoda para viajar."
+    },
+    {
+      "nombre": "Virote de ballesta",
+      "peso": 0.075,
+      "cantidad": 20,
+      "desc": "Munición para ballesta."
+    },
+    {
+      "nombre": "Dungeoneer's Pack",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Incluye mochila, barra de hierro, martillo, piolet, linterna sorda, aceite x2, raciones (10 días), odre, cuerda de cáñamo (50 ft)."
+    },
+    {
+      "nombre": "Bolsa (Pouch)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Bolsa pequeña para monedas y objetos menores."
+    },
+    {
+      "nombre": "Herramientas de Herrero (Smith's Tools)",
+      "peso": 8,
+      "cantidad": 1,
+      "desc": "Set de herramientas para trabajar metales."
+    },
+    {
+      "nombre": "Herramientas de Ladrón (Thieves' Tools)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Set de ganzúas y herramientas para forzar cerraduras y desactivar trampas."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 0,
+      "desc": "Piezas de Oro."
+    }
   ]
 }

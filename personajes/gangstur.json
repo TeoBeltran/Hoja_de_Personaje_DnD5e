@@ -5,74 +5,153 @@
     "raza": "Tiefling Mephistopheles",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 14,
-        "CON": 15,
-        "INT": 10,
-        "WIS": 9,
-        "CHA": 15
+      "STR": 8,
+      "DEX": 14,
+      "CON": 15,
+      "INT": 10,
+      "WIS": 9,
+      "CHA": 15
     }
   },
   "improvements": {
     "race": [
-        {
-            "atributo": "CHA",
-            "valor": 2,
-            "motivo": "Tiefling"
-        },
-        {
-            "atributo": "INT",
-            "valor": 1,
-            "motivo": "Mephistopheles"
-        }
+      {
+        "atributo": "CHA",
+        "valor": 2,
+        "motivo": "Tiefling"
+      },
+      {
+        "atributo": "INT",
+        "valor": 1,
+        "motivo": "Mephistopheles"
+      }
     ],
     "asi": [
-        {
-            "nivel": 4,
-            "atributos": {
-                "CHA": 2
-            }
+      {
+        "nivel": 4,
+        "atributos": {
+          "CHA": 2
         }
-    ],
-    "feats": [
-        {
-            "nivel": 8,
-            "nombre": "Telekinetic",
-            "atributos": {
-                "CHA": 1
-            }
-        }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "59/59" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "11" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "7"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": true },
-    { "nombre": "Engaño", "proficiente": true },
-    { "nombre": "Historia", "proficiente": false },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": true },
-    { "nombre": "Juego de manos", "proficiente": true },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": false },
-    { "nombre": "Persuasión", "proficiente": false },
-    { "nombre": "Perspicacia", "proficiente": false },
-    { "nombre": "Religión", "proficiente": false },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": true
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": true
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": true
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": false
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "False Identity",
@@ -84,54 +163,118 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Pact Magic", "esPactMagic": true, "desc": "Todos los hechizos del brujo se lanzan siempre con tu única ranura de Pacto (su nivel depende de tu nivel de personaje, se recalcula solo). El brujo recupera espacios de hechizos con descansos cortos." },
-    { "nombre": "Agonizing Blast", "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.", "bonoDano": "CHA", "aplicaA": "hechizo:Eldritch Blast", "disparadores": { "hechizo": "Eldritch Blast" } },
-    { "nombre": "Repelling Blast", "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta.", "disparadores": { "hechizo": "Eldritch Blast" } },
-    { "nombre": "Investment of The Chain Master", "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño." },
-    { "nombre": "Dark One's Blessing", "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel).", "disparadores": { "arma": true, "hechizo": true } },
-    { "nombre": "Pact Boon: Pact of The Chain", "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite." },
-    { "nombre": "Eldritch Versatility", "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19." },
-    { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia al fuego", "desc": "Tienes resistencia al daño de fuego." }
+    {
+      "nombre": "Pact Magic",
+      "desc": "Todos los hechizos del brujo se lanzan como si fueran de nivel 3. El brujo recupera espacios de hechizos con descansos cortos."
+    },
+    {
+      "nombre": "Agonizing Blast",
+      "desc": "Cuando se usa Eldritch Blast, sumas el bonificador de Carisma como daño.",
+      "bonoDano": "CHA",
+      "aplicaA": "hechizo:Eldritch Blast",
+      "disparadores": {
+        "hechizo": "Eldritch Blast"
+      }
+    },
+    {
+      "nombre": "Repelling Blast",
+      "desc": "Cuando se golpea una criatura con Eldritch Blast, puede empujar una criatura hasta 10ft en línea recta.",
+      "disparadores": {
+        "hechizo": "Eldritch Blast"
+      }
+    },
+    {
+      "nombre": "Investment of The Chain Master",
+      "desc": "a) El familiar tiene 40ft de vel.\nb) Acción Adicional para atacar.\nc) Ataques mágicos.\nd) Tirada de salvación (8+Prof+Cha).\ne) Reacción para dar resistencia al daño."
+    },
+    {
+      "nombre": "Dark One's Blessing",
+      "desc": "Cuando dejas un enemigo en 0HP, ganas puntos de vida temporales (Mod Carisma + nivel).",
+      "disparadores": {
+        "arma": true,
+        "hechizo": true
+      }
+    },
+    {
+      "nombre": "Pact Boon: Pact of The Chain",
+      "desc": "Puede invocar un familiar mejorado: Imp, Pseudo Dragon, Quasit o Sprite."
+    },
+    {
+      "nombre": "Eldritch Versatility",
+      "desc": "Solo se activa al subir de nivel 4, 8, 12, 16 y 19."
+    },
+    {
+      "nombre": "Visión Nocturna",
+      "desc": "Visión en la oscuridad hasta 60ft."
+    },
+    {
+      "nombre": "Resistencia al fuego",
+      "desc": "Tienes resistencia al daño de fuego."
+    }
   ],
   "habilidadesUso": [
-    { "nombre": "Dark One's Own Luck", "usos": "1/1", "recupera": "corto", "accion": "Reacción", "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto." },
-    { "nombre": "Magical Cunning", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "desc": "Con una ráfaga de energía mágica, recuperás automáticamente TODOS tus espacios de conjuro gastados.", "restaurarTodasLasRanuras": true },
-    { "nombre": "Flame Blade", "usos": "1/1", "recupera": "largo", "accion": "Acción Bonus", "distancia": "Propio", "duracion": "Concentración, 10 min", "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2." },
+    {
+      "nombre": "Dark One's Own Luck",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Reacción",
+      "desc": "Cuando se hace una tirada de habilidad o salvación, podes sumarle 1d10. Se recarga en descanso corto."
+    },
+    {
+      "nombre": "Magical Cunning",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción Bonus",
+      "desc": "Con una ráfaga de energía mágica, recuperás automáticamente TODOS tus espacios de conjuro gastados.",
+      "restaurarTodasLasRanuras": true
+    },
+    {
+      "nombre": "Flame Blade",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "duracion": "Concentración, 10 min",
+      "desc": "En su mano libre invoca una espada de fuego, desaparece al soltarla. Como Acción hace un ataque de conjuro melee (+6). El objetivo recibe 3d6 de daño por fuego. Suma 1d6 por nivel arriba del 2."
+    },
     {
       "nombre": "Eldritch Invocation: Grasp of Hadar",
       "requisito": "Eldritch Blast cantrip",
       "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, podés moverla en línea recta 10 ft hacia vos.",
-      "disparadores": { "hechizo": "Eldritch Blast" }
+      "disparadores": {
+        "hechizo": "Eldritch Blast"
+      }
     },
     {
       "nombre": "Eldritch Invocation: Lance of Lethargy",
       "requisito": "Eldritch Blast cantrip",
       "desc": "Una vez por turno, cuando golpeás a una criatura con Eldritch Blast, reducís su velocidad en 10 ft hasta el final de tu próximo turno.",
-      "disparadores": { "hechizo": "Eldritch Blast" }
+      "disparadores": {
+        "hechizo": "Eldritch Blast"
+      }
     },
     {
       "nombre": "Eldritch Invocation: Repelling Blast",
       "requisito": "Eldritch Blast cantrip",
       "desc": "Cuando golpeás a una criatura con Eldritch Blast, la empujás 10 ft lejos de vos.",
-      "disparadores": { "hechizo": "Eldritch Blast" }
+      "disparadores": {
+        "hechizo": "Eldritch Blast"
+      }
     }
   ],
   "equipo": [
-    { 
-      "nombre": "Cuero Tachonado +1", 
-      "imagen": "Studded_Leather.png",
-      "esArmadura": true, 
-      "tipoArmadura": "ligera", 
-      "armaduraBase": 13, 
-      "manos": 0, 
+    {
+      "nombre": "Cuero Tachonado +1",
+      "esArmadura": true,
+      "tipoArmadura": "ligera",
+      "armaduraBase": 13,
+      "manos": 0,
       "peso": 13,
       "valor": 1000,
       "desc": "Armadura ligera mágica. CA: 13 + Modificador de Destreza. Peso: 13lb."
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
-      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -149,10 +292,9 @@
         }
       ]
     },
-        {
+    {
       "nombre": "Vara del Guardián del Pacto (Rod of the Pact Keeper) +1",
-      "imagen": "Rod.png",
-      "manos": 1, 
+      "manos": 1,
       "peso": 5,
       "valor": 1000,
       "desc": "Mientras sostengas esta vara mágica, obtenés +1 a las tiradas de ataque con hechizos de brujo y +1 a la CD de salvación de tus hechizos de brujo.",
@@ -168,21 +310,19 @@
       ]
     },
     {
-      "nombre": "Ballesta Ligera", 
-      "imagen": "Crossbow.png",
-      "dano": "1d8", 
-      "tipoDano": "perforante", 
-      "tipo": "finesse", 
-      "manos": 2, 
+      "nombre": "Ballesta Ligera",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 2,
       "peso": 5,
       "valor": 25,
-      "accion": "Acción", 
-      "distancia": "80/320 ft", 
+      "accion": "Acción",
+      "distancia": "80/320 ft",
       "desc": "Arma a distancia. Propiedades: 2 manos, <strong>Recarga, Munición.</strong>"
     },
     {
       "nombre": "Daga +1",
-      "imagen": "Dagger.png",
       "dano": "1d4",
       "tipoDano": "perforante",
       "tipo": "melee",
@@ -198,66 +338,205 @@
     }
   ],
   "hechizos": {
-        "ranuras": [
-            { "nivel": "Nivel 4", "cantidad": "2", "recupera": "corto" }
-        ],
-        "lista": [
-          { "nivel": "CANTRIPS", "nombre": "Eldritch Blast", "dano": "1d10", "ataques": 1, "escalaAtaques": { "5": 2, "11": 3, "17": 4 }, "tipoDano": "fuerza", "accion": "Acción", "distancia": "120 ft", "desc": "Lanza un rayo de energía. Hacé tirada de ataque por cada rayo. A nivel 5+ son 2 rayos, nivel 11+ son 3, nivel 17+ son 4. Cada rayo hace 1d10 + bono de Agonizing Blast (CHA) si lo tenés." },
-          { "nivel": "CANTRIPS", "nombre": "Mage Hand", "accion": "Acción", "distancia": "30 ft", "duracion": "1 minuto", "desc": "Crea una mano espectral que dura hasta 1 minuto y desaparece si se aleja más de 30ft del usuario. Puede manipular objetos no mágicos ni cargar más de 10 pounds." },
-          { "nivel": "CANTRIPS", "nombre": "Mind Sliver", "dano": "1d6", "escala": { "5": "2d6", "11": "3d6", "17": "4d6" }, "tipoDano": "psíquico", "accion": "Acción", "distancia": "60 ft", "duracion": "1 ronda", "desc": "Dispara un pico de energía psíquica. El objetivo hace salvación de INT o recibe daño psíquico y resta 1d4 a su próxima tirada de salvación antes del final de tu próximo turno." },
-          { "nivel": "NIVEL 1", "nombre": "Burning Hands", "dano": "3d6", "escala": { "1": "3d6", "3": "4d6", "5": "5d6", "7": "6d6", "9": "7d6" }, "tipoDano": "fuego", "accion": "Acción", "distancia": "Cono 15 ft", "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 2d6 + 1d6 por nivel de la ranura usada de daño de fuego si fallan (mínimo 3d6 a nivel 1), o la mitad si aciertan la salvación." },
-          { "nivel": "NIVEL 1", "nombre": "Find Familiar", "accion": "Acción", "distancia": "10 ft", "duracion": "1 hora", "desc": "Puede invocar un familiar animal o especial y se comunican telepáticamente.",
-            "familiar": {
-              "_nota": "Confirmado por el usuario: Imp, 10 HP, 13 CA. Ataque tomado del stat block estándar del Imp.",
-              "id": "familiar-gangstur",
-              "nombre": "Imp",
-              "tipo": "Pact of the Chain",
-              "emoji": "😈",
-              "vidaMaxima": 10,
-              "ca": 13,
-              "mod": "DEX +3",
-              "notas": "A diferencia de un familiar común, los familiares de Pact of the Chain SÍ pueden atacar. No escala con tu nivel de personaje (stats fijos del monstruo).",
-              "ataques": [
-                { "nombre": "Aguijón (Sting)", "dano": "1d4+3", "desc": "Ataque cuerpo a cuerpo. +5 al ataque. 1d4+3 perforante, más 3d6 de daño por veneno (salvación de CON 11 para la mitad)." }
-              ]
+    "ranuras": [
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "0",
+        "recupera": "corto"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "0",
+        "recupera": "corto"
+      },
+      {
+        "nivel": "Nivel 3",
+        "cantidad": "0",
+        "recupera": "corto"
+      },
+      {
+        "nivel": "Nivel 4",
+        "cantidad": "2",
+        "recupera": "corto"
+      }
+    ],
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Eldritch Blast",
+        "dano": "1d10",
+        "ataques": 1,
+        "escalaAtaques": {
+          "5": 2,
+          "11": 3,
+          "17": 4
+        },
+        "tipoDano": "fuerza",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Lanza un rayo de energía. Hacé tirada de ataque por cada rayo. A nivel 5+ son 2 rayos, nivel 11+ son 3, nivel 17+ son 4. Cada rayo hace 1d10 + bono de Agonizing Blast (CHA) si lo tenés."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mage Hand",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Crea una mano espectral que dura hasta 1 minuto y desaparece si se aleja más de 30ft del usuario. Puede manipular objetos no mágicos ni cargar más de 10 pounds."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mind Sliver",
+        "dano": "1d6",
+        "escala": {
+          "5": "2d6",
+          "11": "3d6",
+          "17": "4d6"
+        },
+        "tipoDano": "psíquico",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "1 ronda",
+        "desc": "Dispara un pico de energía psíquica. El objetivo hace salvación de INT o recibe daño psíquico y resta 1d4 a su próxima tirada de salvación antes del final de tu próximo turno."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Burning Hands (Nivel real 1)",
+        "dano": "3d6",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "Cono 15 ft",
+        "desc": "Cada criatura en un cono de 15 pies debe realizar una tirada de salvación de Destreza. Reciben 2d6 + 1d6 por nivel de la ranura usada de daño de fuego si fallan (mínimo 3d6 a nivel 1), o la mitad si aciertan la salvación.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "3d6",
+            "2": "4d6",
+            "3": "5d6",
+            "4": "6d6",
+            "5": "7d6"
+          }
+        }
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Find Familiar (Nivel real 1)",
+        "accion": "Acción",
+        "distancia": "10 ft",
+        "duracion": "1 hora",
+        "desc": "Puede invocar un familiar animal o especial y se comunican telepáticamente.",
+        "familiar": {
+          "_nota": "Confirmado por el usuario: Imp, 10 HP, 13 CA. Ataque tomado del stat block estándar del Imp.",
+          "id": "familiar-gangstur",
+          "nombre": "Imp",
+          "tipo": "Pact of the Chain",
+          "emoji": "😈",
+          "vidaMaxima": 10,
+          "ca": 13,
+          "mod": "DEX +3",
+          "notas": "A diferencia de un familiar común, los familiares de Pact of the Chain SÍ pueden atacar. No escala con tu nivel de personaje (stats fijos del monstruo).",
+          "ataques": [
+            {
+              "nombre": "Aguijón (Sting)",
+              "dano": "1d4+3",
+              "desc": "Ataque cuerpo a cuerpo. +5 al ataque. 1d4+3 perforante, más 3d6 de daño por veneno (salvación de CON 11 para la mitad)."
             }
-          },
-          { "nivel": "NIVEL 1", "nombre": "Hex", "dano": "1d6", "tipoDano": "necrótico", "accion": "Acción Bonus", "distancia": "90 ft", "duracion": "Concentración, 1 hora", "desc": "Pone una maldición en una criatura que pueda ver en rango, hasta que termine el hechizo hace 1d6 de daño necrotic extra cada vez que hagas daño a esa criatura. También elegis una habilidad y el objetivo tiene desventaja en tiradas de salvación de ese tipo.  Si el objetivo muere mientras Hex sigue activo, podes gastar tu Acción Bonus para maldecir otra criatura." },
-          { "nivel": "NIVEL 2", "nombre": "Misty Step", "accion": "Acción Bonus", "distancia": "Propio", "desc": "Teletransporte hasta 30 ft a un lugar que puedas ver." },
-          { "nivel": "NIVEL 2", "nombre": "Scorching Ray", "dano": "2d6", "ataques": 3, "escalaAtaques": { "5": 4, "7": 5, "9": 6 }, "tipoDano": "fuego", "accion": "Acción", "distancia": "120 ft", "desc": "Crea 3 rayos de fuego y los gira hacia enemigos en rango, pueden ser enemigos distintos. Cada rayo acierta o falla por separado. Si aciertan, hacen 2d6 de daño de fuego. Cada nivel por encima del nivel 2 que se use suma 1 rayo extra (no dado extra)." },
-          { "nivel": "NIVEL 3", "nombre": "Counterspell", "accion": "Reacción", "distancia": "60 ft", "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo." },
-          { "nivel": "NIVEL 3", "nombre": "Fear", "accion": "Acción", "distancia": "30 ft", "duracion": "Concentración, 1 min", "desc": "Proyecta una imagen fantasmal: cada criatura en un cono de 30 ft tiene que pasar una tirada de Sabiduría o soltar lo que tenga en las manos y quedar Frightened. Mientras esté así, en su turno usa toda su acción para correr por el camino más seguro lejos tuyo. Si la criatura pierde de vista a la fuente del miedo, puede repetir la salvación al final de cada uno de sus turnos." },
-          { "nivel": "NIVEL 3", "nombre": "Fireball", "dano": "8d6", "escala": { "5": "8d6", "7": "9d6", "9": "10d6" }, "tipoDano": "fuego", "accion": "Acción", "distancia": "150 ft", "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada." },
-          { "nivel": "NIVEL 4", "nombre": "Banishment", "accion": "Acción", "distancia": "60 ft", "duracion": "Concentración, 1 min", "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa." },
-          { "nivel": "NIVEL 4", "nombre": "Phantasmal Killer", "accion": "Acción", "distancia": "120 ft", "duracion": "Concentración, 1 min", "desc": "Creás una ilusión terrorífica en la mente del objetivo, visible solo para él. Debe hacer una tirada de salvación de Sabiduría o quedar Frightened durante la duración. Al inicio de cada uno de sus turnos mientras dure el miedo, recibe 4d10 de daño psíquico; puede repetir la salvación al final de cada uno de sus turnos, reduciendo el daño a la mitad si la pasa y terminando el efecto con un segundo acierto consecutivo." }
-        ]
+          ]
+        }
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Hex (Nivel real 1)",
+        "dano": "1d6",
+        "tipoDano": "necrótico",
+        "accion": "Acción Bonus",
+        "distancia": "90 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Pone una maldición en una criatura que pueda ver en rango, hasta que termine el hechizo hace 1d6 de daño necrotic extra cada vez que hagas daño a esa criatura. También elegis una habilidad y el objetivo tiene desventaja en tiradas de salvación de ese tipo.  Si el objetivo muere mientras Hex sigue activo, podes gastar tu Acción Bonus para maldecir otra criatura."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Misty Step (Nivel real 2)",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "desc": "Teletransporte hasta 30 ft a un lugar que puedas ver."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Scorching Ray (Nivel real 2)",
+        "dano": "2d6",
+        "ataques": 3,
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Crea 3 rayos de fuego y los gira hacia enemigos en rango, pueden ser enemigos distintos. Cada rayo acierta o falla por separado. Si aciertan, hacen 2d6 de daño de fuego. Cada nivel por encima del nivel 2 que se use es 1d6 extra de daño."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Counterspell (Nivel real 3)",
+        "accion": "Reacción",
+        "distancia": "60 ft",
+        "desc": "Interrumpe a una criatura que esté casteando un hechizo, si el hechizo es de nivel 3 o menor el rival lo falla instantáneamente. Si es nivel 4 o más tiene que hacer una tirada de salvación que pase 10 + El nivel del hechizo."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Fear (Nivel real 3)",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 min",
+        "desc": "Proyecta una imagen fantasmal, cada criatura a 30ft del cono tienen que pasar una tirada de Sabiduría o soltar lo que tengan y pasan a estar Frightened. Mientras estén así, usan su acción para correr hacia la ruta mas segura. Si perdes visión de la criatura, puede hacer una tirada de salvación de Sabiduría."
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Fireball (Nivel real 3)",
+        "dano": "8d6",
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "150 ft",
+        "desc": "Cada criatura a 20ft del radio del ataque tiene que hacer una tirada de salvación de Destreza o recibir 8d6 de daño de fuego, o la mitad si pasan la tirada.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "3": "8d6",
+            "4": "9d6",
+            "5": "10d6"
+          }
+        }
+      },
+      {
+        "nivel": "NIVEL 4",
+        "nombre": "Banishment (Nivel real 4)",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 min",
+        "desc": "Obliga a una criatura a hacer una salvación de Carisma; si falla, es enviada a un semiplano inofensivo y queda fuera del combate durante la duración del hechizo. Si es nativa del plano, vuelve al terminar; si no lo es, no regresa."
+      }
+    ]
   },
   "inventario": [
-      {
-          "nombre": "Leña",
-          "peso": 1,
-          "cantidad": 2,
-          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-      },
-      {
-          "nombre": "Oro",
-          "peso": 0.02,
-          "cantidad": 150,
-          "desc": "Piezas de Oro."
-      },
-      {
-        "nombre": "Greater Healing Potion",
-        "peso": 0.5,
-        "cantidad": 2,
-        "accion": "Acción",
-        "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
-      },
-      {
-        "nombre": "Scroll of Counterspell",
-        "peso": 0,
-        "cantidad": 1,
-        "accion": "Acción",
-        "desc": "Pergamino mágico que permite lanzar Counterspell una única vez. Luego de usarlo, el pergamino se destruye."
-      }
+    {
+      "nombre": "Leña",
+      "peso": 1,
+      "cantidad": 2,
+      "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 150,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Greater Healing Potion",
+      "peso": 0.5,
+      "cantidad": 2,
+      "accion": "Acción",
+      "desc": "Al beber esta poción recuperás 4d4 + 4 puntos de vida."
+    },
+    {
+      "nombre": "Scroll of Counterspell",
+      "peso": 0,
+      "cantidad": 1,
+      "accion": "Acción",
+      "desc": "Pergamino mágico que permite lanzar Counterspell una única vez. Luego de usarlo, el pergamino se destruye."
+    }
   ]
 }

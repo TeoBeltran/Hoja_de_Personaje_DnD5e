@@ -5,71 +5,153 @@
     "raza": "High Elf",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 14,
-        "CON": 14,
-        "INT": 15,
-        "WIS": 12,
-        "CHA": 8
+      "STR": 8,
+      "DEX": 14,
+      "CON": 14,
+      "INT": 15,
+      "WIS": 12,
+      "CHA": 8
     }
   },
   "improvements": {
     "race": [
-        {
-            "atributo": "DEX",
-            "valor": 2,
-            "motivo": "Elf"
-        },
-        {
-            "atributo": "INT",
-            "valor": 1,
-            "motivo": "Half Elf"
-        }
+      {
+        "atributo": "DEX",
+        "valor": 2,
+        "motivo": "Elf"
+      },
+      {
+        "atributo": "INT",
+        "valor": 1,
+        "motivo": "Half Elf"
+      }
     ],
     "asi": [
-        {
-            "nivel": 1,
-            "atributos": {
-                "INT": 2
-            }
-        },
-        {
-            "nivel": 8,
-            "atributos": {
-                "INT": 2
-            }
+      {
+        "nivel": 1,
+        "atributos": {
+          "INT": 2
         }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      4
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "50/50" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "11" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "7"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": true },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": true },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": true },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": true },
-    { "nombre": "Persuasión", "proficiente": false },
-    { "nombre": "Perspicacia", "proficiente": false },
-    { "nombre": "Religión", "proficiente": true },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": true
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Sage",
@@ -81,17 +163,56 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Arcane Tradition: School of Evocation", "desc": "Te especializás en Magia de Evocación: hechizos que crean energía mágica destructiva (fuego, rayos, fuerza). Esta tradición desbloquea features adicionales a medida que subís de nivel." },
-    { "nombre": "Evocation Savant", "desc": "El oro y el tiempo que debés gastar para copiar un hechizo de Evocación a tu spellbook se reduce a la mitad." },
-    { "nombre": "Sculpt Spells", "desc": "Cuando lanzás un hechizo de Evocación que afecta a otras criaturas, podés proteger a un número de ellas igual a 1 + el nivel del hechizo (mínimo 1). Las criaturas elegidas pasan automáticamente la salvación contra el hechizo y no reciben daño si fallaban.", "disparadores": { "hechizo": true } },
-    { "nombre": "Potent Cantrip", "desc": "Cuando una criatura pasa la salvación contra un cantrip tuyo, igual recibe la mitad del daño (sin otros efectos secundarios).", "disparadores": { "cantrip": true } },
-    { "nombre": "Cantrip Formulas", "desc": "Cuando terminás un descanso largo, podés reemplazar uno de los cantrips de mago que conocés por otro de la lista de cantrips de mago." },
-    { "nombre": "Darkvision", "desc": "Acostumbrado a las sombras del bosque, tenés visión superior en condiciones de poca luz. Podés ver en luz tenue dentro de 60 ft como si fuera luz brillante, y en oscuridad como si fuera luz tenue (en oscuridad solo distinguís en grises, no colores)." },
-    { "nombre": "Keen Senses", "desc": "Tenés proficiencia en Percepción." },
-    { "nombre": "Fey Ancestry", "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir." },
-    { "nombre": "Elf Weapon Training", "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
-    { "nombre": "Extra Language", "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección." },
-    { "nombre": "Trance", "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."}
+    {
+      "nombre": "Arcane Tradition: School of Evocation",
+      "desc": "Te especializás en Magia de Evocación: hechizos que crean energía mágica destructiva (fuego, rayos, fuerza). Esta tradición desbloquea features adicionales a medida que subís de nivel."
+    },
+    {
+      "nombre": "Evocation Savant",
+      "desc": "El oro y el tiempo que debés gastar para copiar un hechizo de Evocación a tu spellbook se reduce a la mitad."
+    },
+    {
+      "nombre": "Sculpt Spells",
+      "desc": "Cuando lanzás un hechizo de Evocación que afecta a otras criaturas, podés proteger a un número de ellas igual a 1 + el nivel del hechizo (mínimo 1). Las criaturas elegidas pasan automáticamente la salvación contra el hechizo y no reciben daño si fallaban.",
+      "disparadores": {
+        "hechizo": true
+      }
+    },
+    {
+      "nombre": "Potent Cantrip",
+      "desc": "Cuando una criatura pasa la salvación contra un cantrip tuyo, igual recibe la mitad del daño (sin otros efectos secundarios).",
+      "disparadores": {
+        "cantrip": true
+      }
+    },
+    {
+      "nombre": "Cantrip Formulas",
+      "desc": "Cuando terminás un descanso largo, podés reemplazar uno de los cantrips de mago que conocés por otro de la lista de cantrips de mago."
+    },
+    {
+      "nombre": "Darkvision",
+      "desc": "Acostumbrado a las sombras del bosque, tenés visión superior en condiciones de poca luz. Podés ver en luz tenue dentro de 60 ft como si fuera luz brillante, y en oscuridad como si fuera luz tenue (en oscuridad solo distinguís en grises, no colores)."
+    },
+    {
+      "nombre": "Keen Senses",
+      "desc": "Tenés proficiencia en Percepción."
+    },
+    {
+      "nombre": "Fey Ancestry",
+      "desc": "Tenés ventaja en tiradas de salvación contra ser charmed, y la magia no te puede dormir."
+    },
+    {
+      "nombre": "Elf Weapon Training",
+      "desc": "Tenés proficiencia con espadas largas, espadas cortas, arcos cortos y arcos largos."
+    },
+    {
+      "nombre": "Extra Language",
+      "desc": "Podés hablar, leer y escribir un idioma adicional de tu elección."
+    },
+    {
+      "nombre": "Trance",
+      "desc": "Los elfos en lugar de dormir, entrás en un estado de meditación semiconsciente durante 4 horas. Ese tiempo cuenta como un descanso largo para los efectos de dormir. Luego podés pasar el resto del descanso largo en actividad ligera (vigilar, leer, conversar), pero sin esfuerzo físico o combate."
+    }
   ],
   "habilidadesUso": [
     {
@@ -126,7 +247,6 @@
   "equipo": [
     {
       "nombre": "Capa de protección (Cloak of Protection)",
-      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -146,7 +266,6 @@
     },
     {
       "nombre": "Varita del mago de guerra (Wand of the War Mage) +1",
-      "imagen": "Wand.png",
       "dano": "1d4",
       "tipoDano": "perforante",
       "tipo": "rango",
@@ -170,17 +289,37 @@
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 3", "cantidad": "3", "recupera": "largo" },
-      { "nivel": "Nivel 4", "cantidad": "2", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 3",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 4",
+        "cantidad": "1",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {
         "nivel": "CANTRIPS",
         "nombre": "Fire Bolt",
         "dano": "1d10",
-        "escala": { "5": "2d10", "11": "3d10", "17": "4d10" },
+        "escala": {
+          "5": "2d10",
+          "11": "3d10",
+          "17": "4d10"
+        },
         "tipoDano": "fuego",
         "accion": "Acción",
         "distancia": "120 ft",
@@ -190,7 +329,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Shocking Grasp",
         "dano": "1d8",
-        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
         "tipoDano": "rayo",
         "accion": "Acción",
         "distancia": "Toque",
@@ -200,7 +343,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Mind Sliver",
         "dano": "1d6",
-        "escala": { "5": "2d6", "11": "3d6", "17": "4d6" },
+        "escala": {
+          "5": "2d6",
+          "11": "3d6",
+          "17": "4d6"
+        },
         "tipoDano": "psíquico",
         "accion": "Acción",
         "distancia": "60 ft",
@@ -226,7 +373,11 @@
         "nivel": "CANTRIPS",
         "nombre": "Toll the Dead",
         "dano": "1d8",
-        "escala": { "5": "2d8", "11": "3d8", "17": "4d8" },
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
         "tipoDano": "necrótico",
         "accion": "Acción",
         "distancia": "60 ft",
@@ -407,23 +558,6 @@
         "accion": "Acción",
         "distancia": "120 ft",
         "desc": "Creas un muro de fuego sobre una superficie sólida dentro del alcance. Puede ser una línea de hasta 60 ft de largo, 20 ft de alto y 1 ft de grosor, o un anillo de hasta 20 ft de diámetro, 20 ft de alto y 1 ft de grosor. Al aparecer, las criaturas en su área hacen salvación de DEX o reciben 5d8 fuego (mitad si pasan). Un lado del muro emite calor intenso; las criaturas que terminan su turno a 10 ft o menos de ese lado o lo atraviesan por primera vez en un turno reciben 5d8 fuego. Cada slot superior al 4 suma 1d8. Cada slot superior al 4 aumenta el daño en 1d8."
-      },
-      {
-        "nivel": "NIVEL 4",
-        "nombre": "Ice Storm",
-        "dano": "2d8+4d6",
-        "tipoDano": "frío/contundente",
-        "accion": "Acción",
-        "distancia": "300 ft",
-        "desc": "Cae granizo torrencial en un cilindro de 20 ft de radio y 40 ft de alto. Cada criatura en el área hace salvación de DEX: si falla, recibe 2d8 contundente + 4d6 frío (mitad si pasa). El terreno del área queda cubierto de hielo y se vuelve difícil hasta el final de tu próximo turno."
-      },
-      {
-        "nivel": "NIVEL 4",
-        "nombre": "Greater Invisibility",
-        "accion": "Acción",
-        "distancia": "Toque",
-        "duracion": "Concentración, 1 minuto",
-        "desc": "Vos o una criatura voluntaria que toques se vuelve invisible durante la duración, incluso al atacar o lanzar hechizos."
       }
     ]
   },

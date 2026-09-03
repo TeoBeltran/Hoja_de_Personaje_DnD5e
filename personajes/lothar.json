@@ -5,80 +5,157 @@
     "raza": "Humano",
     "tamano": "estandar",
     "stats": {
-        "STR": 16,
-        "DEX": 16,
-        "CON": 16,
-        "INT": 9,
-        "WIS": 9,
-        "CHA": 9
+      "STR": 16,
+      "DEX": 16,
+      "CON": 16,
+      "INT": 9,
+      "WIS": 9,
+      "CHA": 9
     }
   },
   "improvements": {
     "race": [
-        {
-            "atributo": "STR",
-            "valor": 0,
-            "motivo": "Humano"
-        }
+      {
+        "atributo": "STR",
+        "valor": 0,
+        "motivo": "Humano"
+      }
     ],
     "feats": [
-        {
-            "nivel": 1,
-            "nombre": "Great Weapon Master",
-            "atributos": {
-                "STR": 0
-            }
-        },
-        {
-            "nivel": 6,
-            "nombre": "Tough",
-            "atributos": {}
+      {
+        "nivel": 1,
+        "nombre": "Great Weapon Master",
+        "atributos": {
+          "STR": 0
         }
+      }
     ],
     "asi": [
-        {
-            "nivel": 4,
-            "atributos": {
-                "STR": 2
-            }
-        },
-        {
-            "nivel": 8,
-            "atributos": {
-                "STR": 2
-            }
+      {
+        "nivel": 4,
+        "atributos": {
+          "STR": 2
         }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "92/92" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "11" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "7"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": true },
-    { "nombre": "Conoc. Arcano", "proficiente": false },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": true },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": true },
-    { "nombre": "Investigación", "proficiente": false },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": false },
-    { "nombre": "Persuasión", "proficiente": true },
-    { "nombre": "Perspicacia", "proficiente": false },
-    { "nombre": "Religión", "proficiente": false },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": false
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Soldier",
@@ -90,13 +167,45 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Fighting Style: Great Weapon Fighting", "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos.", "disparadores": { "arma": { "manos": 2, "tipo": "melee" } } },
-    { "nombre": "Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1. El primer golpe con un arma gasta tu Acción; el segundo sale automáticamente sin volver a gastarla." },
-    { "nombre": "Improved Critical", "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20).", "disparadores": { "arma": true } },
-    { "nombre": "Remarkable Athlete", "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "arma": true } },
-    { "nombre": "Tactical Shift", "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.", "disparadores": { "habilidad": "Second Wind" } },
-    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." },
-    { "nombre": "Tough", "desc": "Tus puntos de vida máximos aumentan en 2 por cada nivel de personaje que tengas (ya reflejado en Vida)." }
+    {
+      "nombre": "Fighting Style: Great Weapon Fighting",
+      "desc": "Cuando tirás 1 o 2 en un dado de daño con un arma melee empuñada a dos manos, podés re-tirarlo. Debés quedarte con el segundo resultado, aunque sea peor. Aplica solo a armas a 2 manos o versátiles empuñadas a 2 manos.",
+      "disparadores": {
+        "arma": {
+          "manos": 2,
+          "tipo": "melee"
+        }
+      }
+    },
+    {
+      "nombre": "Extra Attack",
+      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 ataques en lugar de 1. El primer golpe con un arma gasta tu Acción; el segundo sale automáticamente sin volver a gastarla."
+    },
+    {
+      "nombre": "Improved Critical",
+      "desc": "Hacés golpe crítico con tiradas de ataque de 19 o 20 en el d20 (en vez de solo 20).",
+      "disparadores": {
+        "arma": true
+      }
+    },
+    {
+      "nombre": "Remarkable Athlete",
+      "desc": "Sumás +2 a las pruebas de Fuerza, Destreza o Constitución en las que no apliques tu bonificador de competencia. Además, tu distancia de salto en carrera aumenta en 4 ft. También tirás con VENTAJA (2 dados, quedate con el más alto) en tiradas de iniciativa. Si das un golpe crítico, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.",
+      "disparadores": {
+        "arma": true
+      }
+    },
+    {
+      "nombre": "Tactical Shift",
+      "desc": "Cuando usás Second Wind, podés moverte hasta la mitad de tu velocidad sin provocar ataques de oportunidad.",
+      "disparadores": {
+        "habilidad": "Second Wind"
+      }
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente."
+    }
   ],
   "habilidadesUso": [
     {
@@ -140,7 +249,6 @@
   "equipo": [
     {
       "nombre": "Armadura de placas (Plate Armor)",
-      "imagen": "Plate_Armor.png",
       "esArmadura": true,
       "tipoArmadura": "pesada",
       "armaduraBase": 18,
@@ -151,7 +259,6 @@
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",
-      "imagen": "Cloak.png",
       "equipable": true,
       "manos": 0,
       "peso": 1,
@@ -171,7 +278,6 @@
     },
     {
       "nombre": "Botas de zancada y salto (Boots of Striding and Springing)",
-      "imagen": "Boots.png",
       "equipable": true,
       "manos": 0,
       "peso": 5,
@@ -181,7 +287,6 @@
     },
     {
       "nombre": "Espada Larga (Greatsword) +2",
-      "imagen": "Greatsword.png",
       "dano": "2d6+2",
       "tipoDano": "cortante",
       "tipo": "melee",
@@ -201,7 +306,6 @@
     },
     {
       "nombre": "Arco Largo (Longbow) +1",
-      "imagen": "Longbow.png",
       "dano": "1d8",
       "tipoDano": "perforante",
       "tipo": "ranged",
@@ -222,17 +326,17 @@
     "lista": []
   },
   "inventario": [
-      {
-          "nombre": "Leña",
-          "peso": 1,
-          "cantidad": 2,
-          "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-      },
-      {
-          "nombre": "Oro",
-          "peso": 0.02,
-          "cantidad": 150,
-          "desc": "Piezas de Oro."
-      }
+    {
+      "nombre": "Leña",
+      "peso": 1,
+      "cantidad": 2,
+      "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 150,
+      "desc": "Piezas de Oro."
+    }
   ]
 }

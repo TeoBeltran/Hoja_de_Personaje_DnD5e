@@ -5,74 +5,154 @@
     "raza": "Aasimar",
     "tamano": "estandar",
     "stats": {
-        "STR": 15,
-        "DEX": 10,
-        "CON": 14,
-        "INT": 8,
-        "WIS": 10,
-        "CHA": 14
+      "STR": 15,
+      "DEX": 10,
+      "CON": 14,
+      "INT": 8,
+      "WIS": 10,
+      "CHA": 14
     }
   },
   "improvements": {
     "race": [
-        {
-            "atributo": "CHA",
-            "valor": 2,
-            "motivo": "Aasimar"
-        },
-        {
-            "atributo": "WIS",
-            "valor": 1,
-            "motivo": "Protector"
-        }
+      {
+        "atributo": "CHA",
+        "valor": 2,
+        "motivo": "Aasimar"
+      },
+      {
+        "atributo": "WIS",
+        "valor": 1,
+        "motivo": "Protector"
+      }
     ],
     "feats": [
-        {
-            "nivel": 1,
-            "nombre": "Polearm Master",
-            "atributos": {
-                "STR": 0
-            }
+      {
+        "nivel": 1,
+        "nombre": "Polearm Master",
+        "atributos": {
+          "STR": 0
         }
-    ],
-    "asi": [
-        {
-            "nivel": 8,
-            "atributos": {
-                "STR": 2
-            }
-        }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "68/68" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "11" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "7"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": true },
-    { "nombre": "Conoc. Arcano", "proficiente": false },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": false },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": false },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": false },
-    { "nombre": "Persuasión", "proficiente": true },
-    { "nombre": "Perspicacia", "proficiente": true },
-    { "nombre": "Religión", "proficiente": true },
-    { "nombre": "Sigilo", "proficiente": false },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": false
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": true
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Shelter of the Faithful",
@@ -84,216 +164,248 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Fighting Style: Dueling", "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.", "bonoDano": 2, "aplicaA": "duelingMelee", "disparadores": { "arma": { "tipo": "melee", "manos": 1 } } },
-    { "nombre": "Aura of Protection", "desc": "Vos y cualquier criatura aliada dentro de 10 ft tuyos suman tu modificador de CHA (mínimo +1) a sus tiradas de salvación. Necesitás estar consciente para que el aura funcione." },
-    { "nombre": "Divine Health", "desc": "Inmune a enfermedades." },
-    { "nombre": "Martial Versatility: Extra Attack", "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno.", "disparadores": { "arma": true } },
-    { "nombre": "Visión Nocturna", "desc": "Visión en la oscuridad hasta 60ft." },
-    { "nombre": "Resistencia Radiante y Necrótica", "desc": "Tenés resistencia al daño radiante y necrótico." },
-    { "nombre": "Aura of Warding", "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."},
-    { "nombre": "Aura del Gran Panal",
+    {
+      "nombre": "Fighting Style: Dueling",
+      "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.",
+      "bonoDano": 2,
+      "aplicaA": "duelingMelee",
+      "disparadores": {
+        "arma": {
+          "tipo": "melee",
+          "manos": 1
+        }
+      }
+    },
+    {
+      "nombre": "Aura of Protection",
+      "desc": "Vos y cualquier criatura aliada dentro de 10 ft tuyos suman tu modificador de CHA (mínimo +1) a sus tiradas de salvación. Necesitás estar consciente para que el aura funcione."
+    },
+    {
+      "nombre": "Divine Health",
+      "desc": "Inmune a enfermedades."
+    },
+    {
+      "nombre": "Martial Versatility: Extra Attack",
+      "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno.",
+      "disparadores": {
+        "arma": true
+      }
+    },
+    {
+      "nombre": "Visión Nocturna",
+      "desc": "Visión en la oscuridad hasta 60ft."
+    },
+    {
+      "nombre": "Resistencia Radiante y Necrótica",
+      "desc": "Tenés resistencia al daño radiante y necrótico."
+    },
+    {
+      "nombre": "Aura of Warding",
+      "desc": "Vos y las criaturas aliadas dentro de 10 ft tienen resistencia al daño causado por conjuros."
+    },
+    {
+      "nombre": "Aura del Gran Panal",
       "desc": "Una criatura Enmielada queda cubierta por miel sagrada. <br>Mientras estés consciente, proyectás un aura de 30 ft. <br>Todas las criaturas Enmieladas dentro del aura pierden 10 ft de velocidad luego de recibir cualquier tipo de daño. <br><br>Cada vez que una criatura Enmielada dentro del aura recibe daño de un ataque, recibe Daño de Miel adicional equivalente a 1d4+3 (máximo 7) de daño Radiante. <br>El aura afecta por igual a aliados, enemigos y a vos mismo. <br><br> Las criaturas salvajes tienen 1d4+3 (máximo 7) de daño extra al atacar objetivos Enmielados. <br> Si la criatura es un Oso, tiene ventaja en la tirada de ataque."
     },
-    { "nombre": "Aura del Gran Panal (daño)",
+    {
+      "nombre": "Aura del Gran Panal (daño)",
       "desc": "Si el objetivo está Enmielado: +1d4+3 (máx. 7) de daño Radiante extra.",
       "oculto": true,
-      "colorCard": "#e65100",
-      "colorCardFondo": "#fff3e0",
-      "disparadores": { "arma": true, "hechizo": true },
-      "bonoCondicional": { "formula": "1d4+3", "tipoDano": "radiante", "nota": "solo si el objetivo está Enmielado" }
+      "colorCard": "#6a1b9a",
+      "disparadores": {
+        "arma": true,
+        "hechizo": true
+      }
     },
-    { "nombre": "Polearm Master", "desc": "Revisar la sección de Características Activas"},
-    { "nombre": "Weapon Mastery", "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente." }
+    {
+      "nombre": "Polearm Master",
+      "desc": "Revisar la sección de Características Activas"
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Ganaste maestría con ciertos tipos de arma. Cuando atacás con un arma para la que tenés maestría, además de su daño normal aplicás la propiedad especial de esa arma (Cleave, Graze, Sap, Slow, etc).<br><br>Fijate el detalle de cada arma para ver cuál le toca y qué hace exactamente."
+    }
   ],
   "habilidadesUso": [
     {
-        "nombre": "Divine Sense",
-        "usos": "4/4",
-        "recupera": "largo",
-        "accion": "Acción",
-        "distancia": "60 ft",
-        "desc": "Detectás la posición de cualquier celestial, demonio o no-muerto a 60 ft."
+      "nombre": "Divine Sense",
+      "usos": "4/4",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "60 ft",
+      "desc": "Detectás la posición de cualquier celestial, demonio o no-muerto a 60 ft."
     },
     {
-        "nombre": "Lay on Hands",
-        "usos": "1/1",
-        "recupera": "largo",
-        "accion": "Acción",
-        "distancia": "Toque",
-        "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5.",
-        "efectos": [
-            {
-                "tipo": "notificacionYAbreVida",
-                "descripcion": "Lay on Hands",
-                "mensaje": "Curás <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel × 5</strong> de HP (repartible entre varias criaturas). Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
-            }
-        ]
+      "nombre": "Lay on Hands",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5."
     },
     {
-        "nombre": "Divine Smite",
-        "tipo": "smite",
-        "tipoDano": "radiante",
-        "danoPorNivel": {
-            "1": "2d8",
-            "2": "3d8",
-            "3": "4d8",
-            "4": "5d8"
-        },
-        "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
+      "nombre": "Divine Smite",
+      "tipo": "smite",
+      "tipoDano": "radiante",
+      "danoPorNivel": {
+        "1": "2d8",
+        "2": "3d8",
+        "3": "4d8",
+        "4": "5d8"
+      },
+      "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
     },
     {
-        "nombre": "Channel Divinity",
-        "usos": "2/2",
-        "usosPorNivel": { "1": 1, "6": 2, "18": 3 },
-        "recupera": "corto",
-        "esPoolCompartido": true,
-        "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Nature's Wrath o Turn the Faithless)."
+      "nombre": "Channel Divinity",
+      "usos": "2/2",
+      "usosPorNivel": {
+        "1": 1,
+        "6": 2,
+        "18": 3
+      },
+      "recupera": "corto",
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Nature's Wrath o Turn the Faithless)."
     },
     {
-        "nombre": "Channel Divinity: Nature's Wrath",
-        "consumeUsoDe": "Channel Divinity",
-        "accion": "Acción",
-        "distancia": "10 ft",
-        "desc": "Crea enredaderas espectrales a un enemigo a 10 ft. El objetivo hace tirada de STR o DEX o queda agarrado. Solo se libera al final de cada turno con la tirada. Consume 1 uso de Channel Divinity."
+      "nombre": "Channel Divinity: Nature's Wrath",
+      "consumeUsoDe": "Channel Divinity",
+      "accion": "Acción",
+      "distancia": "10 ft",
+      "desc": "Crea enredaderas espectrales a un enemigo a 10 ft. El objetivo hace tirada de STR o DEX o queda agarrado. Solo se libera al final de cada turno con la tirada. Consume 1 uso de Channel Divinity."
     },
     {
-        "nombre": "Channel Divinity: Turn the Faithless",
-        "consumeUsoDe": "Channel Divinity",
-        "accion": "Acción",
-        "distancia": "30 ft",
-        "desc": "Cada hada o demonio que pueda oírte hace tirada de salvación de WIS. Si falla, durante 1 minuto o hasta que reciba daño queda con miedo hacia vos. Consume 1 uso de Channel Divinity."
+      "nombre": "Channel Divinity: Turn the Faithless",
+      "consumeUsoDe": "Channel Divinity",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Cada hada o demonio que pueda oírte hace tirada de salvación de WIS. Si falla, durante 1 minuto o hasta que reciba daño queda con miedo hacia vos. Consume 1 uso de Channel Divinity."
     },
     {
-        "nombre": "Healing Hands",
-        "usos": "1/1",
-        "recupera": "largo",
-        "accion": "Acción",
-        "distancia": "Toque",
-        "desc": "Tocás a una criatura y la curás una cantidad de HP igual a tu nivel.",
-        "efectos": [
-            {
-                "tipo": "notificacionYAbreVida",
-                "descripcion": "Healing Hands",
-                "mensaje": "Curás <strong style=\"color: #2e7d32; font-size: 1.2rem;\">tu nivel ({nivelPersonaje})</strong> de HP. Al cerrar este modal se abre el de vida para que apliques la curación manualmente."
-            }
-        ]
+      "nombre": "Healing Hands",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "desc": "Tocás a una criatura y la curás una cantidad de HP igual a tu nivel."
     },
     {
-        "nombre": "Radiant Soul",
-        "usos": "1/1",
-        "recupera": "largo",
-        "accion": "Acción Bonus",
-        "duracion": "1 minuto",
-        "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Mientras esté activo, hacés daño radiante extra igual a tu nivel al usar un ataque o hechizo. Se activa y desactiva como Acción Bonus (el botón cambia solo, o se apaga solo a los 6 turnos).",
-        "toggleBonoDano": { "formula": "nivelPersonaje", "tipoDano": "radiante" },
-        "disparadoresSiActivo": { "arma": true, "hechizo": true },
-        "toggleDuracionTurnos": 6
+      "nombre": "Radiant Soul",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción Bonus",
+      "duracion": "1 minuto",
+      "desc": "Liberás energía divina en vos mismo: tus ojos brillan y te salen 2 alas de luz. Ganás 30 ft de velocidad de vuelo. Mientras esté activo, hacés daño radiante extra igual a tu nivel al usar un ataque o hechizo. Se activa y desactiva como Acción Bonus (el botón cambia solo).",
+      "toggleBonoDano": {
+        "formula": "nivelPersonaje",
+        "tipoDano": "radiante"
+      },
+      "disparadoresSiActivo": {
+        "arma": true,
+        "hechizo": true
+      }
     },
     {
-        "nombre": "Polearm Master",
-        "usos": "99/99",
-        "accion": "Acción Bonus",
-        "danio": "1d4+STR",
-        "desc": "Puedes usar la acción bonus para hacer un ataque adicional con el extremo opuesto de una lanza o arma similar (1d4+STR contundente). <br>Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."
+      "nombre": "Polearm Master",
+      "usos": "99/99",
+      "accion": "Acción Bonus",
+      "danio": "1d4+STR",
+      "desc": "Puedes usar la acción bonus para hacer un ataque adicional con el extremo opuesto de una lanza o arma similar (1d4+STR contundente). <br>Además, mientras empuñás una de estas armas, las criaturas provocan ataque de oportunidad cuando entran en tu rango de alcance."
     },
     {
-        "nombre": "Honey Smite",
-        "tipo": "smite",
-        "tipoDano": "radiante",
-        "danoPorNivel": { "1": "1d6" },
-        "accion": "Sin acción",
-        "distancia": "Melee",
-        "desc": "Cuando golpeás con un ataque cuerpo a cuerpo y decidís no usar Divine Smite, podés activar Honey Smite sin consumir ninguna acción. Gasta una ranura de hechizo de Nivel 1 (siempre Nivel 1, no escala). Cae un rayo de miel sobre el objetivo: 1d6 de daño radiante y queda Enmielado."
+      "nombre": "Honey Smite",
+      "tipo": "smite",
+      "tipoDano": "radiante",
+      "danoPorNivel": {
+        "1": "1d6"
+      },
+      "accion": "Sin acción",
+      "distancia": "Melee",
+      "desc": "Cuando golpeás con un ataque cuerpo a cuerpo y decidís no usar Divine Smite, podés activar Honey Smite sin consumir ninguna acción. Gasta una ranura de hechizo de Nivel 1 (siempre Nivel 1, no escala). Cae un rayo de miel sobre el objetivo: 1d6 de daño radiante y queda Enmielado."
     },
     {
-        "nombre": "Consagración del Panal",
-        "usos": "1/1",
-        "recupera": "largo",
-        "accion": "Acción",
-        "distancia": "15 ft",
-        "duracion": "1 minuto",
-        "desc": "Crea un área  de miel de 30 ft de radio en un punto que puedas ver hasta 15 ft de distancia. <br>Al aparecer al área, todas las criaturas dentro quedan Enmieladas (incluyendo aliados). <br>Cualquier criatura que entre por primera vez al área durante la duración del hechizo también queda Enmielada. <br>La condición Enmielado permanece aunque la criatura abandone el área."
+      "nombre": "Consagración del Panal",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "15 ft",
+      "duracion": "1 minuto",
+      "desc": "Crea un área  de miel de 30 ft de radio en un punto que puedas ver hasta 15 ft de distancia. <br>Al aparecer al área, todas las criaturas dentro quedan Enmieladas (incluyendo aliados). <br>Cualquier criatura que entre por primera vez al área durante la duración del hechizo también queda Enmielada. <br>La condición Enmielado permanece aunque la criatura abandone el área."
     }
   ],
   "equipo": [
     {
-        "nombre": "Armadura de placas (Plate Armor)",
-        "imagen": "Plate_Armor.png",
-        "esArmadura": true,
-        "tipoArmadura": "pesada",
-        "armaduraBase": 18,
-        "manos": 0,
-        "peso": 65,
-        "valor": 1500,
-        "desc": "Armadura pesada. CA: 18."
+      "nombre": "Armadura de placas (Plate Armor)",
+      "esArmadura": true,
+      "tipoArmadura": "pesada",
+      "armaduraBase": 18,
+      "manos": 0,
+      "peso": 65,
+      "valor": 1500,
+      "desc": "Armadura pesada. CA: 18."
     },
+    {
+      "nombre": "Lanza (Spear) +1",
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 3,
+      "valor": 1500,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "magico": true,
+      "bonoAtaque": 1,
+      "bonoDano": 1,
+      "maestriaArma": "Sap",
+      "desc": "Lanza mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
+    },
+    {
+      "nombre": "Capa de protección (Cloak of Protection)",
+      "equipable": true,
+      "manos": 0,
+      "peso": 1,
+      "valor": 2000,
+      "magico": true,
+      "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
+      "efectos": [
         {
-        "nombre": "Lanza (Spear) +1",
-        "imagen": "Spear.png",
-        "dano": "1d6",
-        "tipoDano": "cortante",
-        "tipo": "melee",
-        "manos": 1,
-        "peso": 3,
-        "valor": 1500,
-        "accion": "Acción",
-        "distancia": "Melee 5 ft",
-        "magico": true,
-        "bonoAtaque": 1,
-        "bonoDano": 1,
-        "maestriaArma": "Sap",
-        "desc": "Lanza mágica. +1 a las tiradas de ataque y +1 al daño. Cuenta como arma mágica para superar resistencias e inmunidades."
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
+      ]
     },
     {
-        "nombre": "Capa de protección (Cloak of Protection)",
-        "imagen": "Cloak.png",
-        "equipable": true,
-        "manos": 0,
-        "peso": 1,
-        "valor": 2000,
-        "magico": true,
-        "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
-        "efectos": [
-            {
-            "tipo": "CA",
-            "valor": 1
-            },
-            {
-            "tipo": "salvaciones",
-            "valor": 1
-            }
-        ]
+      "nombre": "Escudo centinela (Sentinel Shield)",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 0,
+      "manos": 1,
+      "peso": 4,
+      "valor": 500,
+      "magico": true,
+      "desc": "Escudo mágico. No aumenta la Clase de Armadura. Mientras esté equipado otorga ventaja en tiradas de iniciativa y ventaja en pruebas de Sabiduría (Percepción).",
+      "efectos": [
+        {
+          "tipo": "ventaja",
+          "tirada": "Iniciativa"
+        },
+        {
+          "tipo": "ventaja",
+          "habilidad": "Percepción",
+          "atributo": "WIS"
+        }
+      ]
     },
     {
-        "nombre": "Escudo centinela (Sentinel Shield)",
-        "imagen": "Shield.png",
-        "esArmadura": true,
-        "tipoArmadura": "escudo",
-        "armaduraBase": 0,
-        "manos": 1,
-        "peso": 4,
-        "valor": 500,
-        "magico": true,
-        "desc": "Escudo mágico. No aumenta la Clase de Armadura. Mientras esté equipado otorga ventaja en tiradas de iniciativa y ventaja en pruebas de Sabiduría (Percepción).",
-        "efectos": [
-            {
-            "tipo": "ventaja",
-            "tirada": "Iniciativa"
-            },
-            {
-            "tipo": "ventaja",
-            "habilidad": "Percepción",
-            "atributo": "WIS"
-            }
-        ]
-    },
-    { 
-      "nombre": "Escudo", 
-      "imagen": "Shield.png",
-      "esArmadura": true, 
-      "tipoArmadura": "escudo", 
-      "armaduraBase": 2, 
-      "manos": 1, 
+      "nombre": "Escudo",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 2,
+      "manos": 1,
       "peso": 0,
       "valor": 10,
       "desc": "Escudo."
@@ -301,200 +413,203 @@
   ],
   "hechizos": {
     "ranuras": [
-        { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-        { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" },
-        { "nivel": "Nivel 3", "cantidad": "0", "recupera": "largo" },
-        { "nivel": "Nivel 4", "cantidad": "0", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 3",
+        "cantidad": "0",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 4",
+        "cantidad": "0",
+        "recupera": "largo"
+      }
     ],
     "lista": [
-        {
+      {
         "nivel": "CANTRIPS",
         "nombre": "Light",
         "accion": "Acción",
         "distancia": "Toque",
         "duracion": "1 hora",
         "desc": "Tocás un objeto de hasta 10 ft. El objeto brilla intensamente en un radio de 20 ft y tenuemente otros 20 ft."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Bless",
-            "accion": "Acción",
-            "distancia": "30 ft",
-            "duracion": "Concentración, 1 minuto",
-            "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Command",
-            "accion": "Acción",
-            "distancia": "60 ft",
-            "duracion": "1 ronda",
-            "desc": "⚠️ En esta campaña no afecta a los enemigos."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Cure Wounds",
-            "dano": "1d8+3",
-            "tipoDano": "curación",
-            "accion": "Acción",
-            "distancia": "Toque",
-            "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra.",
-            "efectos": [
-                {
-                    "tipo": "notificacionYAbreVida",
-                    "descripcion": "Cure Wounds",
-                    "mensaje": "Aplicá la curación mostrada arriba. Al cerrar este modal se abre el de vida para que la sumes manualmente."
-                }
-            ]
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Ensnaring Strike",
-            "dano": "1d6",
-            "tipoDano": "perforante",
-            "accion": "Acción Bonus",
-            "distancia": "Propio",
-            "duracion": "Concentración, 1 minuto",
-            "desc": "La próxima vez que golpees a una criatura con un arma, salen enredaderas espinosas: el objetivo hace tirada de STR o queda atrapado hasta que el hechizo termine. Las criaturas grandes tiran con ventaja. Mientras esté atrapado recibe 1d6 perforante al inicio de cada turno. Puede salirse con una tirada de STR contra tu DC."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Protection from Evil and Good",
-            "accion": "Acción",
-            "distancia": "Toque",
-            "duracion": "Concentración, 10 minutos",
-            "desc": "Una criatura que toques queda protegida de no-muertos (en esta campaña). Le tiran con desventaja en ataques, no puede ser charmed/frightened/possessed, y tiene ventaja para curarse."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Shield of Faith",
-            "accion": "Acción Bonus",
-            "distancia": "60 ft",
-            "duracion": "Concentración, 10 minutos",
-            "desc": "Un campo reluciente rodea a una criatura a elección dentro del rango, dándole +2 de CA mientras dure el hechizo."
-        },
-        {
-            "nivel": "NIVEL 1",
-            "nombre": "Speak with Animals",
-            "accion": "Acción",
-            "distancia": "Propio",
-            "duracion": "10 minutos",
-            "desc": "⚠️ En esta campaña no sirve."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Aid",
-            "accion": "Acción",
-            "distancia": "30 ft",
-            "duracion": "8 horas",
-            "desc": "Elegís 3 criaturas en rango. Cada una gana 5 HP máximos y actuales mientras dure el hechizo. Si se lanza con slot Nivel 3, son 10 HP."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Find Steed",
-            "accion": "Acción",
-            "distancia": "30 ft",
-            "duracion": "Hasta que muera",
-            "desc": "Invocás un espíritu en forma física: Colapinto. Si baja a 0 HP desaparece sin dejar rastro. Mientras estén a menos de 1 milla, se comunican telepáticamente. Cast time: 10 minutos.",
-            "familiar": {
-                "_nota": "Confirmado por el usuario: Warhorse, 20 HP, 11 CA. Ataque tomado del stat block estándar del Warhorse (STR 18).",
-                "id": "steed-nika",
-                "nombre": "Colapinto",
-                "tipo": "Steed (Warhorse)",
-                "emoji": "🐎",
-                "vidaMaxima": 20,
-                "ca": 11,
-                "mod": "STR +4",
-                "notas": "No escala con tu nivel de personaje (stats fijos del Warhorse). Podés montarlo mientras esté en rango.",
-                "ataques": [
-                    { "nombre": "Coces (Hooves)", "dano": "2d6+4", "desc": "Ataque cuerpo a cuerpo. +6 al ataque, alcance 5 ft. Daño contundente." }
-                ]
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Bless",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Command",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "1 ronda",
+        "desc": "⚠️ En esta campaña no afecta a los enemigos."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Cure Wounds",
+        "dano": "1d8+3",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Ensnaring Strike",
+        "dano": "1d6",
+        "tipoDano": "perforante",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "La próxima vez que golpees a una criatura con un arma, salen enredaderas espinosas: el objetivo hace tirada de STR o queda atrapado hasta que el hechizo termine. Las criaturas grandes tiran con ventaja. Mientras esté atrapado recibe 1d6 perforante al inicio de cada turno. Puede salirse con una tirada de STR contra tu DC."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Protection from Evil and Good",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Una criatura que toques queda protegida de no-muertos (en esta campaña). Le tiran con desventaja en ataques, no puede ser charmed/frightened/possessed, y tiene ventaja para curarse."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield of Faith",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Un campo reluciente rodea a una criatura a elección dentro del rango, dándole +2 de CA mientras dure el hechizo."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Speak with Animals",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "10 minutos",
+        "desc": "⚠️ En esta campaña no sirve."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Aid",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "8 horas",
+        "desc": "Elegís 3 criaturas en rango. Cada una gana 5 HP máximos y actuales mientras dure el hechizo. Si se lanza con slot Nivel 3, son 10 HP."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Find Steed",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Hasta que muera",
+        "desc": "Invocás un espíritu en forma física: Colapinto. Si baja a 0 HP desaparece sin dejar rastro. Mientras estén a menos de 1 milla, se comunican telepáticamente. Cast time: 10 minutos.",
+        "familiar": {
+          "_nota": "Confirmado por el usuario: Warhorse, 20 HP, 11 CA. Ataque tomado del stat block estándar del Warhorse (STR 18).",
+          "id": "steed-nika",
+          "nombre": "Colapinto",
+          "tipo": "Steed (Warhorse)",
+          "emoji": "🐎",
+          "vidaMaxima": 20,
+          "ca": 11,
+          "mod": "STR +4",
+          "notas": "No escala con tu nivel de personaje (stats fijos del Warhorse). Podés montarlo mientras esté en rango.",
+          "ataques": [
+            {
+              "nombre": "Coces (Hooves)",
+              "dano": "2d6+4",
+              "desc": "Ataque cuerpo a cuerpo. +6 al ataque, alcance 5 ft. Daño contundente."
             }
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Lesser Restoration",
-            "accion": "Acción",
-            "distancia": "Toque",
-            "desc": "Cura ceguera, sordera, parálisis o veneno. ⚠️ En esta campaña no sirve."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Magic Weapon",
-            "accion": "Acción Bonus",
-            "distancia": "Toque",
-            "duracion": "Concentración, 1 hora",
-            "desc": "Tocás un arma no-mágica. Mientras dure, esa arma es mágica con +1 a tiradas de ataque y daño."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Misty Step",
-            "accion": "Acción Bonus",
-            "distancia": "Propio",
-            "desc": "Te cubrís de niebla plateada y te teletransportás a un lugar vacío que puedas ver dentro de 30 ft."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Moonbeam",
-            "dano": "2d10",
-            "tipoDano": "radiante",
-            "accion": "Acción",
-            "distancia": "120 ft",
-            "duracion": "Concentración, 1 minuto",
-            "desc": "Crea un cilindro de luz pálida de 5 ft de radio y 40 ft de alto. Cuando una criatura entra al área por primera vez o inicia su turno ahí, hace tirada de CON: 2d10 radiante (mitad si pasa). En tu turno podés gastar Acción para mover el rayo 60 ft. +1d10 por cada slot superior al 2."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Branding Smite",
-            "dano": "2d6",
-            "tipoDano": "radiante",
-            "accion": "Acción Bonus",
-            "distancia": "Propio",
-            "duracion": "Concentración, 1 minuto",
-            "desc": "El próximo ataque con arma que hagas antes de que termine el hechizo suma 2d6 de daño radiante extra, y el objetivo golpeado emite luz tenue en 5 ft mientras dure, sin poder volverse invisible."
-        },
-        {
-            "nivel": "NIVEL 2",
-            "nombre": "Zone of Truth",
-            "accion": "Acción",
-            "distancia": "60 ft",
-            "duracion": "10 minutos",
-            "desc": "Creás una zona mágica de 15 ft de radio. Cuando una criatura entra por primera vez o inicia su turno ahí, hace tirada de CHA. Si falla, no puede mentir conscientemente dentro del radio. Sabe que está afectada y puede evitar preguntas comprometedoras."
+          ]
         }
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Lesser Restoration",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Cura ceguera, sordera, parálisis o veneno. ⚠️ En esta campaña no sirve."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Magic Weapon",
+        "accion": "Acción Bonus",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Tocás un arma no-mágica. Mientras dure, esa arma es mágica con +1 a tiradas de ataque y daño."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Misty Step",
+        "accion": "Acción Bonus",
+        "distancia": "Propio",
+        "desc": "Te cubrís de niebla plateada y te teletransportás a un lugar vacío que puedas ver dentro de 30 ft."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Moonbeam",
+        "dano": "2d10",
+        "tipoDano": "radiante",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Crea un cilindro de luz pálida de 5 ft de radio y 40 ft de alto. Cuando una criatura entra al área por primera vez o inicia su turno ahí, hace tirada de CON: 2d10 radiante (mitad si pasa). En tu turno podés gastar Acción para mover el rayo 60 ft. +1d10 por cada slot superior al 2."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Zone of Truth",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "10 minutos",
+        "desc": "Creás una zona mágica de 15 ft de radio. Cuando una criatura entra por primera vez o inicia su turno ahí, hace tirada de CHA. Si falla, no puede mentir conscientemente dentro del radio. Sabe que está afectada y puede evitar preguntas comprometedoras."
+      }
     ]
   },
   "inventario": [
-        {
-            "nombre": "Leña",
-            "peso": 1,
-            "cantidad": 0,
-            "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
-        },
-        {
-            "nombre": "Oro",
-            "peso": 0.02,
-            "cantidad": 50,
-            "desc": "Piezas de Oro."
-        },
-        {
-            "nombre": "Potion of Heroism",
-            "peso": 0.5,
-            "cantidad": 1,
-            "accion": "Acción",
-            "duracion": "1 hora",
-            "desc": "Durante 1 hora obtenés 10 puntos de vida temporales y el efecto de Bless sin requerir concentración. Sumás 1d4 a las tiradas de ataque y salvaciones."
-        },
-        {
-            "nombre": "Tarro de Miel",
-            "peso": 0.1,
-            "cantidad": 1,
-            "desc": "Tarro que contiene miel. No se puede rellenar de ninguna forma."
-        },
-        {
-            "nombre": "Miel",
-            "peso": 0.01,
-            "cantidad": 35,
-            "desc": "Miel congelada dentro del tarro, puede lanzarse a enemigos que esten a 15ft."
-        }
+    {
+      "nombre": "Leña",
+      "peso": 1,
+      "cantidad": 0,
+      "desc": "Trozo de madera para hacer fuego. Cada pedazo dura aproximadamente 1 hora encendido."
+    },
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 50,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Potion of Heroism",
+      "peso": 0.5,
+      "cantidad": 1,
+      "accion": "Acción",
+      "duracion": "1 hora",
+      "desc": "Durante 1 hora obtenés 10 puntos de vida temporales y el efecto de Bless sin requerir concentración. Sumás 1d4 a las tiradas de ataque y salvaciones."
+    },
+    {
+      "nombre": "Tarro de Miel",
+      "peso": 0.1,
+      "cantidad": 1,
+      "desc": "Tarro que contiene miel. No se puede rellenar de ninguna forma."
+    },
+    {
+      "nombre": "Miel",
+      "peso": 0.01,
+      "cantidad": 35,
+      "desc": "Miel congelada dentro del tarro, puede lanzarse a enemigos que esten a 15ft."
+    }
   ]
 }

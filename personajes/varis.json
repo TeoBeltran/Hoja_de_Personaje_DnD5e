@@ -5,56 +5,167 @@
     "raza": "Variant Human (Chondathan)",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 15,
-        "CON": 14,
-        "INT": 10,
-        "WIS": 15,
-        "CHA": 8
+      "STR": 8,
+      "DEX": 15,
+      "CON": 14,
+      "INT": 10,
+      "WIS": 15,
+      "CHA": 8
     }
   },
   "improvements": {
     "race": [
-      { "atributo": "DEX", "valor": 1, "motivo": "Variant Human" },
-      { "atributo": "WIS", "valor": 1, "motivo": "Variant Human" }
+      {
+        "atributo": "DEX",
+        "valor": 1,
+        "motivo": "Variant Human"
+      },
+      {
+        "atributo": "WIS",
+        "valor": 1,
+        "motivo": "Variant Human"
+      }
     ],
     "feats": [
-      { "nivel": 1, "nombre": "Sharpshooter", "atributos": {} }
+      {
+        "nivel": 1,
+        "nombre": "Sharpshooter",
+        "atributos": {}
+      }
     ],
     "asi": [
-      { "nivel": 4, "atributos": { "DEX": 2 } },
-      { "nivel": 8, "atributos": { "DEX": 2 } }
+      {
+        "nivel": 4,
+        "atributos": {
+          "DEX": 2
+        }
+      },
+      {
+        "nivel": 8,
+        "atributos": {
+          "DEX": 2
+        }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "68/68" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "30ft" },
-    { "nombre": "Percepción P.", "valor": "16" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "8"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "16"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": true },
-    { "nombre": "Conoc. Arcano", "proficiente": false },
-    { "nombre": "Engaño", "proficiente": false },
-    { "nombre": "Historia", "proficiente": false },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": false },
-    { "nombre": "Juego de manos", "proficiente": false },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": true },
-    { "nombre": "Persuasión", "proficiente": false },
-    { "nombre": "Perspicacia", "proficiente": true },
-    { "nombre": "Religión", "proficiente": false },
-    { "nombre": "Sigilo", "proficiente": true },
-    { "nombre": "Supervivencia", "proficiente": true },
-    { "nombre": "Trato animal", "proficiente": true }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": true
+    }
   ],
   "background": {
     "nombre": "Outlander",
@@ -97,7 +208,9 @@
     {
       "nombre": "Dread Ambusher: daño extra",
       "desc": "Si este es el ataque adicional de tu primer turno de combate y golpea, sumá 1d8 de daño extra del mismo tipo que el arma.",
-      "disparadores": { "arma": true },
+      "disparadores": {
+        "arma": true
+      },
       "oculto": true
     },
     {
@@ -112,7 +225,9 @@
     {
       "nombre": "Extra Attack",
       "desc": "Cuando tomás la acción de Atacar, podés hacer 2 golpes en lugar de uno.",
-      "disparadores": { "arma": true }
+      "disparadores": {
+        "arma": true
+      }
     },
     {
       "nombre": "Sharpshooter (Feat)",
@@ -121,13 +236,17 @@
     {
       "nombre": "Sharpshooter: cobertura y -5/+10",
       "desc": "Este ataque ignora media cobertura y tres cuartos de cobertura.<br><br>Podés elegir -5 a la tirada de ataque para sumar +10 al daño si golpea.",
-      "disparadores": { "arma": "Oathbow" },
+      "disparadores": {
+        "arma": "Oathbow"
+      },
       "oculto": true
     },
     {
       "nombre": "Oathbow: Enemigo Jurado",
       "desc": "Como parte de un ataque con el Oathbow, podés decir la frase de mando ('Swift death to you who have wronged me') para volver a esa criatura tu Enemigo Jurado hasta que muera o hasta el amanecer 7 días después. Solo podés tener un Enemigo Jurado a la vez.<br><br>Contra tu Enemigo Jurado: tenés Ventaja en la tirada de ataque, el objetivo no se beneficia de cobertura (salvo cobertura total), y no sufrís desventaja por rango largo. Si el ataque golpea, tu Enemigo Jurado recibe 3d6 de daño perforante extra.<br><br>Mientras tu Enemigo Jurado siga vivo, tenés Desventaja en las tiradas de ataque con cualquier otra arma.",
-      "disparadores": { "arma": "Oathbow" }
+      "disparadores": {
+        "arma": "Oathbow"
+      }
     }
   ],
   "habilidadesUso": [
@@ -183,8 +302,16 @@
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "3", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "3",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {

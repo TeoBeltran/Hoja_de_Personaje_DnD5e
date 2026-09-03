@@ -48,10 +48,13 @@
       }
     ]
   },
+  "vidaFormula": {
+    "tiradas": [5, 5, 5, 5, 5, 5, 5]
+  },
   "estadisticas": [
     {
       "nombre": "Vida",
-      "valor": "59/59"
+      "valor": "auto"
     },
     {
       "nombre": "Nivel",
@@ -172,7 +175,7 @@
     },
     {
       "nombre": "Unarmored Defense",
-      "desc": "Mientras no lleves armadura ni escudo, tu CA es 10 + Modificador de Destreza + Modificador de Sabiduría. (Ya aplicado automáticamente al cálculo de tu CA.)"
+      "desc": "Mientras no lleves armadura ni escudo, tu CA es 10 + Modificador de Destreza + Modificador de Sabiduría."
     },
     {
       "nombre": "Martial Arts (d6)",
@@ -198,7 +201,7 @@
     },
     {
       "nombre": "Mobile (Feat)",
-      "desc": "Sos excepcionalmente rápido y ágil. Tu velocidad aumenta 10 ft. Cuando usás Dash, el terreno difícil no te cuesta movimiento extra ese turno. Cuando hacés un ataque cuerpo a cuerpo contra una criatura, no provocás ataques de oportunidad de esa criatura por el resto del turno, la hayas golpeado o no.<br><br>Desglose de tu velocidad: 30 ft (Human) + 15 ft (Unarmored Movement nivel 8) + 10 ft (Mobile) = 55 ft."
+      "desc": "Sos excepcionalmente rápido y ágil. Tu velocidad aumenta 10 ft. Cuando usás Dash, el terreno difícil no te cuesta movimiento extra ese turno. Cuando hacés un ataque cuerpo a cuerpo contra una criatura, no provocás ataques de oportunidad de esa criatura por el resto del turno, la hayas golpeado o no."
     },
     {
       "nombre": "Evasion",
@@ -224,7 +227,7 @@
       "recupera": "corto",
       "accion": "Varía",
       "esPoolCompartido": true,
-      "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Attacks (redirigir el ataque), Hand of Healing, Hand of Harm y Stunning Strike. Cantidad = tu nivel de monje (se recalcula solo si subís de nivel)."
+      "desc": "Pool compartido para Flurry of Blows, Patient Defense, Step of the Wind, Deflect Attacks, Hand of Healing, Hand of Harm y Stunning Strike. Cantidad: {nivelPersonaje}."
     },
     {
       "nombre": "Eldritch Maul (Tattoo)",
@@ -250,6 +253,7 @@
       "requiereAccionGastada": true,
       "postGolpe": true,
       "accion": "Acción Bonus",
+      "costoKi": "1",
       "desc": "Después de tomar la acción de Atacar, gastá 1 punto de Ki para hacer 2 golpes desarmados como Acción Bonus (el gasto es 1 Ki en total, no por golpe).",
       "soloPostGolpe": true
     },
@@ -257,38 +261,42 @@
       "nombre": "Patient Defense",
       "consumeUsoDe": "Puntos de Ki",
       "accion": "Acción Bonus",
+      "costoKi": "1",
       "desc": "Gastá 1 punto de Ki para tomar la acción de Dodge (Esquivar) como Acción Bonus."
     },
     {
       "nombre": "Step of the Wind",
       "consumeUsoDe": "Puntos de Ki",
       "accion": "Acción Bonus",
+      "costoKi": "1",
       "desc": "Gastá 1 punto de Ki para tomar la acción de Disengage (Desconectar) o Dash (Correr) como Acción Bonus, y tu distancia de salto se duplica ese turno."
     },
     {
-      "nombre": "Deflect Attacks: redirigir el ataque",
+      "nombre": "Deflect Attacks",
       "consumeUsoDe": "Puntos de Ki",
       "accion": "Reacción",
-      "desc": "Cuando te golpea un ataque (cuerpo a cuerpo O a distancia) cuyo daño incluye contundente, perforante o cortante, usás tu Reacción para reducir el daño total en 1d10 + tu mod. de DEX + tu nivel de monje (esto es automático, sin costo). Si lo reducís a 0, podés gastar 1 punto de Ki para redirigir parte de la fuerza del golpe: elegís una criatura que puedas ver a 5 ft (si el ataque fue cuerpo a cuerpo) o a 60 ft sin cobertura total (si fue a distancia). Esa criatura tira salvación de DEX o recibe daño igual a 2 tiradas de tu dado de Martial Arts + tu mod. de DEX, del mismo tipo que el ataque original."
+      "costoKi": "0-1",
+      "desc": "Cuando te golpea un ataque (cuerpo a cuerpo o a distancia) cuyo daño incluye contundente, perforante o cortante, usás tu Reacción para reducir el daño total en 1d10 + tu mod. de DEX ({modDEX}) + tu nivel de monje ({nivelPersonaje}).\nSi lo reducís a 0, podés gastar 1 punto de Ki para redirigir parte de la fuerza del golpe: elegís una criatura que puedas ver a 5 ft (si el ataque fue cuerpo a cuerpo) o a 60 ft sin cobertura total (si fue a distancia).\nEsa criatura tira salvación de DEX o recibe daño igual a 2 tiradas de tu dado de Martial Arts + tu mod. de DEX ({modDEX}), del mismo tipo que el ataque original."
     },
     {
       "nombre": "Slow Fall",
       "usos": "1/1",
       "recupera": "turno",
       "accion": "Reacción",
-      "desc": "Reducís el daño de caída en 40 (5 × tu nivel de monje). No cuesta Ki. Se recarga automáticamente en cada turno nuevo (va de la mano de tu Reacción)."
+      "desc": "Reducís el daño de caída en {danoCaidaSlowFall} (5 × tu nivel de monje). No cuesta Ki. Se recarga automáticamente en cada turno nuevo (va de la mano de tu Reacción)."
     },
     {
       "nombre": "Stunning Strike (2024)",
       "consumeUsoDe": "Puntos de Ki",
       "postGolpe": true,
       "accion": "Sin acción",
-      "desc": "Una vez por turno (máximo), cuando golpeás con un Unarmed Strike o un arma de monje, gastá 1 punto de Ki para intentar un Stunning Strike: la criatura tira salvación de CON (DC 14). Si falla, queda Aturdida hasta el INICIO de tu próximo turno (ya no hasta el final). Si la pasa, igual sufre algo: su velocidad se reduce a la mitad hasta el inicio de tu próximo turno, y el próximo ataque que reciba antes de eso tiene Ventaja.",
+      "costoKi": "1",
+      "desc": "Una vez por turno (máximo), cuando golpeás con un Unarmed Strike o un arma de monje, gastá 1 punto de Ki para intentar un Stunning Strike: la criatura tira salvación de CON (DC {dcKi}).\nSi falla, queda Aturdida hasta el INICIO de tu próximo turno (ya no hasta el final).\nSi la pasa, igual sufre algo: su velocidad se reduce a la mitad hasta el inicio de tu próximo turno, y el próximo ataque que reciba antes de eso tiene Ventaja.",
       "efectos": [
         {
           "tipo": "notificacion",
           "descripcion": "Stunning Strike (2024)",
-          "mensaje": "El objetivo hace salvación de <strong>CON (DC 14)</strong>. Si <strong>falla</strong>, queda <strong>Aturdido</strong> hasta el INICIO de tu próximo turno. Si <strong>pasa</strong>, su <strong>velocidad se reduce a la mitad</strong> hasta el inicio de tu próximo turno y el próximo ataque contra él/ella tiene <strong>Ventaja</strong>.<br><br><em>Máximo 1 vez por turno.</em>"
+          "mensaje": "El objetivo hace salvación de <strong>CON (DC {dcKi})</strong>. Si <strong>falla</strong>, queda <strong>Aturdido</strong> hasta el INICIO de tu próximo turno. Si <strong>pasa</strong>, su <strong>velocidad se reduce a la mitad</strong> hasta el inicio de tu próximo turno y el próximo ataque contra él/ella tiene <strong>Ventaja</strong>.<br><br><em>Máximo 1 vez por turno.</em>"
         }
       ],
       "soloPostGolpe": true
@@ -298,6 +306,7 @@
       "consumeUsoDe": "Puntos de Ki",
       "postGolpe": true,
       "accion": "Sin acción",
+      "costoKi": "1",
       "desc": "Cuando golpeás con un golpe desarmado, gastá 1 punto de Ki para sumar daño necrótico extra igual a una tirada de tu dado de Martial Arts (1d6) + tu modificador de WIS. Solo una vez por turno.",
       "efectos": [
         {
@@ -313,6 +322,7 @@
       "consumeUsoDe": "Puntos de Ki",
       "accion": "Acción",
       "distancia": "Toque",
+      "costoKi": "1",
       "desc": "Gastá 1 punto de Ki para tocar a una criatura y curarle una tirada de tu dado de Martial Arts (1d6) + tu modificador de WIS de HP.",
       "efectos": [
         {
@@ -389,7 +399,8 @@
       "peso": 0,
       "valor": 300,
       "magico": true,
-      "desc": "(Retirado — reemplazado por Bracers of Defense + Amulet of Health. Ya no otorga ningún bono ni la activa Eldritch Maul; se deja en el inventario como objeto/recuerdo.) Tatuaje mágico (requiere sintonía). Mientras lo tengas en la piel, tus golpes desarmados cuentan como mágicos para superar resistencias e inmunidades a daño no mágico, y sumás +1 a las tiradas de ataque y de daño con golpes desarmados."
+      "oculto": true,
+      "desc": "Tatuaje mágico (requiere sintonía). Mientras lo tengas en la piel, tus golpes desarmados cuentan como mágicos para superar resistencias e inmunidades a daño no mágico, y sumás +1 a las tiradas de ataque y de daño con golpes desarmados.<br><br>También tiene una habilidad activa: Eldritch Maul (ver Habilidades de Uso)."
     },
     {
       "nombre": "Bracers of Defense",
@@ -399,7 +410,7 @@
       "peso": 1,
       "valor": 2500,
       "magico": true,
-      "desc": "Brazaletes mágicos raros (requieren sintonía). Mientras no lleves armadura ni escudo, otorgan +2 a la Clase de Armadura. No es armadura: no interfiere con Unarmored Defense (se suma aparte).<br><br>(La app no chequea si tenés armadura puesta al aplicar este bono — para Kael no es un problema porque nunca usa armadura, pero si algún día equipara una, este +2 seguiría sumando igual.)",
+      "desc": "Brazaletes mágicos raros (requieren sintonía).\nMientras no lleves armadura ni escudo, otorgan +2 a la Clase de Armadura.",
       "efectos": [
         {
           "tipo": "CA",
@@ -415,7 +426,7 @@
       "peso": 1,
       "valor": 2000,
       "magico": true,
-      "desc": "Amuleto mágico raro (requiere sintonía). Mientras lo lleves puesto, tu puntaje de Constitución es 19 (no hace nada si tu CON real ya es 19 o más).<br><br>Esto ya se refleja solo en el modificador de CON y en tu salvación de CON. <strong>Ojo:</strong> tu Vida Máxima (59/59) NO se recalcula sola — la app no tiene una fórmula automática de HP, es un número fijo — así que si querés que la suba de CON también te sume vida, hay que actualizar ese número a mano (con CON 15→19, el modificador sube +2, así que a nivel 8 serían +16 HP: 59 → 75, a criterio tuyo).",
+      "desc": "Amuleto mágico raro (requiere sintonía).\nMientras lo lleves puesto, tu puntaje de Constitución es 19.",
       "efectos": [
         {
           "tipo": "atributoMinimo",

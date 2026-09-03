@@ -5,54 +5,166 @@
     "raza": "Wood Elf",
     "tamano": "estandar",
     "stats": {
-        "STR": 8,
-        "DEX": 15,
-        "CON": 14,
-        "INT": 14,
-        "WIS": 10,
-        "CHA": 10
+      "STR": 8,
+      "DEX": 15,
+      "CON": 14,
+      "INT": 14,
+      "WIS": 10,
+      "CHA": 10
     }
   },
   "improvements": {
     "race": [
-        { "atributo": "DEX", "valor": 2, "motivo": "Wood Elf" },
-        { "atributo": "WIS", "valor": 1, "motivo": "Wood Elf" }
+      {
+        "atributo": "DEX",
+        "valor": 2,
+        "motivo": "Wood Elf"
+      },
+      {
+        "atributo": "WIS",
+        "valor": 1,
+        "motivo": "Wood Elf"
+      }
     ],
     "feats": [],
     "asi": [
-        { "nivel": 4, "atributos": { "DEX": 2 } },
-        { "nivel": 8, "atributos": { "DEX": 1, "WIS": 1 } }
+      {
+        "nivel": 4,
+        "atributos": {
+          "DEX": 2
+        }
+      },
+      {
+        "nivel": 8,
+        "atributos": {
+          "DEX": 1,
+          "WIS": 1
+        }
+      }
+    ]
+  },
+  "vidaFormula": {
+    "tiradas": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
     ]
   },
   "estadisticas": [
-    { "nombre": "Vida", "valor": "59/59" },
-    { "nombre": "Nivel", "valor": "8" },
-    { "nombre": "CA", "valor": "auto" },
-    { "nombre": "Iniciativa", "valor": "auto" },
-    { "nombre": "Velocidad", "valor": "35ft" },
-    { "nombre": "Percepción P.", "valor": "14" },
-    { "nombre": "Proficiencia", "valor": "auto" },
-    { "nombre": "Hit Dice", "valor": "auto" }
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "8"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "35ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "14"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
   ],
   "habilidades": [
-    { "nombre": "Acrobacias", "proficiente": false },
-    { "nombre": "Atletismo", "proficiente": false },
-    { "nombre": "Conoc. Arcano", "proficiente": true },
-    { "nombre": "Engaño", "proficiente": true, "experto": true },
-    { "nombre": "Historia", "proficiente": true },
-    { "nombre": "Interpretación", "proficiente": false },
-    { "nombre": "Intimidación", "proficiente": false },
-    { "nombre": "Investigación", "proficiente": true, "experto": true },
-    { "nombre": "Juego de manos", "proficiente": true, "experto": true },
-    { "nombre": "Medicina", "proficiente": false },
-    { "nombre": "Naturaleza", "proficiente": false },
-    { "nombre": "Percepción", "proficiente": true },
-    { "nombre": "Persuasión", "proficiente": false },
-    { "nombre": "Perspicacia", "proficiente": false },
-    { "nombre": "Religión", "proficiente": false },
-    { "nombre": "Sigilo", "proficiente": true, "experto": true },
-    { "nombre": "Supervivencia", "proficiente": false },
-    { "nombre": "Trato animal", "proficiente": false }
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": true
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": true,
+      "experto": true
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
   ],
   "background": {
     "nombre": "Sage",
@@ -64,22 +176,70 @@
     ]
   },
   "rasgos": [
-    { "nombre": "Darkvision", "desc": "Visión en la oscuridad hasta 60 ft (en blanco y negro)." },
-    { "nombre": "Fey Ancestry", "desc": "Tenés Ventaja en salvaciones contra quedar Hechizada, y la magia no puede dormirte." },
-    { "nombre": "Trance", "desc": "No necesitás dormir. En cambio, entrás en un trance meditativo profundo durante 4 horas al día (en vez de dormir 8 horas)." },
-    { "nombre": "Elf Weapon Training", "desc": "Tenés competencia con espadas largas, espadas cortas, arcos cortos y arcos largos." },
-    { "nombre": "Mask of the Wild", "desc": "Podés intentar Esconderte incluso cuando estás solo ligeramente oculta por follaje, lluvia intensa, niebla, nieve cayendo u otro fenómeno natural." },
-    { "nombre": "Keen Senses", "desc": "Tenés competencia en Percepción (ya reflejado en Habilidades)." },
-    { "nombre": "Fleet of Foot", "desc": "Tu velocidad base de caminar es 35 ft en vez de 30 ft (ya reflejado en Velocidad)." },
-    { "nombre": "Thieves' Cant", "desc": "Conocés la Jerga de Ladrones: una mezcla secreta de dialecto, jerga y señas que te permite ocultar mensajes en una conversación normal. Solo otra criatura que también la conozca nota el mensaje oculto; para cualquier otro oyente, suena a charla común." },
-    { "nombre": "Sneak Attack", "desc": "Revisar la sección de Características Activas." },
-    { "nombre": "Cunning Action", "desc": "Revisar la sección de Características Activas." },
-    { "nombre": "Roguish Archetype: Arcane Trickster", "desc": "Combinás el sigilo de la pícara con trucos de magia arcana. Ganás lanzamiento de conjuros (lista de Mago, mayormente Encantamiento e Ilusión) y la habilidad Mage Hand Legerdemain." },
-    { "nombre": "Mage Hand Legerdemain", "desc": "Revisar la sección de Características Activas." },
-    { "nombre": "Uncanny Dodge", "desc": "Revisar la sección de Características Activas." },
-    { "nombre": "Expertise", "desc": "Duplicás tu bonificador de competencia en Sigilo, Juego de Manos, Investigación y Engaño (ya reflejado en sus valores)." },
-    { "nombre": "Evasion", "desc": "Cuando hacés una tirada de salvación de Destreza contra un efecto que normalmente te haría la mitad de daño si fallás (ej: Fireball), en cambio no recibís nada de daño si pasás la salvación, y solo la mitad si fallás." },
-    { "nombre": "Competencia: Herramientas de Ladrón", "desc": "Tenés competencia con las Herramientas de Ladrón (Thieves' Tools): podés usarlas para forzar cerraduras y desarmar trampas." }
+    {
+      "nombre": "Darkvision",
+      "desc": "Visión en la oscuridad hasta 60 ft (en blanco y negro)."
+    },
+    {
+      "nombre": "Fey Ancestry",
+      "desc": "Tenés Ventaja en salvaciones contra quedar Hechizada, y la magia no puede dormirte."
+    },
+    {
+      "nombre": "Trance",
+      "desc": "No necesitás dormir. En cambio, entrás en un trance meditativo profundo durante 4 horas al día (en vez de dormir 8 horas)."
+    },
+    {
+      "nombre": "Elf Weapon Training",
+      "desc": "Tenés competencia con espadas largas, espadas cortas, arcos cortos y arcos largos."
+    },
+    {
+      "nombre": "Mask of the Wild",
+      "desc": "Podés intentar Esconderte incluso cuando estás solo ligeramente oculta por follaje, lluvia intensa, niebla, nieve cayendo u otro fenómeno natural."
+    },
+    {
+      "nombre": "Keen Senses",
+      "desc": "Tenés competencia en Percepción (ya reflejado en Habilidades)."
+    },
+    {
+      "nombre": "Fleet of Foot",
+      "desc": "Tu velocidad base de caminar es 35 ft en vez de 30 ft (ya reflejado en Velocidad)."
+    },
+    {
+      "nombre": "Thieves' Cant",
+      "desc": "Conocés la Jerga de Ladrones: una mezcla secreta de dialecto, jerga y señas que te permite ocultar mensajes en una conversación normal. Solo otra criatura que también la conozca nota el mensaje oculto; para cualquier otro oyente, suena a charla común."
+    },
+    {
+      "nombre": "Sneak Attack",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Cunning Action",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Roguish Archetype: Arcane Trickster",
+      "desc": "Combinás el sigilo de la pícara con trucos de magia arcana. Ganás lanzamiento de conjuros (lista de Mago, mayormente Encantamiento e Ilusión) y la habilidad Mage Hand Legerdemain."
+    },
+    {
+      "nombre": "Mage Hand Legerdemain",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Uncanny Dodge",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Expertise",
+      "desc": "Duplicás tu bonificador de competencia en Sigilo, Juego de Manos, Investigación y Engaño (ya reflejado en sus valores)."
+    },
+    {
+      "nombre": "Evasion",
+      "desc": "Cuando hacés una tirada de salvación de Destreza contra un efecto que normalmente te haría la mitad de daño si fallás (ej: Fireball), en cambio no recibís nada de daño si pasás la salvación, y solo la mitad si fallás."
+    },
+    {
+      "nombre": "Competencia: Herramientas de Ladrón",
+      "desc": "Tenés competencia con las Herramientas de Ladrón (Thieves' Tools): podés usarlas para forzar cerraduras y desarmar trampas."
+    }
   ],
   "habilidadesUso": [
     {
@@ -105,7 +265,9 @@
       "accion": "Acción Bonus (para controlar la mano)",
       "distancia": "30 ft",
       "desc": "Cuando lanzás Mage Hand, podés hacer la mano invisible y usarla para Juego de Manos a distancia: guardar o sacar un objeto de un contenedor o de encima de una criatura, abrir/cerrar puertas y contenedores no cerrados con llave, esconder un objeto en un contenedor, o usar Herramientas de Ladrón para forzar cerraduras o desarmar trampas a distancia. Como Acción Bonus mientras la mano esté a 5 ft tuyo, podés hacer que repita una de estas acciones.",
-      "disparadores": { "hechizo": "Mage Hand" }
+      "disparadores": {
+        "hechizo": "Mage Hand"
+      }
     }
   ],
   "equipo": [
@@ -163,8 +325,14 @@
       "magico": true,
       "desc": "Capa mágica. Mientras esté equipada otorga +1 a la Clase de Armadura y +1 a todas las tiradas de salvación.",
       "efectos": [
-        { "tipo": "CA", "valor": 1 },
-        { "tipo": "salvaciones", "valor": 1 }
+        {
+          "tipo": "CA",
+          "valor": 1
+        },
+        {
+          "tipo": "salvaciones",
+          "valor": 1
+        }
       ]
     },
     {
@@ -180,8 +348,16 @@
   ],
   "hechizos": {
     "ranuras": [
-      { "nivel": "Nivel 1", "cantidad": "4", "recupera": "largo" },
-      { "nivel": "Nivel 2", "cantidad": "2", "recupera": "largo" }
+      {
+        "nivel": "Nivel 1",
+        "cantidad": "4",
+        "recupera": "largo"
+      },
+      {
+        "nivel": "Nivel 2",
+        "cantidad": "2",
+        "recupera": "largo"
+      }
     ],
     "lista": [
       {
@@ -271,9 +447,29 @@
     ]
   },
   "inventario": [
-    { "nombre": "Oro", "peso": 0.02, "cantidad": 0, "desc": "Piezas de Oro." },
-    { "nombre": "Herramientas de Ladrón (Thieves' Tools)", "peso": 1, "cantidad": 1, "desc": "Set de ganzúas y herramientas para forzar cerraduras y desarmar trampas. Sos competente con ellas." },
-    { "nombre": "Foco Arcano", "peso": 1, "cantidad": 1, "desc": "Cristal, varita o bastón usado como foco para canalizar tus hechizos de Arcane Trickster." },
-    { "nombre": "Carta de un colega fallecido", "peso": 0, "cantidad": 1, "desc": "Carta de un colega ya fallecido, planteando una pregunta que todavía no pudiste responder. Parte del trasfondo Sage." }
+    {
+      "nombre": "Oro",
+      "peso": 0.02,
+      "cantidad": 0,
+      "desc": "Piezas de Oro."
+    },
+    {
+      "nombre": "Herramientas de Ladrón (Thieves' Tools)",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Set de ganzúas y herramientas para forzar cerraduras y desarmar trampas. Sos competente con ellas."
+    },
+    {
+      "nombre": "Foco Arcano",
+      "peso": 1,
+      "cantidad": 1,
+      "desc": "Cristal, varita o bastón usado como foco para canalizar tus hechizos de Arcane Trickster."
+    },
+    {
+      "nombre": "Carta de un colega fallecido",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Carta de un colega ya fallecido, planteando una pregunta que todavía no pudiste responder. Parte del trasfondo Sage."
+    }
   ]
 }
