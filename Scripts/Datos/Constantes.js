@@ -49,6 +49,17 @@ const NOMBRES_STATS = {
     'CHA': 'Carisma (CHA)'
 };
 
+// Nombre en inglés de cada atributo, usado en el modal de detalle de cada modificador
+// (muchos jugadores del grupo no manejan bien el inglés, así que se muestran los dos).
+const NOMBRES_STATS_EN = {
+    'STR': 'Strength',
+    'DEX': 'Dexterity',
+    'CON': 'Constitution',
+    'INT': 'Intelligence',
+    'WIS': 'Wisdom',
+    'CHA': 'Charisma'
+};
+
 // Mapa de skill → stat asociada
 const SKILL_STAT = {
     'Atletismo': 'STR',
@@ -111,6 +122,7 @@ export {
     ICONOS_PERSONAJE,
     PROFICIENCIAS_POR_CLASE,
     NOMBRES_STATS,
+    NOMBRES_STATS_EN,
     SKILL_STAT,
     SKILL_DESC,
     MAESTRIA_ARMA_INFO

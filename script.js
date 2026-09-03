@@ -2,6 +2,7 @@ import {
     ICONOS_PERSONAJE,
     PROFICIENCIAS_POR_CLASE,
     NOMBRES_STATS,
+    NOMBRES_STATS_EN,
     SKILL_STAT,
     SKILL_DESC,
     MAESTRIA_ARMA_INFO
@@ -836,6 +837,29 @@ function calcularBonosEquipoActivo() {
     });
 
     return { bonos, notas };
+}
+
+// Nombres de los ítems equipados que otorgan bono a TODAS las salvaciones (ej. un anillo
+// de protección con efecto "salvaciones"), para mostrarlos en el desglose del modal de
+// detalle de cada salvación (ver render de #saves-grid en init()).
+function nombresBonoEquipoSalvaciones() {
+    const equipo = window._equipoData || [];
+    const itemsEquipados = [];
+    if (armaduraEquipadaId) {
+        const it = equipo.find(e => e.nombre === armaduraEquipadaId);
+        if (it) itemsEquipados.push(it);
+    }
+    if (escudoEquipadoId) {
+        const it = equipo.find(e => e.nombre === escudoEquipadoId);
+        if (it) itemsEquipados.push(it);
+    }
+    armasEquipadas.forEach(nombre => {
+        const it = equipo.find(e => e.nombre === nombre);
+        if (it) itemsEquipados.push(it);
+    });
+    return itemsEquipados
+        .filter(it => Array.isArray(it.efectos) && it.efectos.some(ef => ef.tipo === 'salvaciones'))
+        .map(it => it.nombre);
 }
 
 // Devuelve los nombres de armasEquipadas que REALMENTE ocupan una mano (manos > 0).
@@ -2311,11 +2335,42 @@ async function init() {
         // Tratamiento especial para Vida
         if (i.nombre === "Vida" && i.valor.includes("/")) {
             const partes = i.valor.split("/");
+            // vidaMaximaOriginal es SIEMPRE el valor recién calculado (por vidaFormula, o el fijo
+            // si el personaje no usa "auto") — es la referencia contra la que se compara para saber
+            // si hay un ajuste manual real (badge "modificado", ver actualizarVidaDOM()).
             vidaMaximaOriginal = parseInt(partes[1]);
             const guardadaMax = localStorage.getItem(STORAGE_PREFIX + 'vidaMaxima');
-            vidaMaxima = guardadaMax !== null ? parseInt(guardadaMax) : vidaMaximaOriginal;
+            // 'vidaFormulaCalculada' guarda el ÚLTIMO resultado que la fórmula calculó (no lo que el
+            // jugador haya ajustado a mano con los botones +/- de Vida Máx). Sirve para distinguir
+            // un 'vidaMaxima' guardado que es solo el resultado viejo de la fórmula (hay que
+            // recalcular apenas cambie CON/nivel/equipo) de un ajuste manual real hecho a propósito.
+            // BUG corregido acá: sin esto, la primera vez que se guardaba 'vidaMaxima' (con cualquier
+            // daño/curación, ver guardarVida()) ese número quedaba pegado para siempre y la fórmula
+            // dejaba de tener efecto — equipar el Amulet of Health no subía la Vida ni recargando.
+            const formulaAnterior = localStorage.getItem(STORAGE_PREFIX + 'vidaFormulaCalculada');
+            const maximoAnteriorConocido = formulaAnterior !== null ? parseInt(formulaAnterior)
+                : (guardadaMax !== null ? parseInt(guardadaMax) : null);
+            const esAjusteManual = formulaAnterior !== null && guardadaMax !== null
+                && parseInt(guardadaMax) !== parseInt(formulaAnterior);
+            vidaMaxima = esAjusteManual ? parseInt(guardadaMax) : vidaMaximaOriginal;
+            localStorage.setItem(STORAGE_PREFIX + 'vidaFormulaCalculada', String(vidaMaximaOriginal));
+
             const guardada = localStorage.getItem(STORAGE_PREFIX + 'vidaActual');
-            vidaActual = guardada !== null ? parseInt(guardada) : parseInt(partes[0]);
+            if (guardada === null) {
+                vidaActual = parseInt(partes[0]);
+            } else if (esAjusteManual) {
+                vidaActual = Math.min(vidaMaxima, parseInt(guardada));
+            } else {
+                // La vida actual sube/baja el mismo delta que subió/bajó el máximo calculado por la
+                // fórmula (mismo criterio que un cambio real de CON en las reglas de D&D), en vez de
+                // quedar pegada al número viejo o saltar siempre a full.
+                const delta = maximoAnteriorConocido !== null ? (vidaMaxima - maximoAnteriorConocido) : 0;
+                vidaActual = Math.max(0, Math.min(vidaMaxima, parseInt(guardada) + delta));
+            }
+            // Persistir ya mismo (no solo en el próximo daño/curación) para que 'vidaMaxima' quede
+            // sincronizado con 'vidaFormulaCalculada' y la próxima carga no lo confunda con un ajuste
+            // manual que nunca pasó.
+            guardarVida();
             const btn = document.createElement('button');
             btn.className = 'skill-btn vida-btn';
             btn.id = 'vida-btn';
@@ -2364,11 +2419,61 @@ async function init() {
         placeholder.className = 'stat-vacio';
         sG.insertBefore(placeholder, sG.children[2]);
     }
-    data.modificadores.forEach(i => mG.appendChild(createBtn(i)));
+    // Nombre completo (ej. "Fuerza (STR)") -> key ("STR"), para poder recuperar el valor
+    // real del atributo o su nombre en inglés al abrir el modal de detalle de cada tile.
+    const keyPorNombreStat = {};
+    Object.keys(NOMBRES_STATS).forEach(k => { keyPorNombreStat[NOMBRES_STATS[k]] = k; });
+    const nombreEsSinCodigo = (key) => (NOMBRES_STATS[key] || key).replace(/\s*\(.+\)$/, '');
+
+    // Modificadores de atributo: antes el click no hacía nada (createBtn solo agrega
+    // listener si el item trae "desc", y generarModificadores no lo setea). Ahora un modal
+    // chico muestra el nombre en inglés y en español (varios jugadores no manejan bien el
+    // inglés) junto al valor REAL del atributo, no solo el modificador que ya se ve en el tile.
+    data.modificadores.forEach(i => {
+        const btn = createBtn(i);
+        const key = keyPorNombreStat[i.nombre];
+        btn.addEventListener('click', () => {
+            const nombreEn = NOMBRES_STATS_EN[key] || key;
+            const nombreEs = nombreEsSinCodigo(key);
+            const valorAtributo = (statsGlobal && statsGlobal[key] != null) ? statsGlobal[key] : '?';
+            modalTitle.textContent = i.nombre;
+            modalDesc.textContent = `${nombreEn} / ${nombreEs}: ${valorAtributo}`;
+            if (modalActions) modalActions.style.display = 'none';
+            const imgEquipoContStat = document.getElementById('modal-imagen-equipo');
+            if (imgEquipoContStat) imgEquipoContStat.style.display = 'none';
+            if (modalContentPrincipal) modalContentPrincipal.classList.remove('con-imagen-lateral');
+            modal.style.display = 'flex';
+        });
+        mG.appendChild(btn);
+    });
+
+    // Salvaciones: mismo problema (click sin efecto). Ahora un modal muestra el desglose
+    // completo del cálculo (modificador de atributo + proficiencia + bono de equipo activo
+    // si aplica, ej. un anillo de protección), recalculado en el momento del click para
+    // reflejar el equipo puesto en ese instante (no el valor congelado al cargar la página).
     data.salvaciones.forEach(i => {
         const btn = createBtn(i);
         btn.dataset.saveNombre = i.nombre;
         btn.dataset.saveBase = String(parseMod(i.valor));
+        const key = keyPorNombreStat[i.nombre];
+        btn.addEventListener('click', () => {
+            const modAtributo = statAMod((statsGlobal && statsGlobal[key]) || 10);
+            const { bonos } = calcularBonosEquipoActivo();
+            const totalActual = modAtributo + (i.proficiente ? proficienciaActual : 0) + bonos.salvaciones;
+            let desc = `${formatMod(modAtributo)} modificador de ${key}<br>`;
+            if (i.proficiente) desc += `${formatMod(proficienciaActual)} proficiencia<br>`;
+            if (bonos.salvaciones) {
+                const nombresEquipo = nombresBonoEquipoSalvaciones().join(', ');
+                desc += `${formatMod(bonos.salvaciones)} equipo${nombresEquipo ? ` (${nombresEquipo})` : ''}<br>`;
+            }
+            modalTitle.textContent = `Salvación de ${nombreEsSinCodigo(key)}: ${formatMod(totalActual)}`;
+            modalDesc.innerHTML = desc;
+            if (modalActions) modalActions.style.display = 'none';
+            const imgEquipoContStat = document.getElementById('modal-imagen-equipo');
+            if (imgEquipoContStat) imgEquipoContStat.style.display = 'none';
+            if (modalContentPrincipal) modalContentPrincipal.classList.remove('con-imagen-lateral');
+            modal.style.display = 'flex';
+        });
         vG.appendChild(btn);
     });
     data.habilidades.forEach(i => skG.appendChild(createBtn(i)));
