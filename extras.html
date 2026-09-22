@@ -74,14 +74,12 @@
 
     <script>
         // ==========================================================
-        // Lista de personajes "extra" que viven detrás de este login.
-        // Para agregar uno nuevo: sumarlo acá con su ícono/nombre, Y
-        // agregar su id a PERSONAJES_EXTRA en el guard de personaje.html.
+        // Herramientas del DM que viven detrás de este login. Varis y Kael
+        // se mudaron al menú público (personajes2.html) y ya no van acá.
+        // Para agregar un personaje nuevo detrás del login: sumarlo a este
+        // array con su id/nombre/ícono.
         // ==========================================================
-        const PERSONAJES_EXTRA = [
-            { id: 'varis', nombre: 'Varis', icono: '🏹' },
-            { id: 'kael', nombre: 'Kael', icono: '🙏' }
-        ];
+        const PERSONAJES_EXTRA = [];
 
         const USUARIO_CORRECTO = 'DM';
         const CLAVE_CORRECTA = 'boss1234';
