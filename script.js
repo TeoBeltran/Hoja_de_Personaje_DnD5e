@@ -386,6 +386,18 @@ function procesarEfectos(item, contexto) {
         }
     });
 
+    // Wild Magic Surge (Hechicero, subclase Wild Magic): al lanzar CUALQUIER hechizo de
+    // Nivel 1+ (no cantrips: 'tipos' trae 'hechizo' pero no 'cantrip' en ese caso), recordatorio
+    // corto de que el DM puede pedir la tirada de Wild Magic. Se agrega solo si el personaje
+    // tiene el rasgo "Wild Magic Surge" en su JSON.
+    if (tieneRasgo('Wild Magic Surge') && tiposContexto.includes('hechizo') && !tiposContexto.includes('cantrip')) {
+        listaEfectos.push({
+            tipo: 'notificacion',
+            descripcion: '🎲 Wild Magic Surge',
+            mensaje: '(Consultar con el DM) Lanzar 1d100 y ver el efecto de Wild Magic.'
+        });
+    }
+
     if (listaEfectos.length === 0 && !contexto.danoTexto) return;
 
     const efectosAplicables = listaEfectos.filter(e => {

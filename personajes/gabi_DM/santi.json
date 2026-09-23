@@ -1,0 +1,144 @@
+{
+  "personaje": {
+    "nombre": "Santi",
+    "clase": "Por definir",
+    "raza": "Por definir",
+    "tamano": "mediano",
+    "stats": {
+      "STR": 10,
+      "DEX": 10,
+      "CON": 10,
+      "INT": 10,
+      "WIS": 10,
+      "CHA": 10
+    }
+  },
+  "improvements": {
+    "race": [],
+    "feats": [],
+    "asi": []
+  },
+  "vidaFormula": {
+    "tiradas": []
+  },
+  "estadisticas": [
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "1"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "10"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
+  ],
+  "habilidades": [
+    {
+      "nombre": "Acrobacias",
+      "proficiente": false
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": false
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
+  ],
+  "background": {
+    "nombre": "Por definir",
+    "habilidades": []
+  },
+  "rasgos": [],
+  "habilidadesUso": [],
+  "equipo": [],
+  "hechizos": {
+    "ranuras": [],
+    "lista": []
+  },
+  "inventario": []
+}
