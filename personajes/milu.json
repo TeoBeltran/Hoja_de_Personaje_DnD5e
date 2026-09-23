@@ -5,16 +5,32 @@
     "raza": "Tritón",
     "tamano": "mediano",
     "stats": {
-      "STR": 12,
-      "DEX": 12,
-      "CON": 12,
-      "INT": 12,
-      "WIS": 12,
-      "CHA": 12
+      "STR": 15,
+      "DEX": 8,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 8,
+      "CHA": 15
     }
   },
   "improvements": {
-    "race": [],
+    "race": [
+      {
+        "atributo": "STR",
+        "valor": 1,
+        "motivo": "Tritón"
+      },
+      {
+        "atributo": "CON",
+        "valor": 1,
+        "motivo": "Tritón"
+      },
+      {
+        "atributo": "CHA",
+        "valor": 1,
+        "motivo": "Tritón"
+      }
+    ],
     "feats": [],
     "asi": []
   },
@@ -47,7 +63,7 @@
     },
     {
       "nombre": "Percepción P.",
-      "valor": "11"
+      "valor": "9"
     },
     {
       "nombre": "Proficiencia",
@@ -113,11 +129,11 @@
     },
     {
       "nombre": "Perspicacia",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Religión",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Sigilo",
@@ -133,12 +149,145 @@
     }
   ],
   "background": {
-    "nombre": "Por definir",
-    "habilidades": []
+    "nombre": "Soldier",
+    "habilidades": [
+      {
+        "nombre": "Military Rank",
+        "desc": "Tenés un rango militar de tu antiguo cuerpo o unidad. Los soldados leales a esa organización todavía reconocen tu autoridad e influencia: podés usar tu rango para influir en soldados de menor graduación, y podés invocar tu antigua organización para conseguir equipo simple o caballos de forma temporal."
+      }
+    ]
   },
-  "rasgos": [],
-  "habilidadesUso": [],
-  "equipo": [],
+  "rasgos": [
+    {
+      "nombre": "Fighting Style: Dueling",
+      "desc": "Cuando empuñás un arma melee de una sola mano y no tenés ningún otro arma en la otra mano, hacés +2 al daño con esa arma.",
+      "bonoDano": 2,
+      "aplicaA": "duelingMelee",
+      "disparadores": {
+        "arma": {
+          "tipo": "melee",
+          "manos": 1
+        }
+      }
+    },
+    {
+      "nombre": "Divine Health",
+      "desc": "Inmune a enfermedades."
+    },
+    {
+      "nombre": "Anfibio",
+      "desc": "Podés respirar aire y agua."
+    },
+    {
+      "nombre": "Guardianes de las Profundidades",
+      "desc": "Adaptado incluso a las profundidades oceánicas más extremas. Tenés resistencia al daño frío e ignorás las desventajas de estar en un entorno submarino extremo."
+    },
+    {
+      "nombre": "Emisario del Mar",
+      "desc": "Las bestias acuáticas tienen una afinidad extraordinaria con tu pueblo. Podés comunicar ideas simples con bestias que puedan respirar agua: entienden el significado de tus palabras, aunque no tenés forma de entenderlas a ellas."
+    },
+    {
+      "nombre": "Controlar Aire y Agua",
+      "desc": "Podés lanzar fog cloud con este rasgo. Desde nivel 3 podés lanzar gust of wind con él, y desde nivel 5 también wall of water. Una vez que lanzás un hechizo con este rasgo, no podés volver a hacerlo hasta completar un descanso largo. Carisma es tu habilidad de conjuración para estos hechizos."
+    },
+    {
+      "nombre": "Idiomas",
+      "desc": "Común y Primordial."
+    },
+    {
+      "nombre": "Cure Wounds: bono CHA",
+      "desc": "Cure Wounds suma CHA al daño.",
+      "bonoDano": "CHA",
+      "aplicaA": "hechizo:Cure Wounds"
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Divine Sense",
+      "usos": "4/4",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "60 ft",
+      "desc": "Detectás la posición de cualquier celestial, demonio o no-muerto a 60 ft."
+    },
+    {
+      "nombre": "Lay on Hands",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "Toque",
+      "desc": "Cura HP o enfermedades. Curas tu nivel multiplicado por 5."
+    },
+    {
+      "nombre": "Divine Smite",
+      "tipo": "smite",
+      "tipoDano": "radiante",
+      "danoPorNivel": {
+        "1": "2d8",
+        "2": "3d8",
+        "3": "4d8",
+        "4": "5d8"
+      },
+      "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
+    },
+    {
+      "nombre": "Channel Divinity",
+      "usos": "1/1",
+      "usosPorNivel": {
+        "1": 1,
+        "6": 2,
+        "18": 3
+      },
+      "recupera": "corto",
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones que te da tu juramento."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Cota de Malla (Chain Mail)",
+      "esArmadura": true,
+      "tipoArmadura": "pesada",
+      "armaduraBase": 16,
+      "manos": 0,
+      "peso": 55,
+      "valor": 75,
+      "desc": "Armadura pesada. CA: 16."
+    },
+    {
+      "nombre": "Escudo",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 2,
+      "manos": 1,
+      "peso": 6,
+      "valor": 10,
+      "desc": "Escudo."
+    },
+    {
+      "nombre": "Lanza (Spear)",
+      "dano": "1d6",
+      "tipoDano": "perforante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 3,
+      "valor": 1,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Lanza. 1d6 de daño perforante."
+    },
+    {
+      "nombre": "Espada Larga (Longsword)",
+      "dano": "1d8",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 3,
+      "valor": 15,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Espada larga. 1d8 de daño cortante."
+    }
+  ],
   "hechizos": {
     "ranuras": [
       {
@@ -147,7 +296,49 @@
         "recupera": "largo"
       }
     ],
-    "lista": []
+    "lista": [
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Bless",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Cure Wounds",
+        "dano": "1d8",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield of Faith",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 10 minutos",
+        "desc": "Un campo reluciente rodea a una criatura a elección dentro del rango, dándole +2 de CA mientras dure el hechizo."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Fog Cloud",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "duracion": "Concentración, 1 hora",
+        "desc": "Creás una esfera de niebla de 20 ft de radio centrada en un punto dentro del rango. El área queda fuertemente oscurecida. La niebla se dispersa con viento de velocidad moderada o mayor."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Gust of Wind",
+        "accion": "Acción",
+        "distancia": "Propio (línea de 60 ft)",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un chorro de viento fuerte de 60 ft de largo y 10 ft de ancho sale de vos en la dirección que elijas mientras dure el hechizo. Cada criatura que empiece su turno en la línea debe superar una tirada de salvación de STR o ser empujada 15 ft en la dirección de la línea; moverse hacia vos dentro de la línea cuesta el doble de movimiento. El viento dispersa gases o vapores y apaga llamas desprotegidas (50% de probabilidad con llamas protegidas). Como acción bonus podés cambiar la dirección de la línea. Bajó a nivel 1 para poder usarlo."
+      }
+    ]
   },
   "inventario": []
 }

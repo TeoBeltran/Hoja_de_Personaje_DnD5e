@@ -5,16 +5,27 @@
     "raza": "Tiefling",
     "tamano": "mediano",
     "stats": {
-      "STR": 12,
-      "DEX": 12,
-      "CON": 12,
-      "INT": 12,
-      "WIS": 12,
-      "CHA": 12
+      "STR": 8,
+      "DEX": 10,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 15,
+      "CHA": 14
     }
   },
   "improvements": {
-    "race": [],
+    "race": [
+      {
+        "atributo": "WIS",
+        "valor": 1,
+        "motivo": "Tiefling"
+      },
+      {
+        "atributo": "CHA",
+        "valor": 2,
+        "motivo": "Legado de Flegetos"
+      }
+    ],
     "feats": [],
     "asi": []
   },
@@ -47,7 +58,7 @@
     },
     {
       "nombre": "Percepción P.",
-      "valor": "11"
+      "valor": "13"
     },
     {
       "nombre": "Proficiencia",
@@ -97,7 +108,7 @@
     },
     {
       "nombre": "Medicina",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Naturaleza",
@@ -109,15 +120,15 @@
     },
     {
       "nombre": "Persuasión",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Perspicacia",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Religión",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Sigilo",
@@ -133,12 +144,137 @@
     }
   ],
   "background": {
-    "nombre": "Por definir",
-    "habilidades": []
+    "nombre": "Acolyte",
+    "habilidades": [
+      {
+        "nombre": "Shelter of the Faithful",
+        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
+      }
+    ]
   },
-  "rasgos": [],
-  "habilidadesUso": [],
-  "equipo": [],
+  "rasgos": [
+    {
+      "nombre": "Visión Nocturna",
+      "desc": "Visión en la oscuridad hasta 60ft."
+    },
+    {
+      "nombre": "Resistencia Infernal",
+      "desc": "Tenés resistencia al daño de fuego."
+    },
+    {
+      "nombre": "Legado de Flegetos",
+      "desc": "Conocés el cantrip friends gracias a este rasgo (ya incluido en tus cantrips). Carisma es tu habilidad de conjuración para los hechizos de este rasgo."
+    },
+    {
+      "nombre": "Disciple of Life",
+      "desc": "Cuando curás vida con un hechizo de nivel 1 o mayor, la criatura recupera vida adicional igual a 2 + el nivel del hechizo."
+    },
+    {
+      "nombre": "Idiomas",
+      "desc": "Podés hablar los idiomas Common, Infernal, Halfling y Abyssal."
+    },
+    {
+      "nombre": "Cure Wounds: bono WIS",
+      "desc": "Cure Wounds suma WIS al daño.",
+      "bonoDano": "WIS",
+      "aplicaA": "hechizo:Cure Wounds"
+    },
+    {
+      "nombre": "Healing Word: bono WIS",
+      "desc": "Healing Word suma WIS al daño.",
+      "bonoDano": "WIS",
+      "aplicaA": "hechizo:Healing Word"
+    },
+    {
+      "nombre": "Spiritual Weapon: bono WIS",
+      "desc": "Spiritual Weapon suma WIS al daño.",
+      "bonoDano": "WIS",
+      "aplicaA": "hechizo:Spiritual Weapon"
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Channel Divinity",
+      "usos": "1/1",
+      "usosPorNivel": {
+        "1": 1,
+        "6": 2,
+        "18": 3
+      },
+      "recupera": "corto",
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Preserve Life o Turn Undead)."
+    },
+    {
+      "nombre": "Channel Divinity: Preserve Life",
+      "consumeUsoDe": "Channel Divinity",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Repartís 15 HP de curación entre las criaturas que elijas dentro de 30 ft (podés incluirte). Ninguna criatura puede superar la mitad de su HP máximo con esta curación. No tiene efecto sobre no-muertos ni constructos. Consume 1 uso de Channel Divinity."
+    },
+    {
+      "nombre": "Channel Divinity: Turn Undead",
+      "consumeUsoDe": "Channel Divinity",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "desc": "Cada no-muerto que pueda verte u oírte dentro de 30 ft hace tirada de salvación de WIS. Si falla, queda Turned durante 1 minuto o hasta que reciba daño. Consume 1 uso de Channel Divinity."
+    },
+    {
+      "nombre": "Legado de Flegetos: Charm Person",
+      "usos": "1/1",
+      "recupera": "largo",
+      "accion": "Acción",
+      "distancia": "30 ft",
+      "duracion": "Concentración, 1 hora",
+      "desc": "Podés lanzar charm person como un hechizo de Nivel 2 usando este rasgo, sin gastar espacio de conjuro. Recuperás la habilidad de usarlo al completar un descanso largo."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Armadura de Escamas (Scale Mail)",
+      "esArmadura": true,
+      "tipoArmadura": "mediana",
+      "armaduraBase": 14,
+      "manos": 0,
+      "peso": 45,
+      "valor": 50,
+      "desc": "Armadura mediana. CA: 14 + Modificador de Destreza (máx +2)."
+    },
+    {
+      "nombre": "Escudo",
+      "esArmadura": true,
+      "tipoArmadura": "escudo",
+      "armaduraBase": 2,
+      "manos": 1,
+      "peso": 6,
+      "valor": 10,
+      "desc": "Escudo."
+    },
+    {
+      "nombre": "Martillo de Guerra (Warhammer)",
+      "dano": "1d8",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 15,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Martillo de guerra. 1d8 de daño contundente.",
+      "proficiente": false
+    },
+    {
+      "nombre": "Ballesta Ligera (Light Crossbow)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 2,
+      "peso": 5,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "80/320 ft",
+      "desc": "Ballesta ligera. 1d8 de daño perforante. Requiere munición."
+    }
+  ],
   "hechizos": {
     "ranuras": [
       {
@@ -152,7 +288,99 @@
         "recupera": "largo"
       }
     ],
-    "lista": []
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Guidance",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Tocás a una criatura dispuesta. Antes de que termine el hechizo, esa criatura puede tirar 1d4 y sumarlo a una prueba de habilidad a elección."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Thaumaturgy",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Manifestás un efecto menor dentro de 30 ft mientras dure el hechizo (elegís uno cada vez que lo usás): tu voz retumba hasta 3 veces más fuerte, llamas cambian de color o de tamaño, temblores inofensivos en el suelo, un sonido a elección sale de un punto del rango, una puerta o ventana se abre o cierra de golpe, o tus ojos brillan momentáneamente."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Friends",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Ganás Ventaja en todas las pruebas de Carisma dirigidas a una criatura a elección dentro del rango mientras dure el hechizo. Al terminar, el objetivo se da cuenta de que usaste magia para influenciar su humor y puede quedar hostil hacia vos."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Bless",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Cure Wounds",
+        "dano": "1d8",
+        "tipoDano": "curación",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de WIS. Cada slot superior al 1 suma 1d8 extra.",
+        "efectos": [
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Disciple of Life",
+            "descripcion": "Disciple of Life (curación extra al objetivo)"
+          }
+        ]
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Healing Word",
+        "dano": "1d4",
+        "tipoDano": "curación",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "desc": "Una criatura a elección dentro del rango recupera 1d4 + tu modificador de WIS de HP. No tiene efecto sobre no-muertos ni constructos. Cada slot superior al 1 suma 1d4 extra.",
+        "efectos": [
+          {
+            "tipo": "autoCuracion",
+            "formula": "2 + nivelHechizo",
+            "rasgoRequerido": "Disciple of Life",
+            "descripcion": "Disciple of Life (curación extra al objetivo)"
+          }
+        ]
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Lesser Restoration",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "desc": "Tocás a una criatura y terminás una enfermedad o una de estas condiciones que la afecte: ciego, sordo, paralizado o envenenado."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Spiritual Weapon",
+        "dano": "1d8",
+        "tipoDano": "fuerza",
+        "accion": "Acción Bonus",
+        "distancia": "60 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás un arma espectral flotante dentro del rango que dura 1 minuto o hasta que volvés a lanzar este hechizo. Como Acción Bonus en turnos posteriores podés mover el arma hasta 20 ft y atacar con ella a una criatura dentro de 5 ft: en un golpe hace 1d8 + tu modificador de WIS de daño de fuerza. Cada dos slots superiores al 2 suma 1d8 extra."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Aid",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "8 horas",
+        "desc": "Elegís 3 criaturas en rango. Cada una gana 5 HP máximos y actuales mientras dure el hechizo. Si se lanza con slot Nivel 3, son 10 HP."
+      }
+    ]
   },
   "inventario": []
 }

@@ -2,19 +2,35 @@
   "personaje": {
     "nombre": "Angie",
     "clase": "Pícaro",
-    "raza": "Humano",
+    "raza": "Humana",
     "tamano": "mediano",
     "stats": {
-      "STR": 12,
-      "DEX": 12,
-      "CON": 12,
-      "INT": 12,
-      "WIS": 12,
-      "CHA": 12
+      "STR": 8,
+      "DEX": 15,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 10,
+      "CHA": 15
     }
   },
   "improvements": {
-    "race": [],
+    "race": [
+      {
+        "atributo": "DEX",
+        "valor": 1,
+        "motivo": "Humana"
+      },
+      {
+        "atributo": "CON",
+        "valor": 1,
+        "motivo": "Humana"
+      },
+      {
+        "atributo": "CHA",
+        "valor": 1,
+        "motivo": "Humana"
+      }
+    ],
     "feats": [],
     "asi": []
   },
@@ -47,7 +63,7 @@
     },
     {
       "nombre": "Percepción P.",
-      "valor": "11"
+      "valor": "12"
     },
     {
       "nombre": "Proficiencia",
@@ -61,11 +77,11 @@
   "habilidades": [
     {
       "nombre": "Acrobacias",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Atletismo",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Conoc. Arcano",
@@ -73,7 +89,7 @@
     },
     {
       "nombre": "Engaño",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Historia",
@@ -89,7 +105,7 @@
     },
     {
       "nombre": "Investigación",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Juego de manos",
@@ -105,7 +121,7 @@
     },
     {
       "nombre": "Percepción",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Persuasión",
@@ -113,15 +129,16 @@
     },
     {
       "nombre": "Perspicacia",
-      "proficiente": false
+      "proficiente": true,
+      "experto": true
     },
     {
       "nombre": "Religión",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Sigilo",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Supervivencia",
@@ -133,12 +150,121 @@
     }
   ],
   "background": {
-    "nombre": "Por definir",
-    "habilidades": []
+    "nombre": "Acolyte",
+    "habilidades": [
+      {
+        "nombre": "Shelter of the Faithful",
+        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
+      }
+    ]
   },
-  "rasgos": [],
-  "habilidadesUso": [],
-  "equipo": [],
+  "rasgos": [
+    {
+      "nombre": "Visión Nocturna",
+      "desc": "Visión en la oscuridad hasta 60ft."
+    },
+    {
+      "nombre": "Fey Ancestry",
+      "desc": "Tenés Ventaja en tiradas de salvación contra quedar Encantada (Charmed), y la magia no puede dormirte."
+    },
+    {
+      "nombre": "Thieves' Cant",
+      "desc": "Conocés la Jerga de Ladrones: una mezcla secreta de dialecto, jerga y señas que te permite ocultar mensajes en una conversación normal. Solo otra criatura que también la conozca nota el mensaje oculto; para cualquier otro oyente, suena a charla común."
+    },
+    {
+      "nombre": "Sneak Attack",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Cunning Action",
+      "desc": "Revisar la sección de Características Activas."
+    },
+    {
+      "nombre": "Roguish Archetype: Swashbuckler",
+      "desc": "Te especializás en el combate cuerpo a cuerpo con una sola arma liviana, usando tu encanto y tu agilidad para esquivar entre enemigos."
+    },
+    {
+      "nombre": "Fancy Footwork",
+      "desc": "Durante tu turno, si atacás cuerpo a cuerpo a una criatura, esa criatura no puede hacerte ataques de oportunidad por el resto de tu turno."
+    },
+    {
+      "nombre": "Rakish Audacity",
+      "desc": "Sumás tu modificador de CHA a tus tiradas de Iniciativa (esto NO está calculado en el campo de Iniciativa automático de la ficha — sumalo manualmente al tirar). Además, no necesitás Ventaja en la tirada de ataque para usar Sneak Attack si ningún otro enemigo está a 5 ft de vos y no tenés Desventaja en el ataque. El resto de las reglas de Sneak Attack siguen aplicando igual."
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Cunning Action",
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "desc": "Como Acción Bonus en cada uno de tus turnos, podés Correr (Dash), Desengancharte (Disengage) o Esconderte (Hide)."
+    },
+    {
+      "nombre": "Sneak Attack",
+      "dano": "1d6",
+      "escala": {
+        "3": "2d6",
+        "5": "3d6",
+        "7": "4d6",
+        "9": "5d6",
+        "11": "6d6",
+        "13": "7d6",
+        "15": "8d6",
+        "17": "9d6",
+        "19": "10d6"
+      },
+      "accion": "Sin acción (parte de un ataque)",
+      "desc": "Una vez por turno, sumás {sneakAttackDados}d6 de daño extra a UN ataque que hagas con un arma finesse o a distancia, si tenés Ventaja en la tirada de ataque, o si un aliado está a 5 ft del objetivo (y vos no tenés Desventaja en el ataque). Con Rakish Audacity, tampoco necesitás Ventaja si ningún otro enemigo está a 5 ft de vos y no tenés Desventaja. No se puede usar más de una vez por turno."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Armadura de Cuero (Leather Armor)",
+      "esArmadura": true,
+      "tipoArmadura": "ligera",
+      "armaduraBase": 11,
+      "manos": 0,
+      "peso": 10,
+      "valor": 10,
+      "desc": "Armadura ligera. CA: 11 + Modificador de Destreza."
+    },
+    {
+      "nombre": "Espada Corta (Shortsword)",
+      "dano": "1d6",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 2,
+      "valor": 10,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Espada corta. Finesse, a una mano."
+    },
+    {
+      "nombre": "Estoque (Rapier)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 2,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Estoque. Finesse, a una mano."
+    },
+    {
+      "nombre": "Daga",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 1,
+      "valor": 2,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Arma finesse, liviana y arrojadiza."
+    }
+  ],
   "hechizos": {
     "ranuras": [],
     "lista": []

@@ -270,11 +270,16 @@ function evaluarFormula(formula, contexto) {
 function resolverDescDinamicaHabilidad(desc) {
     if (!desc) return '';
     const dcKi = 8 + proficienciaActual + modWisGlobal;
+    // {sneakAttackDados}: cantidad de d6 de Sneak Attack según nivel de Pícaro (1d6 a nivel 1-2,
+    // +1d6 cada 2 niveles). Mismo cálculo que el campo "escala" del hechizo/habilidad usa para
+    // el badge de daño del modal — esto solo repite el número en el texto de la card de lista.
+    const sneakAttackDados = Math.ceil(nivelPersonajeGlobal / 2);
     return desc
         .split('{nivelPersonaje}').join(nivelPersonajeGlobal)
         .split('{modDEX}').join(formatMod(modDexGlobal))
         .split('{danoCaidaSlowFall}').join(5 * nivelPersonajeGlobal)
-        .split('{dcKi}').join(dcKi);
+        .split('{dcKi}').join(dcKi)
+        .split('{sneakAttackDados}').join(sneakAttackDados);
 }
 
 // Verifica si el personaje tiene un rasgo dado (por nombre)
@@ -766,6 +771,19 @@ function extraerBonusHorneado(danoStr) {
     const match = /^(\d+d\d+)\+(\d+)$/.exec(danoStr || '');
     if (match) return { base: match[1], bonus: parseInt(match[2]) };
     return { base: danoStr, bonus: 0 };
+}
+
+// Calcula el bono a la tirada de ataque de un arma específica del equipo: mod de
+// característica (STR, o DEX si es "finesse") + bono de proficiencia (SALVO que el arma
+// declare "proficiente": false, en cuyo caso no se suma) + bono de arma mágica (item.bonoAtaque).
+// Por defecto ("proficiente" ausente) se asume proficiente, para no afectar a ningún personaje
+// existente que no use este campo. Devuelve null si el ítem no es un arma con "tipo" definido.
+function calcularBonoAtaqueArma(item, modStrArma, modDexArma, profArma) {
+    if (!item || !item.tipo) return null;
+    const mod = (item.tipo === 'finesse') ? modDexArma : modStrArma;
+    const prof = (item.proficiente === false) ? 0 : profArma;
+    const bonoMagico = item.bonoAtaque || 0;
+    return mod + prof + bonoMagico;
 }
 
 // Objetos mágicos que suben una característica mientras están equipados (ej: Amulet of Health
@@ -2581,6 +2599,10 @@ async function init() {
         }
 
         const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
+        const bonoAtqCard = (i.dano && i.tipo) ? calcularBonoAtaqueArma(i, modStr, modDexNum, proficienciaActual) : null;
+        const atqHTML = (bonoAtqCard !== null)
+            ? `<span class="skill-mod" style="background-color: var(--gris-fill, #757575); color: white;" title="${i.proficiente === false ? 'Sin proficiencia' : 'Con proficiencia'}">Atq: ${formatMod(bonoAtqCard)}</span>`
+            : '';
         const condicionalHTML = (i.dano && i.tipo) ? bonosCondicionalesHTML(i, ['arma']) : '';
         const tipoDanoHTML = i.tipoDano ? `<span style="font-size: 0.85rem; font-weight: bold; padding: 2px 8px; border: 1px solid #757575; border-radius: 4px; color: #757575; background-color: #eeeeee; margin-left: 6px;">${capitalizar(i.tipoDano)}</span>` : '';
         const maestriaHTML = (i.maestriaArma && tieneRasgo('Weapon Mastery') && MAESTRIA_ARMA_INFO[i.maestriaArma])
@@ -2625,6 +2647,7 @@ async function init() {
                 <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 4px;">
                     ${armaduraHTML}
                     ${manosHTML}
+                    ${atqHTML}
                     ${danoHTML}
                     ${condicionalHTML}
                     ${tipoDanoHTML}
@@ -2682,6 +2705,15 @@ async function init() {
             if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
             ultimoDanoMostrado = item.tipoDano ? `${danoTexto} ${item.tipoDano}` : danoTexto;
             partes.push(`<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoTexto}</span>`);
+
+            // Bono a la tirada de ataque (solo armas, no hechizos): mod STR/DEX + proficiencia
+            // (salvo "proficiente": false) + bono de arma mágica. Ver calcularBonoAtaqueArma().
+            if (!esHechizoItem) {
+                const bonoAtqModal = calcularBonoAtaqueArma(item, modStrGlobal, modDexGlobal, proficienciaActual);
+                if (bonoAtqModal !== null) {
+                    partes.push(`<span class="skill-mod" style="background-color: var(--gris-fill, #757575); color: white;" title="${item.proficiente === false ? 'Sin proficiencia' : 'Con proficiencia'}">Atq: ${formatMod(bonoAtqModal)}</span>`);
+                }
+            }
 
             // Bonos condicionales (ej: Aura del Gran Panal) — se muestran siempre en naranja,
             // aparte, porque dependen de algo que la hoja no puede saber (ej: si el objetivo
@@ -3414,8 +3446,15 @@ async function init() {
 
         const saveDCActual = 8 + proficienciaActual + modPrincipal + bonos.bonoCDHechizo;
         const spellAttackBonusActual = formatMod(proficienciaActual + modPrincipal + bonos.bonoAtaqueHechizo);
-        const atkMeleeBonusActual = formatMod(proficienciaActual + modStr + bonos.atkMeleeExtra);
-        const atkFinesseBonusActual = formatMod(proficienciaActual + modDexNum + bonos.atkFinesseExtra);
+        // Si el arma melee/finesse actualmente equipada declara "proficiente": false, no se
+        // suma el bono de proficiencia a este header (ver calcularBonoAtaqueArma() para el
+        // desglose por arma individual, que se muestra en cada card/modal de equipo).
+        const meleeEquipadaActual = data.equipo.find(e => e.tipo === 'melee' && armasEquipadas.includes(e.nombre));
+        const finesseEquipadaActual = data.equipo.find(e => e.tipo === 'finesse' && armasEquipadas.includes(e.nombre));
+        const profMeleeActual = (meleeEquipadaActual && meleeEquipadaActual.proficiente === false) ? 0 : proficienciaActual;
+        const profFinesseActual = (finesseEquipadaActual && finesseEquipadaActual.proficiente === false) ? 0 : proficienciaActual;
+        const atkMeleeBonusActual = formatMod(profMeleeActual + modStr + bonos.atkMeleeExtra);
+        const atkFinesseBonusActual = formatMod(profFinesseActual + modDexNum + bonos.atkFinesseExtra);
 
         const tieneMelee = data.equipo.some(e => e.tipo === 'melee');
         const tieneFinesse = data.equipo.some(e => e.tipo === 'finesse');
