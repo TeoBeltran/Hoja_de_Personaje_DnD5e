@@ -1,0 +1,220 @@
+{
+  "personaje": {
+    "nombre": "Teo",
+    "clase": "Bárbaro",
+    "raza": "Goliath",
+    "tamano": "mediano",
+    "stats": {
+      "STR": 14,
+      "DEX": 14,
+      "CON": 15,
+      "INT": 8,
+      "WIS": 8,
+      "CHA": 12
+    }
+  },
+  "improvements": {
+    "race": [
+      {
+        "atributo": "STR",
+        "valor": 2,
+        "motivo": "Goliath"
+      },
+      {
+        "atributo": "CON",
+        "valor": 1,
+        "motivo": "Goliath"
+      }
+    ],
+    "feats": [],
+    "asi": []
+  },
+  "vidaFormula": {
+    "tiradas": [
+      7,
+      7
+    ]
+  },
+  "estadisticas": [
+    {
+      "nombre": "Vida",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Nivel",
+      "valor": "3"
+    },
+    {
+      "nombre": "CA",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Iniciativa",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Velocidad",
+      "valor": "30ft"
+    },
+    {
+      "nombre": "Percepción P.",
+      "valor": "11"
+    },
+    {
+      "nombre": "Proficiencia",
+      "valor": "auto"
+    },
+    {
+      "nombre": "Hit Dice",
+      "valor": "auto"
+    }
+  ],
+  "habilidades": [
+    {
+      "nombre": "Acrobacias",
+      "proficiente": true
+    },
+    {
+      "nombre": "Atletismo",
+      "proficiente": true
+    },
+    {
+      "nombre": "Conoc. Arcano",
+      "proficiente": false
+    },
+    {
+      "nombre": "Engaño",
+      "proficiente": false
+    },
+    {
+      "nombre": "Historia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Interpretación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Intimidación",
+      "proficiente": true
+    },
+    {
+      "nombre": "Investigación",
+      "proficiente": false
+    },
+    {
+      "nombre": "Juego de manos",
+      "proficiente": false
+    },
+    {
+      "nombre": "Medicina",
+      "proficiente": false
+    },
+    {
+      "nombre": "Naturaleza",
+      "proficiente": false
+    },
+    {
+      "nombre": "Percepción",
+      "proficiente": true
+    },
+    {
+      "nombre": "Persuasión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Perspicacia",
+      "proficiente": false
+    },
+    {
+      "nombre": "Religión",
+      "proficiente": false
+    },
+    {
+      "nombre": "Sigilo",
+      "proficiente": false
+    },
+    {
+      "nombre": "Supervivencia",
+      "proficiente": true
+    },
+    {
+      "nombre": "Trato animal",
+      "proficiente": false
+    }
+  ],
+  "background": {
+    "nombre": "Pirate",
+    "habilidades": [
+      {
+        "nombre": "Ship's Passage",
+        "desc": "Podés conseguir pasaje gratuito en un barco a vela para vos y tus compañeros, a cambio de trabajo, mientras estés en el mar. Podés estar viajando en esa nave, o cruzarte con su capitán en algún puerto."
+      }
+    ]
+  },
+  "rasgos": [
+    {
+      "nombre": "Unarmored Defense",
+      "desc": "Sin armadura: CA = 10 + DEX + CON. Podés usar escudo y mantener este beneficio."
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Spirit Seeker: Speak with Animals",
+      "accion": "Ritual (10 min)",
+      "distancia": "Propio",
+      "duracion": "10 minutos",
+      "desc": "Podés entender y comunicarte verbalmente con bestias. Se lanza solo como ritual, sin gastar ranura de hechizo."
+    },
+    {
+      "nombre": "Spirit Seeker: Beast Sense",
+      "accion": "Ritual (10 min)",
+      "distancia": "Toque",
+      "duracion": "Concentración, hasta 1 hora",
+      "desc": "Tocás a una bestia dispuesta y percibís a través de sus sentidos mientras dure la concentración. Se lanza solo como ritual, sin gastar ranura de hechizo."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Hacha Grande (Greataxe)",
+      "dano": "1d12",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 2,
+      "peso": 7,
+      "valor": 30,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Hacha grande a dos manos."
+    },
+    {
+      "nombre": "Hachuela (Handaxe)",
+      "dano": "1d6",
+      "tipoDano": "cortante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 5,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Arma liviana y arrojadiza."
+    },
+    {
+      "nombre": "Jabalina (Javelin)",
+      "dano": "1d6",
+      "tipoDano": "perforante",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 5,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 30/120 ft",
+      "desc": "Arma arrojadiza."
+    }
+  ],
+  "hechizos": {
+    "ranuras": [],
+    "lista": []
+  },
+  "inventario": []
+}

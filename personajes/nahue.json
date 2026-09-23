@@ -5,16 +5,27 @@
     "raza": "Tiefling",
     "tamano": "mediano",
     "stats": {
-      "STR": 12,
-      "DEX": 12,
-      "CON": 12,
-      "INT": 12,
-      "WIS": 12,
-      "CHA": 12
+      "STR": 8,
+      "DEX": 15,
+      "CON": 16,
+      "INT": 8,
+      "WIS": 10,
+      "CHA": 16
     }
   },
   "improvements": {
-    "race": [],
+    "race": [
+      {
+        "atributo": "CHA",
+        "valor": 2,
+        "motivo": "Tiefling"
+      },
+      {
+        "atributo": "CON",
+        "valor": 1,
+        "motivo": "Levistus"
+      }
+    ],
     "feats": [],
     "asi": []
   },
@@ -47,7 +58,7 @@
     },
     {
       "nombre": "Percepción P.",
-      "valor": "11"
+      "valor": "10"
     },
     {
       "nombre": "Proficiencia",
@@ -69,7 +80,7 @@
     },
     {
       "nombre": "Conoc. Arcano",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Engaño",
@@ -77,7 +88,7 @@
     },
     {
       "nombre": "Historia",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Interpretación",
@@ -109,11 +120,11 @@
     },
     {
       "nombre": "Persuasión",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Perspicacia",
-      "proficiente": false
+      "proficiente": true
     },
     {
       "nombre": "Religión",
@@ -133,12 +144,86 @@
     }
   ],
   "background": {
-    "nombre": "Por definir",
-    "habilidades": []
+    "nombre": "Sage",
+    "habilidades": [
+      {
+        "nombre": "Researcher",
+        "desc": "Cuando intentás recordar o aprender un dato que no sabés, generalmente sabés dónde o de quién podés conseguirlo: una biblioteca, un escritorio, una universidad, un sabio u otra persona instruida. El DM puede decidir que ese conocimiento está en un lugar de difícil acceso, o que directamente no puede encontrarse."
+      }
+    ]
   },
-  "rasgos": [],
-  "habilidadesUso": [],
-  "equipo": [],
+  "rasgos": [
+    {
+      "nombre": "Visión Nocturna",
+      "desc": "Visión en la oscuridad hasta 60ft."
+    },
+    {
+      "nombre": "Resistencia Infernal",
+      "desc": "Tenés resistencia al daño de fuego."
+    },
+    {
+      "nombre": "Legacy of Stygia",
+      "desc": "Conocés el cantrip ray of frost gracias a este rasgo (ya incluido en tus cantrips). Al llegar a nivel 3, podés lanzar armor of agathys como un hechizo de Nivel 2 una vez con este rasgo, y recuperás la habilidad de hacerlo al completar un descanso largo. Al llegar a nivel 5, también podés lanzar darkness una vez con este rasgo de la misma forma. Carisma es tu habilidad de conjuración para los hechizos de este rasgo."
+    },
+    {
+      "nombre": "Idiomas",
+      "desc": "Podés hablar los idiomas Common, Infernal, Undercommon y Deep Speech."
+    },
+    {
+      "nombre": "Sorcery Points",
+      "desc": "Tenés 3 puntos de hechicería. Se recuperan al completar un descanso largo."
+    },
+    {
+      "nombre": "Wild Magic Surge",
+      "desc": "Cada vez que lanzás un hechizo de Hechicero de nivel 1 o superior, el DM puede hacerte tirar 1d20. Si sale 1, tirás en la Tabla de Descontrol de Magia Salvaje para generar un efecto mágico aleatorio."
+    },
+    {
+      "nombre": "Metamagic: Quickened Spell",
+      "desc": "Gastá 2 puntos de hechicería para convertir el lanzamiento de un hechizo con tiempo de lanzamiento de 1 Acción a 1 Acción Bonus."
+    },
+    {
+      "nombre": "Metamagic: Twinned Spell",
+      "desc": "Gastá una cantidad de puntos de hechicería igual al nivel del hechizo (mínimo 1) para afectar a una segunda criatura con un hechizo que ya tenga un único objetivo."
+    }
+  ],
+  "habilidadesUso": [
+    {
+      "nombre": "Flexible Casting",
+      "accion": "Acción Bonus",
+      "desc": "Podés convertir puntos de hechicería en espacios de conjuro (costo en puntos según el nivel del espacio: Nivel 1 = 2, Nivel 2 = 3, Nivel 3 = 5, Nivel 4 = 6, Nivel 5 = 7). También podés convertir un espacio de conjuro en puntos de hechicería, ganando puntos igual al nivel de ese espacio."
+    },
+    {
+      "nombre": "Tides of Chaos",
+      "accion": "Sin acción",
+      "desc": "Podés manipular las fuerzas del azar y el caos para ganar Ventaja en una tirada de ataque, prueba de habilidad o tirada de salvación. Una vez que lo usés, necesitás completar un descanso largo para volver a usarlo. Antes de recuperarlo, el DM puede hacerte tirar en la Tabla de Descontrol de Magia Salvaje inmediatamente después de que lancés un hechizo de Hechicero de nivel 1 o superior; si eso pasa, recuperás el uso de este rasgo."
+    }
+  ],
+  "equipo": [
+    {
+      "nombre": "Daga",
+      "dano": "1d4",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 1,
+      "peso": 1,
+      "valor": 2,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
+      "desc": "Arma finesse, liviana y arrojadiza."
+    },
+    {
+      "nombre": "Ballesta Ligera (Light Crossbow)",
+      "dano": "1d8",
+      "tipoDano": "perforante",
+      "tipo": "finesse",
+      "manos": 2,
+      "peso": 5,
+      "valor": 25,
+      "accion": "Acción",
+      "distancia": "80/320 ft",
+      "desc": "Ballesta ligera. 1d8 de daño perforante. Requiere munición."
+    }
+  ],
   "hechizos": {
     "ranuras": [
       {
@@ -152,7 +237,114 @@
         "recupera": "largo"
       }
     ],
-    "lista": []
+    "lista": [
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Fire Bolt",
+        "dano": "1d10",
+        "escala": {
+          "5": "2d10",
+          "11": "3d10",
+          "17": "4d10"
+        },
+        "tipoDano": "fuego",
+        "accion": "Acción",
+        "distancia": "120 ft",
+        "desc": "Ataque de conjuro a distancia. Si impacta, hace daño de fuego. Un objeto inflamable no portado se prende fuego."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Mage Hand",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás una mano espectral que puede manipular objetos livianos (hasta 10 lb) a distancia."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Minor Illusion",
+        "accion": "Acción",
+        "distancia": "30 ft",
+        "duracion": "1 minuto",
+        "desc": "Creás un sonido o una imagen de un objeto (no más grande que un cubo de 5 ft) dentro del rango."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Ray of Frost",
+        "dano": "1d8",
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
+        "tipoDano": "frío",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Ataque de conjuro a distancia. Si impacta, hace daño de frío y la velocidad del objetivo se reduce 10 ft hasta el inicio de tu próximo turno."
+      },
+      {
+        "nivel": "CANTRIPS",
+        "nombre": "Shocking Grasp",
+        "dano": "1d8",
+        "escala": {
+          "5": "2d8",
+          "11": "3d8",
+          "17": "4d8"
+        },
+        "tipoDano": "rayo",
+        "accion": "Acción",
+        "distancia": "Melee 5 ft",
+        "desc": "Ataque de conjuro cuerpo a cuerpo. Tenés Ventaja si el objetivo lleva armadura de metal. Si impacta, hace daño de rayo y el objetivo no puede usar reacciones hasta el inicio de su próximo turno."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Armor of Agathys",
+        "accion": "Acción",
+        "distancia": "Propio",
+        "duracion": "8 horas",
+        "desc": "Ganás 5 HP temporales. Mientras los tengas, cualquier criatura que te golpee con un ataque cuerpo a cuerpo recibe 5 de daño de frío. Cada slot superior al 1 suma 5 HP temporales y 5 de daño extra."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Mage Armor",
+        "accion": "Acción",
+        "distancia": "Toque",
+        "duracion": "8 horas",
+        "desc": "Tocás a una criatura dispuesta que no lleve armadura. Hasta que termine el hechizo, su CA base pasa a ser 13 + su modificador de DEX."
+      },
+      {
+        "nivel": "NIVEL 1",
+        "nombre": "Shield",
+        "accion": "Reacción",
+        "distancia": "Propio",
+        "duracion": "1 ronda",
+        "desc": "+5 a la CA hasta el inicio de tu próximo turno, incluyendo contra el ataque que lo activó, y no recibís daño de Magic Missile."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Hold Person",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "duracion": "Concentración, 1 minuto",
+        "desc": "Un humanoide a elección dentro del rango hace tirada de salvación de WIS o queda paralizado durante la duración. Puede repetir la salvación al final de cada uno de sus turnos. Cada slot superior al 2 permite elegir un humanoide adicional dentro de 30 ft del primero."
+      },
+      {
+        "nivel": "NIVEL 2",
+        "nombre": "Shatter",
+        "dano": "3d8",
+        "tipoDano": "trueno",
+        "accion": "Acción",
+        "distancia": "60 ft",
+        "desc": "Cada criatura en una esfera de 10 ft de radio hace tirada de salvación de CON: 3d8 de daño de trueno (mitad si pasa la salvación). Una criatura hecha de material inorgánico tiene Desventaja en esta salvación. También daña objetos no mágicos en el área que no estén siendo llevados ni usados. Cada slot superior al 2 suma 1d8."
+      }
+    ]
   },
-  "inventario": []
+  "inventario": [
+    {
+      "nombre": "Carta de un colega muerto",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Una carta de un colega ya fallecido, que planteaba una pregunta que todavía no pudiste responder."
+    }
+  ]
 }

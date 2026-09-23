@@ -117,6 +117,7 @@ let manosUsadas = 0;       // total de manos ocupadas (escudo + armas)
 let modDexGlobal = 0;
 let modStrGlobal = 0;
 let modWisGlobal = 0;
+let modConGlobal = 0;
 let statsGlobal = {};
 let rasgosGlobal = [];
 
@@ -909,11 +910,12 @@ function calcularCA() {
     } else if (mageArmorActivo) {
         // Mage Armor: 13 + DEX (sin tope)
         ca = mageArmorBase + modDexGlobal;
-    } else if (!escudoEquipadoId && tieneRasgo('Unarmored Defense')) {
-        // Unarmored Defense (Monje): 10 + DEX + WIS, sin armadura NI escudo.
-        // (Si en el futuro se agrega un Bárbaro con Unarmored Defense propio, esto habría
-        // que generalizarlo porque el Bárbaro usa CON en vez de WIS.)
-        ca = 10 + modDexGlobal + modWisGlobal;
+    } else if (tieneRasgo('Unarmored Defense') && (claseActual === 'Bárbaro' || !escudoEquipadoId)) {
+        // Unarmored Defense: Monje = 10 + DEX + WIS, sin armadura NI escudo.
+        // Bárbaro = 10 + DEX + CON, sin armadura, pero SÍ puede usar escudo (RAW) — el bono
+        // del escudo se suma aparte, más abajo, igual que en cualquier otra rama.
+        const statExtraUnarmored = (claseActual === 'Bárbaro') ? modConGlobal : modWisGlobal;
+        ca = 10 + modDexGlobal + statExtraUnarmored;
     } else {
         // Sin armadura: 10 + DEX
         ca = 10 + modDexGlobal;
@@ -2219,6 +2221,7 @@ async function init() {
     // Pre-cargar armadura, escudo y armas equipadas desde localStorage
     modDexGlobal = obtenerMod(data.modificadores, "DEX");
     modWisGlobal = obtenerMod(data.modificadores, "WIS");
+    modConGlobal = obtenerMod(data.modificadores, "CON");
 
     // Pre-cargar estado de Mage Armor
     const mageArmorGuardado = localStorage.getItem(STORAGE_PREFIX + 'mageArmorActivo');
