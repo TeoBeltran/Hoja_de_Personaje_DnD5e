@@ -2050,7 +2050,16 @@ async function init() {
                 img.onerror = null;
                 img.src = 'img/personajes/placeholder.png';
             };
-            img.src = `img/personajes/${personajeId}.png`;
+            // Nombre del archivo de imagen: por default es el mismo que personajeId (ej.
+            // "gabi_DM/selene" -> "img/personajes/gabi_DM/selene.png"), pero el JSON puede pisarlo
+            // con "personaje.imagen" si el archivo de la foto se llama distinto (ej. un apodo:
+            // "imagen": "gabi_DM/sele" -> "img/personajes/gabi_DM/sele.png").
+            const nombreImagen = (data.personaje && data.personaje.imagen) ? data.personaje.imagen : personajeId;
+            // Cache-buster con timestamp: si reemplazás la foto de un personaje pero le dejás
+            // el mismo nombre de archivo, el navegador puede seguir mostrando la vieja desde su
+            // caché. Con esto, cada vez que se abre el modal se pide la imagen "de nuevo" (no
+            // afecta nada más, es solo para forzar que no use la copia cacheada).
+            img.src = `img/personajes/${nombreImagen}.png?v=${Date.now()}`;
             img.alt = data.personaje.nombre || '';
             document.getElementById('imagen-modal').style.display = 'flex';
         };

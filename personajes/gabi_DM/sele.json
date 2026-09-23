@@ -1,10 +1,9 @@
 {
   "personaje": {
-    "nombre": "Selene",
+    "nombre": "Sele",
     "clase": "Clérigo",
     "raza": "Tiefling",
     "tamano": "mediano",
-    "imagen": "gabi_DM/sele",
     "stats": {
       "STR": 8,
       "DEX": 10,
