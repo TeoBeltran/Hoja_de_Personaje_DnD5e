@@ -20,7 +20,7 @@ const ICONOS_PERSONAJE = {
     'aldren': '🔧',
     'kael': '🙏',
     'varis': '🏹',
-    // Gabi DM (subcarpeta personajes/gabi_DM/)
+    // Gabi DM (subcarpeta personajes/gabi_DM/; los de arriba viven en personajes/personajes_1/)
     'gabi_DM/sele': '🕊️',
     'gabi_DM/nahue': '⚡',
     'gabi_DM/angie': '🔪',
@@ -130,7 +130,24 @@ const MAESTRIA_ARMA_INFO = {
     'Vex': { nombre: 'Hostigar', emoji: '🎯', desc: 'Si golpeás con el ataque, tenés VENTAJA en tu próxima tirada de ataque contra ese mismo objetivo antes de que termine tu próximo turno.' }
 };
 
+// ===== Carpetas de los JSON de personajes =====
+// personajes/
+//   personajes_1/  -> los personajes "normales" (id sin carpeta, ej. 'gangstur')
+//   gabi_DM/       -> los de Gabi DM (id con carpeta, ej. 'gabi_DM/teo')
+// El id de un personaje normal NO lleva la carpeta: así sus URLs (?p=gangstur) y todo lo
+// guardado en localStorage (pj_gangstur_...) siguen funcionando igual que antes de moverlos.
+const CARPETA_PERSONAJES_NORMALES = 'personajes_1';
+
+// Ruta del .json de un personaje a partir de su id (el mismo que va en ?p=).
+function rutaJsonPersonaje(id) {
+    return id.includes('/')
+        ? `personajes/${id}.json`
+        : `personajes/${CARPETA_PERSONAJES_NORMALES}/${id}.json`;
+}
+
 export {
+    CARPETA_PERSONAJES_NORMALES,
+    rutaJsonPersonaje,
     ICONOS_PERSONAJE,
     PROFICIENCIAS_POR_CLASE,
     NOMBRES_STATS,

@@ -120,11 +120,12 @@ async function generarResumen(){
 
     try{
 
-        const personajes=await leerJSON("personajes/personajes.json");
+        // Los personajes normales viven en personajes/personajes_1/ (junto con su índice personajes.json).
+        const personajes=await leerJSON("personajes/personajes_1/personajes.json");
 
         for(const nombre of personajes){
 
-            const datos=await leerJSON(`personajes/${nombre}.json`);
+            const datos=await leerJSON(`personajes/personajes_1/${nombre}.json`);
 
             crearFicha(datos);
 
@@ -398,4 +399,3 @@ function crearFicha(datos){
     });
 
 }
-

@@ -54,6 +54,23 @@ if (!record) {
             record.velocidad = match ? parseInt(match[0]) : 30;
             cambio = true;
         }
+        // Acciones por turno pasó a ser un valor CALCULADO (Multiataque o, si no tiene,
+        // el valor manual accionesPorTurnoBase). El valor viejo pasa a ser el manual.
+        if (record.accionesPorTurnoBase === undefined) {
+            record.accionesPorTurnoBase = Math.max(1, parseInt(record.accionesPorTurno) || 1);
+            cambio = true;
+        }
+        // Todas las entradas pasan por el mismo normalizador que el importador:
+        // daños como array, consumo, usos por turno y detección de Multiataque.
+        ['habilidades', 'acciones', 'accionesBonus', 'reacciones', 'accionesLegendarias'].forEach(function (sec) {
+            var permiteMulti = (sec === 'acciones' || sec === 'habilidades');
+            var antes = JSON.stringify(record[sec] || []);
+            record[sec] = (Array.isArray(record[sec]) ? record[sec] : []).map(function (it) {
+                return EnemigosComun.normalizarEntrada(it, permiteMulti);
+            });
+            if (JSON.stringify(record[sec]) !== antes) cambio = true;
+        });
+        if (EnemigosComun.sincronizarAcciones(record)) cambio = true;
         if (cambio) localStorage.setItem('enemigo_' + id, JSON.stringify(record));
     })();
 
@@ -139,11 +156,82 @@ if (!record) {
             var texto = formatoDano(d);
             if (texto) badges += '<span class="skill-mod" style="background-color:#6a1b9a;color:white;">' + escapeHTML(texto) + '</span>';
         });
+        if (esMultiataque(item)) {
+            badges += '<span class="skill-mod" style="background-color:var(--accent-color);color:white;">Multiataque: ' + item.multiataque + ' acciones por turno</span>';
+            return badges;
+        }
         if (CATEGORIAS_CON_CONSUMO[seccionClave]) {
             var consumo = normalizarConsumo(item);
             badges += '<span class="skill-mod" style="background-color:var(--naranja-fill);color:white;">Consume ' + consumo + ' ' + CATEGORIAS_CON_CONSUMO[seccionClave] + '</span>';
         }
+        var disp = calcularDisponibilidad(item, seccionClave);
+        if (disp) {
+            badges += '<span class="skill-mod badge-usos' + claseEstadoDisp(disp) + '" title="' +
+                (disp.limitado ? 'Límite propio por turno' : 'Sin límite propio: depende de las ' + TITULO_POOL[MAPA_POOL_POR_SECCION[seccionClave]] + ' que quedan') +
+                '">' + (disp.limitado ? 'Usos' : 'Disponibles') + ': ' + disp.actual + '/' + disp.max + (disp.limitado ? ' por turno' : '') + '</span>';
+        }
         return badges;
+    }
+
+    // ===== Usos por turno / disponibilidad de cada entrada =====
+
+    var TITULO_POOL = {
+        accion: 'Acciones',
+        bonus: 'Acciones Adicionales',
+        reaccion: 'Reacciones',
+        legendaria: 'Acciones Legendarias'
+    };
+
+    // Mismo criterio de colores que el menú de turno: verde lleno, amarillo parcial, rojo agotado.
+    function claseEstadoDisp(disp) {
+        if (!disp.puede) return ' agotado';
+        if (disp.actual < disp.max) return ' parcial';
+        return '';
+    }
+
+    function esMultiataque(item) {
+        return (parseInt(item && item.multiataque) || 0) >= 2;
+    }
+
+    function maximoPool(poolKey) {
+        if (poolKey === 'accion') return record.accionesPorTurno;
+        if (poolKey === 'legendaria') return record.legendariasHabilitadas ? (record.legendariasPorRonda || 0) : 0;
+        return 1; // bonus / reacción
+    }
+
+    // Devuelve null si la entrada no gasta ningún pool (Habilidades, Multiataque).
+    // Si no tiene límite propio: actual/max = cuántas veces entra en el pool (actual/máximo).
+    // Si tiene límite propio (usosPorTurno): actual/max = usosRestantes/usosPorTurno, pero
+    // `puede` también exige que al pool le alcance para pagar el costo.
+    function calcularDisponibilidad(item, seccionClave) {
+        var poolKey = MAPA_POOL_POR_SECCION[seccionClave];
+        if (!poolKey || esMultiataque(item)) return null;
+        var costo = CATEGORIAS_CON_CONSUMO[seccionClave] ? normalizarConsumo(item) : 1;
+        var poolActual = Math.max(0, record.turnoActual[poolKey] || 0);
+        var poolMax = maximoPool(poolKey);
+        var porPool = Math.floor(poolActual / costo);
+        var porPoolMax = Math.floor(poolMax / costo);
+        if (item.usosPorTurno) {
+            var restantes = Math.max(0, Math.min(item.usosRestantes === null || item.usosRestantes === undefined ? item.usosPorTurno : item.usosRestantes, item.usosPorTurno));
+            return {
+                limitado: true,
+                actual: restantes,
+                max: item.usosPorTurno,
+                costo: costo,
+                poolKey: poolKey,
+                porPool: porPool,
+                puede: restantes > 0 && porPool > 0
+            };
+        }
+        return {
+            limitado: false,
+            actual: porPool,
+            max: porPoolMax,
+            costo: costo,
+            poolKey: poolKey,
+            porPool: porPool,
+            puede: porPool > 0
+        };
     }
 
     // ===== Render general =====
@@ -193,7 +281,15 @@ if (!record) {
         btnAcciones.type = 'button';
         btnAcciones.className = 'skill-btn';
         btnAcciones.innerHTML = '<span>Acciones/Turno</span><span class="skill-mod">' + record.accionesPorTurno + '</span>';
-        btnAcciones.addEventListener('click', function () { abrirModalValor('accionesPorTurno', 'Acciones por turno', { min: 1 }); });
+        btnAcciones.addEventListener('click', function () {
+            // Con Multiataque el valor sale de esa acción: se edita ahí (cantidad de ataques).
+            var m = EnemigosComun.buscarMultiataque(record);
+            if (m) {
+                abrirEditarEntrada(m.seccion, m.idx);
+            } else {
+                abrirModalValor('accionesPorTurnoBase', 'Acciones por turno', { min: 1 });
+            }
+        });
         grid.appendChild(btnAcciones);
 
         var btnLegendarias = document.createElement('button');
@@ -254,8 +350,11 @@ if (!record) {
                 e.stopPropagation();
                 abrirConfirmar('¿Borrar "' + item.nombre + '"?', function () {
                     record[clave].splice(idx, 1);
+                    EnemigosComun.sincronizarAcciones(record);
                     guardarRecord();
-                    renderSeccion(clave);
+                    renderStats();
+                    renderTodasLasSecciones();
+                    actualizarTurnoPanelDOM();
                 });
             });
 
@@ -310,6 +409,8 @@ if (!record) {
     }
 
     function abrirModalHp() {
+        document.getElementById('hp-input-danio').value = '0';
+        document.getElementById('hp-input-cura').value = '0';
         actualizarHpModalDOM();
         hpModal.style.display = 'flex';
     }
@@ -333,6 +434,32 @@ if (!record) {
             actualizarHpModalDOM();
             renderStats();
         });
+    });
+
+    // Daño / Curación tipeados (además de los ±1/±5): se aplican de una con "Aplicar"
+    // o con Enter en cualquiera de los dos campos. Mismo patrón que combate.html.
+    var hpInputDanio = document.getElementById('hp-input-danio');
+    var hpInputCura = document.getElementById('hp-input-cura');
+
+    function aplicarHpInputs() {
+        var danio = Math.max(0, parseInt(hpInputDanio.value) || 0);
+        var cura = Math.max(0, parseInt(hpInputCura.value) || 0);
+        if (danio === 0 && cura === 0) return;
+        record.vidaActual = Math.max(0, Math.min(record.vidaMaxima, (record.vidaActual || 0) - danio + cura));
+        guardarRecord();
+        hpInputDanio.value = '0';
+        hpInputCura.value = '0';
+        actualizarHpModalDOM();
+        renderStats();
+    }
+
+    document.getElementById('hp-aplicar-btn').addEventListener('click', aplicarHpInputs);
+    [hpInputDanio, hpInputCura].forEach(function (inp) {
+        inp.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); aplicarHpInputs(); }
+        });
+        // Al enfocar se selecciona el 0 para poder tipear directo encima.
+        inp.addEventListener('focus', function () { inp.select(); });
     });
 
     // ===== Modal de CA (con "restaurar original", igual a combate.js) =====
@@ -397,12 +524,10 @@ if (!record) {
             if (!campoValorActual) return;
             var delta = parseInt(btn.dataset.valorAmount);
 
-            if (campoValorActual === 'accionesPorTurno') {
-                var maxViejo = record.accionesPorTurno;
-                var estabaAlMax = record.turnoActual.accion >= maxViejo;
-                var nuevoMax = Math.max(1, maxViejo + delta);
-                record.accionesPorTurno = nuevoMax;
-                record.turnoActual.accion = estabaAlMax ? nuevoMax : Math.min(record.turnoActual.accion, nuevoMax);
+            if (campoValorActual === 'accionesPorTurnoBase') {
+                record.accionesPorTurnoBase = Math.max(1, (parseInt(record.accionesPorTurnoBase) || 1) + delta);
+                EnemigosComun.sincronizarAcciones(record);
+                renderTodasLasSecciones();
             } else {
                 var actual = parseInt(record[campoValorActual]) || 0;
                 var nuevo = actual + delta;
@@ -488,6 +613,7 @@ if (!record) {
         actualizarLegendariasModalDOM();
         renderStats();
         actualizarTurnoPanelDOM();
+        renderTodasLasSecciones();
     });
 
     Array.prototype.forEach.call(legendariasModal.querySelectorAll('[data-leg-amount]'), function (btn) {
@@ -502,6 +628,7 @@ if (!record) {
             actualizarLegendariasModalDOM();
             renderStats();
             actualizarTurnoPanelDOM();
+            renderTodasLasSecciones();
         });
     });
 
@@ -530,6 +657,12 @@ if (!record) {
     var entradaConsumo = document.getElementById('entrada-consumo');
     var entradaDesc = document.getElementById('entrada-desc');
     var entradaEfecto = document.getElementById('entrada-efecto');
+    var bloqueMultiataque = document.getElementById('bloque-multiataque');
+    var entradaMultiCheck = document.getElementById('entrada-multi-check');
+    var entradaMultiCantCont = document.getElementById('entrada-multi-cant-cont');
+    var entradaMultiCant = document.getElementById('entrada-multi-cant');
+    var bloqueUsos = document.getElementById('bloque-usos');
+    var entradaUsos = document.getElementById('entrada-usos');
 
     var editando = null; // { seccion, idx } mientras se edita una entrada existente, null si es "Agregar"
 
@@ -537,17 +670,32 @@ if (!record) {
         bloqueDanoExtra.style.display = entradaMasDanoCheck.checked ? 'block' : 'none';
     });
 
+    // Muestra/oculta los bloques que dependen del Tipo y de si es Multiataque:
+    // - Multiataque: solo en Acción o Habilidad/Pasiva.
+    // - Consumo: solo Acción / Acción Legendaria, y no si es Multiataque.
+    // - Usos por turno: cualquier tipo que gaste un pool (no Habilidades), y no si es Multiataque.
     function actualizarBloqueConsumo() {
         var tipo = entradaTipo.value;
-        if (CATEGORIAS_CON_CONSUMO[tipo]) {
+        var permiteMulti = (tipo === 'acciones' || tipo === 'habilidades');
+        bloqueMultiataque.style.display = permiteMulti ? 'block' : 'none';
+        var esMulti = permiteMulti && entradaMultiCheck.checked;
+        entradaMultiCantCont.style.display = esMulti ? 'block' : 'none';
+
+        if (CATEGORIAS_CON_CONSUMO[tipo] && !esMulti) {
             bloqueConsumo.style.display = 'block';
             entradaConsumoLabel.textContent = 'Consume cuántas ' + CATEGORIAS_CON_CONSUMO[tipo];
         } else {
             bloqueConsumo.style.display = 'none';
         }
+
+        bloqueUsos.style.display = (MAPA_POOL_POR_SECCION[tipo] && !esMulti) ? 'block' : 'none';
     }
 
     entradaTipo.addEventListener('change', actualizarBloqueConsumo);
+    entradaMultiCheck.addEventListener('change', function () {
+        if (entradaMultiCheck.checked && !(parseInt(entradaMultiCant.value) >= 2)) entradaMultiCant.value = 2;
+        actualizarBloqueConsumo();
+    });
 
     function resetFormularioEntrada() {
         formEntrada.reset();
@@ -556,6 +704,9 @@ if (!record) {
         entradaDano2Cant.value = 0;
         entradaDano2Extra.value = 0;
         entradaConsumo.value = 1;
+        entradaUsos.value = '';
+        entradaMultiCheck.checked = false;
+        entradaMultiCant.value = 2;
         bloqueDanoExtra.style.display = 'none';
         actualizarBloqueConsumo();
     }
@@ -604,6 +755,9 @@ if (!record) {
         }
 
         entradaConsumo.value = normalizarConsumo(item);
+        entradaUsos.value = item.usosPorTurno ? item.usosPorTurno : '';
+        entradaMultiCheck.checked = esMultiataque(item);
+        entradaMultiCant.value = esMultiataque(item) ? item.multiataque : 2;
         actualizarBloqueConsumo();
 
         entradaDesc.value = item.desc || '';
@@ -642,27 +796,50 @@ if (!record) {
             });
         }
 
+        var permiteMulti = (seccion === 'acciones' || seccion === 'habilidades');
+        var esMulti = permiteMulti && entradaMultiCheck.checked;
+        var usos = parseInt(entradaUsos.value);
+        usos = (!esMulti && MAPA_POOL_POR_SECCION[seccion] && usos > 0) ? usos : null;
+
+        var anterior = editando ? (record[editando.seccion] || [])[editando.idx] : null;
+        var usosRestantes = null;
+        if (usos) {
+            // Si ya tenía el mismo límite, se conservan los usos ya gastados este turno;
+            // si el límite cambió (o es nuevo), arranca lleno.
+            usosRestantes = (anterior && anterior.usosPorTurno === usos && anterior.usosRestantes !== null && anterior.usosRestantes !== undefined)
+                ? Math.min(anterior.usosRestantes, usos)
+                : usos;
+        }
+
         var item = {
             nombre: nombre,
             bonoAtaque: entradaBonoAtaque.value !== '' ? (parseInt(entradaBonoAtaque.value) || 0) : null,
             alcance: entradaAlcance.value.trim(),
             danos: danos,
             consumo: Math.max(1, parseInt(entradaConsumo.value) || 1),
+            usosPorTurno: usos,
+            usosRestantes: usosRestantes,
+            // 0 explícito = "no es multiataque" (así no se vuelve a autodetectar por el nombre).
+            multiataque: esMulti ? Math.max(2, parseInt(entradaMultiCant.value) || 2) : 0,
             desc: entradaDesc.value.trim(),
             efectoAdicional: entradaEfecto.value.trim()
         };
 
-        if (editando) {
+        if (editando && editando.seccion === seccion) {
+            // Misma categoría: se reemplaza en su lugar (no se manda al final de la lista).
+            record[seccion][editando.idx] = item;
+        } else if (editando) {
             record[editando.seccion].splice(editando.idx, 1);
             record[seccion].push(item);
-            guardarRecord();
-            renderSeccion(editando.seccion);
-            if (seccion !== editando.seccion) renderSeccion(seccion);
         } else {
             record[seccion].push(item);
-            guardarRecord();
-            renderSeccion(seccion);
         }
+
+        EnemigosComun.sincronizarAcciones(record);
+        guardarRecord();
+        renderStats();
+        renderTodasLasSecciones();
+        actualizarTurnoPanelDOM();
 
         editando = null;
         entradaModal.style.display = 'none';
@@ -700,10 +877,21 @@ if (!record) {
                 btn.type = 'button';
                 btn.className = 'skill-btn';
                 var primerDano = formatoDano(normalizarDanos(item)[0]);
+                var disp = calcularDisponibilidad(item, seccionClave);
+                var badgeDisp = '';
+                if (esMultiataque(item)) {
+                    badgeDisp = '<span class="skill-mod badge-usos">×' + item.multiataque + '</span>';
+                } else if (disp) {
+                    badgeDisp = '<span class="skill-mod badge-usos' + claseEstadoDisp(disp) + '">' + disp.actual + '/' + disp.max + '</span>';
+                }
+                if (disp && !disp.puede) btn.classList.add('fila-agotada');
                 btn.innerHTML =
                     '<span class="fila-lista-btn">' +
                     '<strong>' + escapeHTML(item.nombre) + '</strong>' +
+                    '<span class="fila-lista-badges">' +
                     (primerDano ? '<span class="skill-mod" style="background-color:#6a1b9a;color:white;">' + escapeHTML(primerDano) + '</span>' : '') +
+                    badgeDisp +
+                    '</span>' +
                     '</span>';
                 btn.addEventListener('click', function () {
                     listaModal.style.display = 'none';
@@ -745,11 +933,22 @@ if (!record) {
 
         // "Usar" solo tiene sentido si esta categoría gasta un pool del menú de turno
         // (Habilidades/Pasivas son a voluntad, no consumen nada).
-        if (MAPA_POOL_POR_SECCION[seccionClave]) {
+        // El Multiataque tampoco se "usa": es lo que define cuántas Acciones hay por turno.
+        var disp = calcularDisponibilidad(item, seccionClave);
+        if (disp) {
             detalleUsarBtn.style.display = 'block';
             detalleModalAcciones.classList.remove('una-columna');
+            detalleUsarBtn.disabled = !disp.puede;
+            if (disp.puede) {
+                detalleUsarBtn.textContent = 'Usar';
+            } else if (disp.limitado && disp.actual <= 0) {
+                detalleUsarBtn.textContent = 'Sin usos este turno';
+            } else {
+                detalleUsarBtn.textContent = 'Sin ' + TITULO_POOL[disp.poolKey] + ' suficientes';
+            }
         } else {
             detalleUsarBtn.style.display = 'none';
+            detalleUsarBtn.disabled = false;
             detalleModalAcciones.classList.add('una-columna');
         }
 
@@ -760,16 +959,14 @@ if (!record) {
         if (!detalleContexto) return;
         var seccionClave = detalleContexto.seccionClave;
         var idx = detalleContexto.idx;
-        var poolKey = MAPA_POOL_POR_SECCION[seccionClave];
-        if (poolKey) {
-            var item = (record[seccionClave] || [])[idx];
-            if (item) {
-                var costo = CATEGORIAS_CON_CONSUMO[seccionClave] ? normalizarConsumo(item) : 1;
-                record.turnoActual[poolKey] = Math.max(0, (record.turnoActual[poolKey] || 0) - costo);
-                guardarRecord();
-                actualizarTurnoPanelDOM();
-            }
-        }
+        var item = (record[seccionClave] || [])[idx];
+        var disp = item ? calcularDisponibilidad(item, seccionClave) : null;
+        if (!disp || !disp.puede) return; // no alcanza: no se gasta nada
+        record.turnoActual[disp.poolKey] = Math.max(0, (record.turnoActual[disp.poolKey] || 0) - disp.costo);
+        if (disp.limitado) item.usosRestantes = Math.max(0, disp.actual - 1);
+        guardarRecord();
+        actualizarTurnoPanelDOM();
+        renderTodasLasSecciones();
         detalleModal.style.display = 'none';
     });
 
@@ -820,7 +1017,9 @@ if (!record) {
             var el = document.getElementById(id2);
             if (!el) return;
             el.textContent = actual + ' / ' + max;
+            // Verde = lleno (n/n), amarillo = usado en parte, rojo = agotado.
             el.classList.toggle('agotado', actual <= 0);
+            el.classList.toggle('parcial', actual > 0 && actual < max);
         }
         pintar('turno-valor-accion', record.turnoActual.accion, record.accionesPorTurno);
         pintar('turno-valor-bonus', record.turnoActual.bonus, 1);
@@ -874,8 +1073,10 @@ if (!record) {
             reaccion: 1,
             legendaria: record.legendariasPorRonda
         };
+        EnemigosComun.reponerUsos(record);
         guardarRecord();
         actualizarTurnoPanelDOM();
+        renderTodasLasSecciones();
         turnoPanel.style.display = 'none';
     });
 

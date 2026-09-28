@@ -112,6 +112,47 @@
             padding-top: 10px;
         }
 
+        .bloque-separado {
+            border-top: 1px dashed var(--border-color);
+            margin-top: 14px;
+            padding-top: 10px;
+        }
+
+        .hp-inputs-bloque {
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Badge de usos/disponibles por turno (verde = se puede usar, rojo = agotado) */
+        .skill-mod.badge-usos {
+            background-color: var(--verde-fill);
+            color: white;
+        }
+        .skill-mod.badge-usos.agotado { background-color: var(--rojo-fill); }
+        .skill-mod.badge-usos.parcial { background-color: var(--amarillo-fill); color: #3e2723; }
+
+        .fila-lista-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .fila-lista-badges .skill-mod {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        #lista-modal-contenido .skill-btn { width: 100%; margin-bottom: 8px; }
+        #lista-modal-contenido .skill-btn.fila-agotada { opacity: 0.55; }
+
+        #detalle-usar-btn:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
         #bloque-consumo {
             border-top: 1px dashed var(--border-color);
             margin-top: 14px;
@@ -305,6 +346,7 @@
             background-color: var(--verde-fill); color: white;
         }
         .turno-valor.agotado { background-color: var(--rojo-fill); }
+        .turno-valor.parcial { background-color: var(--amarillo-fill); color: #3e2723; }
         #turno-reset { width: 100%; padding: 10px; font-weight: bold; }
     </style>
 </head>
@@ -431,7 +473,7 @@
 
     <!-- ===== Modal de Vida ===== -->
     <div id="hp-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content form-modal">
             <span class="close-btn" data-close="hp-modal">&times;</span>
             <h3 id="hp-modal-title" style="color: var(--accent-color); margin-top: 0; text-align: center;">Vida</h3>
             <div id="hp-display" style="text-align: center; font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--accent-color);"></div>
@@ -445,6 +487,21 @@
                 <button class="hp-btn hp-heal" data-amount="5">+5 HP</button>
                 <button class="hp-btn hp-damage" data-max-amount="-1">-1 Vida Máx.</button>
                 <button class="hp-btn hp-heal" data-max-amount="1">+1 Vida Máx.</button>
+            </div>
+
+            <!-- Daño / Curación tipeados: se aplican de una (botón o Enter). -->
+            <div class="hp-inputs-bloque">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div>
+                        <label for="hp-input-danio" style="color: #c62828; margin-top: 0;">Daño</label>
+                        <input type="number" id="hp-input-danio" min="0" value="0" inputmode="numeric">
+                    </div>
+                    <div>
+                        <label for="hp-input-cura" style="color: #2e7d32; margin-top: 0;">Curación</label>
+                        <input type="number" id="hp-input-cura" min="0" value="0" inputmode="numeric">
+                    </div>
+                </div>
+                <button type="button" id="hp-aplicar-btn" class="hp-btn" style="width: 100%; margin-top: 10px; background-color: var(--accent-color); color: white;">Aplicar</button>
             </div>
         </div>
     </div>
@@ -667,9 +724,25 @@
                     </select>
                 </div>
 
+                <div id="bloque-multiataque" class="bloque-separado" style="display: none;">
+                    <label class="check-mas-dano" style="margin-top: 0;">
+                        <input type="checkbox" id="entrada-multi-check">
+                        Es el Multiataque (define cuántas Acciones tiene por turno)
+                    </label>
+                    <div id="entrada-multi-cant-cont" style="display: none;">
+                        <label for="entrada-multi-cant">Cantidad de ataques por turno</label>
+                        <input type="number" id="entrada-multi-cant" min="2" value="2">
+                    </div>
+                </div>
+
                 <div id="bloque-consumo" style="display: none;">
                     <label for="entrada-consumo" id="entrada-consumo-label">Consume cuántas Acciones</label>
                     <input type="number" id="entrada-consumo" min="1" value="1">
+                </div>
+
+                <div id="bloque-usos" class="bloque-separado" style="display: none;">
+                    <label for="entrada-usos">Usos máximos por turno (vacío = sin límite propio)</label>
+                    <input type="number" id="entrada-usos" min="1" placeholder="ej: 1 para la Cola, 2 para el Mordisco">
                 </div>
 
                 <label for="entrada-desc">Descripción</label>
@@ -722,6 +795,7 @@
         </div>
     </div>
 
+    <script src="enemigos-comun.js"></script>
     <script src="enemigo.js"></script>
 </body>
 </html>

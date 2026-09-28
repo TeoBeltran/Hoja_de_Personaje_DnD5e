@@ -5,7 +5,7 @@
 // salvaciones y proficiencia sean siempre consistentes.
 // ==========================================================
 
-import { ICONOS_PERSONAJE } from "./Scripts/Datos/Constantes.js";
+import { ICONOS_PERSONAJE, rutaJsonPersonaje } from "./Scripts/Datos/Constantes.js";
 import {
     calcularProficiencia,
     formatMod,
@@ -15,9 +15,19 @@ import {
     generarSalvaciones
 } from "./Scripts/Core/Estadisticas.js";
 
-// Personajes "ya creados" que se pueden sumar a un combate.
-// Para agregar uno nuevo: sumarlo acá con su id (nombre del .json en /personajes).
-const PERSONAJES_DISPONIBLES = [
+// Personajes "ya creados" que se pueden sumar a un combate, agrupados por la CARPETA donde
+// vive su .json dentro de /personajes (una entrada por subcarpeta). Para agregar uno nuevo:
+// sumarlo en su carpeta con su id = el mismo que va en ?p= de personaje.html
+// (los de personajes_1 sin carpeta, ej. 'gangstur'; los de gabi_DM con carpeta, ej. 'gabi_DM/teo').
+// La ruta real del .json la arma rutaJsonPersonaje() de Constantes.js.
+// En "➕ Personaje existente" hay una tilde por carpeta: se listan los personajes de las tildadas.
+const GRUPOS_PERSONAJES = [
+    {
+        key: 'personajes',
+        carpeta: 'personajes_1',
+        titulo: 'Personajes',
+        icono: '🗺️',
+        personajes: [
     { id: 'gangstur', nombre: 'Gangstur' },
     { id: 'leonidas', nombre: 'Leonidas' },
     { id: 'lothar', nombre: 'Lothar' },
@@ -31,7 +41,30 @@ const PERSONAJES_DISPONIBLES = [
     { id: 'aldren', nombre: 'Aldren' },
     { id: 'kael', nombre: 'Kael' },
     { id: 'varis', nombre: 'Varis' }
+        ]
+    },
+    {
+        key: 'gabi_DM',
+        carpeta: 'gabi_DM',
+        titulo: 'Gabi DM',
+        icono: '🎭',
+        personajes: [
+            { id: 'gabi_DM/sele', nombre: 'Sele' },
+            { id: 'gabi_DM/nahue', nombre: 'Nahue' },
+            { id: 'gabi_DM/angie', nombre: 'Angie' },
+            { id: 'gabi_DM/milu', nombre: 'Milu' },
+            { id: 'gabi_DM/teo', nombre: 'Teo' },
+            { id: 'gabi_DM/santi', nombre: 'Santi' }
+        ]
+    }
 ];
+
+// Lista plana de TODOS (para buscar el nombre de respaldo por id).
+const PERSONAJES_DISPONIBLES = GRUPOS_PERSONAJES.flatMap(g => g.personajes.map(pj => ({ ...pj, grupo: g.key })));
+
+function buscarGrupo(key) {
+    return GRUPOS_PERSONAJES.find(g => g.key === key) || GRUPOS_PERSONAJES[0];
+}
 
 const COMBATE_KEY = 'combate_participantes';
 const TURNO_KEY = 'combate_turno';
@@ -681,11 +714,11 @@ async function asegurarDataCargada() {
     await Promise.all(ids.map(async id => {
         if (dataCache[id]) return;
         try {
-            const resp = await fetch(`personajes/${id}.json`);
+            const resp = await fetch(rutaJsonPersonaje(id));
             dataCache[id] = await resp.json();
-            console.log(`[combate] cargado personajes/${id}.json OK`);
+            console.log(`[combate] cargado ${rutaJsonPersonaje(id)} OK`);
         } catch (e) {
-            console.error(`[combate] NO se pudo cargar personajes/${id}.json`, e);
+            console.error(`[combate] NO se pudo cargar ${rutaJsonPersonaje(id)}`, e);
         }
     }));
 }
@@ -694,15 +727,15 @@ async function asegurarDataCargada() {
 
 async function agregarPersonajesJson(ids) {
     for (const id of ids) {
-        const meta = PERSONAJES_DISPONIBLES.find(p => p.id === id);
+        const meta = PERSONAJES_DISPONIBLES.find(p => p.id === id) || { nombre: id };
         let data = dataCache[id];
         if (!data) {
             try {
-                const resp = await fetch(`personajes/${id}.json`);
+                const resp = await fetch(rutaJsonPersonaje(id));
                 data = await resp.json();
                 dataCache[id] = data;
             } catch (e) {
-                mostrarAviso(`No pude cargar personajes/${id}.json`);
+                mostrarAviso(`No pude cargar ${rutaJsonPersonaje(id)}`);
                 continue;
             }
         }
@@ -795,6 +828,7 @@ function marcarDescansoPendiente(personajeId, tipo) {
     localStorage.setItem(`pj_${personajeId}_descansoPendiente`, tipo);
 }
 
+// Se aplica a TODOS los personajes de todas las carpetas (personajes_1 y gabi_DM).
 async function tomarDescansoGlobal(tipo) {
     await asegurarDataCargada();
 
@@ -818,9 +852,8 @@ async function tomarDescansoGlobal(tipo) {
     guardarCombate();
     render();
 
-    const cuantos = PERSONAJES_DISPONIBLES.length;
     mostrarAviso(
-        `Descanso ${tipo} aplicado a los ${cuantos} personajes de la campaña, estén o no en este combate. `
+        `Descanso ${tipo} aplicado a todos los personajes, estén o no en este combate. `
         + `Ranuras, usos de habilidad y Hit Dice de cada uno se van a ver actualizados la próxima vez que abran su ficha.`
     );
 }
@@ -1492,19 +1525,79 @@ function renderModalDetalle() {
 
 // ================== Modal: agregar personaje existente ==================
 
-function abrirModalAgregarPersonaje() {
-    const yaAgregados = new Set(participantes.filter(p => p.origen === 'json').map(p => p.personajeId));
-    const cont = document.getElementById('lista-checks-personajes');
+// Arriba del modal hay una tilde por carpeta (personajes_1 / gabi_DM): la lista de abajo
+// muestra solo los personajes de las carpetas tildadas. Qué carpetas quedaron tildadas se
+// recuerda para la próxima vez (por default, solo personajes_1).
+const CARPETAS_ELEGIDAS_KEY = 'combate_carpetas_elegidas';
+
+function leerCarpetasElegidas() {
+    try {
+        const guardado = JSON.parse(localStorage.getItem(CARPETAS_ELEGIDAS_KEY));
+        if (Array.isArray(guardado)) return new Set(guardado);
+    } catch (e) { /* valor corrupto: se usa el default */ }
+    return new Set([GRUPOS_PERSONAJES[0].key]);
+}
+
+function guardarCarpetasElegidas(set) {
+    localStorage.setItem(CARPETAS_ELEGIDAS_KEY, JSON.stringify([...set]));
+}
+
+function renderTildesCarpetas() {
+    const elegidas = leerCarpetasElegidas();
+    const cont = document.getElementById('checks-carpetas');
     cont.innerHTML = '';
-    PERSONAJES_DISPONIBLES.forEach(pj => {
+    GRUPOS_PERSONAJES.forEach(g => {
         const label = document.createElement('label');
-        const disabled = yaAgregados.has(pj.id);
+        label.className = 'check-carpeta';
         label.innerHTML = `
-            <input type="checkbox" value="${pj.id}" ${disabled ? 'disabled' : ''}>
-            ${ICONOS_PERSONAJE[pj.id] || '🎲'} ${pj.nombre}${disabled ? ' (ya está en el combate)' : ''}
+            <input type="checkbox" value="${g.key}" ${elegidas.has(g.key) ? 'checked' : ''}>
+            ${g.icono} ${g.titulo} <span class="check-carpeta-ruta">(${g.carpeta})</span>
         `;
+        label.querySelector('input').addEventListener('change', () => {
+            const nuevas = new Set([...cont.querySelectorAll('input:checked')].map(i => i.value));
+            guardarCarpetasElegidas(nuevas);
+            renderListaPersonajesParaAgregar();
+        });
         cont.appendChild(label);
     });
+}
+
+function renderListaPersonajesParaAgregar() {
+    const elegidas = leerCarpetasElegidas();
+    const yaAgregados = new Set(participantes.filter(p => p.origen === 'json').map(p => p.personajeId));
+    const cont = document.getElementById('lista-checks-personajes');
+    // Se conservan los personajes que ya estaban tildados al cambiar las carpetas.
+    const tildados = new Set([...cont.querySelectorAll('input:checked')].map(i => i.value));
+    cont.innerHTML = '';
+
+    const grupos = GRUPOS_PERSONAJES.filter(g => elegidas.has(g.key));
+    if (!grupos.length) {
+        cont.innerHTML = `<div class="sin-datos">Tildá al menos una carpeta para ver sus personajes.</div>`;
+        return;
+    }
+    grupos.forEach(g => {
+        if (grupos.length > 1) {
+            const titulo = document.createElement('div');
+            titulo.className = 'lista-checks-titulo';
+            titulo.textContent = `${g.icono} ${g.titulo}`;
+            cont.appendChild(titulo);
+        }
+        g.personajes.forEach(pj => {
+            const label = document.createElement('label');
+            const disabled = yaAgregados.has(pj.id);
+            label.innerHTML = `
+                <input type="checkbox" value="${pj.id}" ${disabled ? 'disabled' : ''} ${!disabled && tildados.has(pj.id) ? 'checked' : ''}>
+                ${ICONOS_PERSONAJE[pj.id] || '🎲'} ${pj.nombre}${disabled ? ' (ya está en el combate)' : ''}
+            `;
+            cont.appendChild(label);
+        });
+    });
+}
+
+function abrirModalAgregarPersonaje() {
+    document.getElementById('lista-checks-personajes').innerHTML = '';
+    renderTildesCarpetas();
+    renderListaPersonajesParaAgregar();
     document.getElementById('modal-agregar-personaje').style.display = 'flex';
 }
 
@@ -1558,13 +1651,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-descanso-corto-todos').addEventListener('click', () => {
         abrirConfirmar(
-            `¿Aplicar un descanso CORTO a los ${PERSONAJES_DISPONIBLES.length} personajes de la campaña (estén o no en este combate)?`,
+            '¿Aplicar un descanso CORTO a todos los personajes (estén o no en este combate)?',
             () => tomarDescansoGlobal('corto')
         );
     });
     document.getElementById('btn-descanso-largo-todos').addEventListener('click', () => {
         abrirConfirmar(
-            `¿Aplicar un descanso LARGO a los ${PERSONAJES_DISPONIBLES.length} personajes de la campaña (estén o no en este combate)? Se restaura su vida, Hit Dice, ranuras y habilidades.`,
+            '¿Aplicar un descanso LARGO a todos los personajes (estén o no en este combate)? Se restaura su vida, Hit Dice, ranuras y habilidades.',
             () => tomarDescansoGlobal('largo')
         );
     });

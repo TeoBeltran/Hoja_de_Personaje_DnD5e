@@ -159,7 +159,7 @@
     },
     {
       "nombre": "Danger Sense",
-      "desc": "Tenés Ventaja en las tiradas de salvación de Destreza, salvo que estés Incapacitado."
+      "desc": "Ventaja en tiradas de salvación de DEX contra efectos que puedas ver."
     },
     {
       "nombre": "Reckless Attack",
@@ -171,20 +171,16 @@
       }
     },
     {
-      "nombre": "Primal Knowledge",
-      "desc": "Obtenés competencia en otra habilidad a tu elección de la lista de habilidades del Bárbaro.\nMientras tu Furia está activa, cuando hacés una prueba de Acrobacias, Intimidación, Percepción, Sigilo o Supervivencia, podés hacerla como prueba de Fuerza aunque normalmente use otra característica."
+      "nombre": "Spirit Seeker",
+      "desc": "A nivel 3, al adoptar este camino, obtenés la capacidad de lanzar los hechizos Beast Sense y Speak with Animals, pero solo como rituales."
     },
     {
-      "nombre": "Path of the Wild Heart",
-      "desc": "Seguís un camino de afinidad con el mundo natural y sus bestias, que se manifiesta en tu Furia."
+      "nombre": "Totem Spirit",
+      "desc": "A nivel 3, al adoptar este camino, elegís un espíritu tótem y obtenés su rasgo.\nTenés que fabricar o conseguir un objeto tótem físico, un amuleto o adorno similar, que incorpore pelaje o plumas, garras, dientes o huesos del animal tótem.\nA tu elección, también obtenés rasgos físicos menores que recuerden a tu espíritu tótem.\nPor ejemplo, si tenés un espíritu tótem de oso, podrías ser inusualmente peludo y de piel gruesa; si tu tótem es el águila, tus ojos se vuelven de un amarillo brillante.\n\nTu animal tótem puede ser un animal relacionado con los listados pero más apropiado a tu tierra natal.\nPor ejemplo, podrías elegir un halcón o un buitre en lugar de un águila."
     },
     {
-      "nombre": "Animal Speaker",
-      "desc": "Podés lanzar los hechizos Beast Sense y Speak with Animals, pero solo como rituales.\nSabiduría es tu característica para lanzarlos."
-    },
-    {
-      "nombre": "Rage of the Wilds",
-      "desc": "Cada vez que activás tu Furia, elegís una de estas opciones, que dura mientras la Furia esté activa:\nOso: tenés Resistencia a todos los tipos de daño excepto Fuerza, Necrótico, Psíquico y Radiante.\nÁguila: al activar la Furia, podés hacer las acciones de Correr (Dash) y Destrabarte (Disengage) como parte de esa misma Acción Bonus. Mientras la Furia esté activa, podés usar una Acción Bonus para hacer ambas acciones.\nLobo: tus aliados tienen Ventaja en las tiradas de ataque contra cualquier enemigo tuyo que esté a 5 ft de vos."
+      "nombre": "Bear",
+      "desc": "Mientras estás en furia, tenés resistencia a todo el daño excepto el psíquico.\nEl espíritu del oso te vuelve lo bastante duro para aguantar cualquier castigo."
     },
     {
       "nombre": "Mountain Born",
@@ -200,7 +196,7 @@
     },
     {
       "nombre": "Weapon Mastery",
-      "desc": "Podés usar las propiedades de maestría de dos tipos de armas cuerpo a cuerpo simples o marciales a tu elección, como Greataxe y Handaxe.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
+      "desc": "Cuando atacás con un arma con la que tenés maestría, además de su daño normal podés aplicar la propiedad de maestría de esa arma."
     }
   ],
   "habilidadesUso": [
@@ -245,14 +241,14 @@
       ]
     },
     {
-      "nombre": "Animal Speaker: Speak with Animals",
+      "nombre": "Spirit Seeker: Speak with Animals",
       "accion": "Ritual (10 min)",
       "distancia": "Propio",
       "duracion": "10 minutos",
       "desc": "Podés entender y comunicarte verbalmente con bestias. Se lanza solo como ritual, sin gastar ranura de hechizo."
     },
     {
-      "nombre": "Animal Speaker: Beast Sense",
+      "nombre": "Spirit Seeker: Beast Sense",
       "accion": "Ritual (10 min)",
       "distancia": "Toque",
       "duracion": "Concentración, hasta 1 hora",

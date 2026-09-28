@@ -1,4 +1,5 @@
 import {
+    rutaJsonPersonaje,
     ICONOS_PERSONAJE,
     PROFICIENCIAS_POR_CLASE,
     NOMBRES_STATS,
@@ -2062,7 +2063,8 @@ async function init() {
     modalActions = document.getElementById('modal-actions');
     useSpellBtn = document.getElementById('use-spell-btn');
 
-    const response = await fetch(`personajes/${personajeId}.json`);
+    // personajes/personajes_1/<id>.json o personajes/gabi_DM/<nombre>.json (ver Constantes.js)
+    const response = await fetch(rutaJsonPersonaje(personajeId));
     const data = await response.json();
 
     data.personaje.improvements = data.improvements;
