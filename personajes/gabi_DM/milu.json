@@ -153,7 +153,7 @@
     "habilidades": [
       {
         "nombre": "Military Rank",
-        "desc": "Tenés un rango militar de tu antiguo cuerpo o unidad. Los soldados leales a esa organización todavía reconocen tu autoridad e influencia: podés usar tu rango para influir en soldados de menor graduación, y podés invocar tu antigua organización para conseguir equipo simple o caballos de forma temporal."
+        "desc": "Tenés un rango militar de tu antiguo cuerpo o unidad.\nLos soldados leales a esa organización todavía reconocen tu autoridad e influencia: podés usar tu rango para influir en soldados de menor graduación, y podés invocar tu antigua organización para conseguir equipo simple o caballos de forma temporal."
       }
     ]
   },
@@ -180,15 +180,15 @@
     },
     {
       "nombre": "Guardianes de las Profundidades",
-      "desc": "Adaptado incluso a las profundidades oceánicas más extremas. Tenés resistencia al daño frío e ignorás las desventajas de estar en un entorno submarino extremo."
+      "desc": "Adaptado incluso a las profundidades oceánicas más extremas.\nTenés resistencia al daño frío e ignorás las desventajas de estar en un entorno submarino extremo."
     },
     {
       "nombre": "Emisario del Mar",
-      "desc": "Las bestias acuáticas tienen una afinidad extraordinaria con tu pueblo. Podés comunicar ideas simples con bestias que puedan respirar agua: entienden el significado de tus palabras, aunque no tenés forma de entenderlas a ellas."
+      "desc": "Las bestias acuáticas tienen una afinidad extraordinaria con tu pueblo.\nPodés comunicar ideas simples con bestias que puedan respirar agua: entienden el significado de tus palabras, aunque no tenés forma de entenderlas a ellas."
     },
     {
       "nombre": "Controlar Aire y Agua",
-      "desc": "Podés lanzar fog cloud con este rasgo. Desde nivel 3 podés lanzar gust of wind con él, y desde nivel 5 también wall of water. Una vez que lanzás un hechizo con este rasgo, no podés volver a hacerlo hasta completar un descanso largo. Carisma es tu habilidad de conjuración para estos hechizos."
+      "desc": "Podés lanzar fog cloud con este rasgo.\nDesde nivel 3 podés lanzar gust of wind con él, y desde nivel 5 también wall of water.\nUna vez que lanzás un hechizo con este rasgo, no podés volver a hacerlo hasta completar un descanso largo.\nCarisma es tu habilidad de conjuración para estos hechizos."
     },
     {
       "nombre": "Idiomas",
@@ -199,6 +199,10 @@
       "desc": "Cure Wounds suma CHA al daño.",
       "bonoDano": "CHA",
       "aplicaA": "hechizo:Cure Wounds"
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Podés usar las propiedades de maestría de dos tipos de armas simples o marciales a tu elección.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
     }
   ],
   "habilidadesUso": [
@@ -228,7 +232,7 @@
         "3": "4d8",
         "4": "5d8"
       },
-      "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8). +1d8 si el objetivo es demonio o no-muerto."
+      "desc": "Al golpear con un arma melee, gastás un slot de hechizo para hacer daño radiante extra. 2d8 con slot Nivel 1, +1d8 por cada nivel superior (máx 5d8).\n+1d8 si el objetivo es demonio o no-muerto."
     },
     {
       "nombre": "Channel Divinity",
@@ -239,7 +243,7 @@
         "18": 3
       },
       "recupera": "corto",
-      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones que te da tu juramento."
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18).\nCada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones que te da tu juramento."
     }
   ],
   "equipo": [
@@ -273,7 +277,8 @@
       "valor": 1,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Lanza. 1d6 de daño perforante."
+      "desc": "Lanza. 1d6 de daño perforante.",
+      "maestriaArma": "Sap"
     },
     {
       "nombre": "Espada Larga (Longsword)",
@@ -285,7 +290,8 @@
       "valor": 15,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Espada larga. 1d8 de daño cortante."
+      "desc": "Espada larga. 1d8 de daño cortante.",
+      "maestriaArma": "Sap"
     }
   ],
   "hechizos": {
@@ -303,7 +309,7 @@
         "accion": "Acción",
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
-        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango.\nCada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
       },
       {
         "nivel": "NIVEL 1",
@@ -312,7 +318,12 @@
         "tipoDano": "curación",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "1d8"
+          }
+        }
       },
       {
         "nivel": "NIVEL 1",
@@ -328,7 +339,7 @@
         "accion": "Acción",
         "distancia": "120 ft",
         "duracion": "Concentración, 1 hora",
-        "desc": "Creás una esfera de niebla de 20 ft de radio centrada en un punto dentro del rango. El área queda fuertemente oscurecida. La niebla se dispersa con viento de velocidad moderada o mayor."
+        "desc": "Creás una esfera de niebla de 20 ft de radio centrada en un punto dentro del rango.\nEl área queda fuertemente oscurecida.\nLa niebla se dispersa con viento de velocidad moderada o mayor."
       },
       {
         "nivel": "NIVEL 1",
@@ -336,7 +347,7 @@
         "accion": "Acción",
         "distancia": "Propio (línea de 60 ft)",
         "duracion": "Concentración, 1 minuto",
-        "desc": "Un chorro de viento fuerte de 60 ft de largo y 10 ft de ancho sale de vos en la dirección que elijas mientras dure el hechizo. Cada criatura que empiece su turno en la línea debe superar una tirada de salvación de STR o ser empujada 15 ft en la dirección de la línea; moverse hacia vos dentro de la línea cuesta el doble de movimiento. El viento dispersa gases o vapores y apaga llamas desprotegidas (50% de probabilidad con llamas protegidas). Como acción bonus podés cambiar la dirección de la línea. Bajó a nivel 1 para poder usarlo."
+        "desc": "Un chorro de viento fuerte de 60 ft de largo y 10 ft de ancho sale de vos en la dirección que elijas mientras dure el hechizo.\nCada criatura que empiece su turno en la línea debe superar una tirada de salvación de STR o ser empujada 15 ft en la dirección de la línea; moverse hacia vos dentro de la línea cuesta el doble de movimiento.\nEl viento dispersa gases o vapores y apaga llamas desprotegidas (50% de probabilidad con llamas protegidas).\nComo acción bonus podés cambiar la dirección de la línea.\nBajó a nivel 1 para poder usarlo."
       }
     ]
   },

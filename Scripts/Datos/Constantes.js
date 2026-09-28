@@ -1,6 +1,11 @@
 // === Funciones del sistema de turno ===
 
-// Íconos por personaje (los mismos que en el menú principal)
+// Íconos por personaje. ÚNICA fuente de verdad del emoji de cada personaje: lo usa la ficha
+// (personaje.html, a los dos lados del nombre) y el submenú gabidm.html lo lee directo de acá
+// para que el ícono del menú y el de la ficha nunca queden distintos. La clave es el mismo id
+// que va en ?p= de la URL (incluida la subcarpeta, ej. 'gabi_DM/teo').
+// Si falta la clave, la ficha cae a '🎭' — por eso todo personaje nuevo tiene que tener su
+// entrada acá con el MISMO emoji que su card del menú.
 const ICONOS_PERSONAJE = {
     'gangstur': '🔮',
     'nika': '🛡️',
@@ -14,7 +19,14 @@ const ICONOS_PERSONAJE = {
     'cedric': '🎻',
     'aldren': '🔧',
     'kael': '🙏',
-    'varis': '🏹'
+    'varis': '🏹',
+    // Gabi DM (subcarpeta personajes/gabi_DM/)
+    'gabi_DM/sele': '🕊️',
+    'gabi_DM/nahue': '⚡',
+    'gabi_DM/angie': '🔪',
+    'gabi_DM/milu': '🔱',
+    'gabi_DM/teo': '🪓',
+    'gabi_DM/santi': '❓'
 };
 
 // === Sistema de stats y proficiencias ===

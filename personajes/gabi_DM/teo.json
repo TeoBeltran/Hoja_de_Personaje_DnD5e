@@ -147,8 +147,8 @@
     "nombre": "Pirate",
     "habilidades": [
       {
-        "nombre": "Ship's Passage",
-        "desc": "Podés conseguir pasaje gratuito en un barco a vela para vos y tus compañeros, a cambio de trabajo, mientras estés en el mar. Podés estar viajando en esa nave, o cruzarte con su capitán en algún puerto."
+        "nombre": "Bad Reputation",
+        "desc": "No importa adónde vayas, la gente te teme por tu reputación.\nCuando estás en un asentamiento civilizado, podés salirte con la tuya en delitos menores, como negarte a pagar la comida en una taberna o romper las puertas de un local, ya que la mayoría de la gente no va a denunciar tu actividad ante las autoridades."
       }
     ]
   },
@@ -156,22 +156,107 @@
     {
       "nombre": "Unarmored Defense",
       "desc": "Sin armadura: CA = 10 + DEX + CON. Podés usar escudo y mantener este beneficio."
+    },
+    {
+      "nombre": "Danger Sense",
+      "desc": "Tenés Ventaja en las tiradas de salvación de Destreza, salvo que estés Incapacitado."
+    },
+    {
+      "nombre": "Reckless Attack",
+      "desc": "Cuando hacés tu primera tirada de ataque en tu turno, podés decidir atacar de forma temeraria.\nSi lo hacés, tenés Ventaja en las tiradas de ataque que usen Fuerza hasta el inicio de tu próximo turno, pero las tiradas de ataque contra vos tienen Ventaja durante ese tiempo.",
+      "disparadores": {
+        "arma": {
+          "tipo": "melee"
+        }
+      }
+    },
+    {
+      "nombre": "Primal Knowledge",
+      "desc": "Obtenés competencia en otra habilidad a tu elección de la lista de habilidades del Bárbaro.\nMientras tu Furia está activa, cuando hacés una prueba de Acrobacias, Intimidación, Percepción, Sigilo o Supervivencia, podés hacerla como prueba de Fuerza aunque normalmente use otra característica."
+    },
+    {
+      "nombre": "Path of the Wild Heart",
+      "desc": "Seguís un camino de afinidad con el mundo natural y sus bestias, que se manifiesta en tu Furia."
+    },
+    {
+      "nombre": "Animal Speaker",
+      "desc": "Podés lanzar los hechizos Beast Sense y Speak with Animals, pero solo como rituales.\nSabiduría es tu característica para lanzarlos."
+    },
+    {
+      "nombre": "Rage of the Wilds",
+      "desc": "Cada vez que activás tu Furia, elegís una de estas opciones, que dura mientras la Furia esté activa:\nOso: tenés Resistencia a todos los tipos de daño excepto Fuerza, Necrótico, Psíquico y Radiante.\nÁguila: al activar la Furia, podés hacer las acciones de Correr (Dash) y Destrabarte (Disengage) como parte de esa misma Acción Bonus. Mientras la Furia esté activa, podés usar una Acción Bonus para hacer ambas acciones.\nLobo: tus aliados tienen Ventaja en las tiradas de ataque contra cualquier enemigo tuyo que esté a 5 ft de vos."
+    },
+    {
+      "nombre": "Mountain Born",
+      "desc": "Estás aclimatado a la gran altitud, incluidas elevaciones de más de 20.000 pies.\nTambién estás naturalmente adaptado a climas fríos."
+    },
+    {
+      "nombre": "Natural Athlete",
+      "desc": "Tenés proficiencia en la habilidad Atletismo."
+    },
+    {
+      "nombre": "Powerful Build",
+      "desc": "Contás como un tamaño más grande al determinar tu capacidad de carga y el peso que podés empujar, arrastrar o levantar."
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Podés usar las propiedades de maestría de dos tipos de armas cuerpo a cuerpo simples o marciales a tu elección, como Greataxe y Handaxe.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
     }
   ],
   "habilidadesUso": [
     {
-      "nombre": "Spirit Seeker: Speak with Animals",
+      "nombre": "Rage",
+      "usos": "3/3",
+      "recupera": "corto",
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "duracion": "Hasta 10 minutos",
+      "desc": "Podés entrar en Furia como Acción Bonus si no llevás armadura pesada.\nMientras estás en Furia: tenés resistencia al daño contundente, perforante y cortante; sumás +2 al daño de los ataques con arma o desarmados que usen Fuerza; tenés Ventaja en las pruebas y tiradas de salvación de Fuerza; y no podés lanzar hechizos ni mantener la concentración en ellos.\nLa Furia dura hasta el final de tu próximo turno y se extiende un turno más si, desde tu último turno, hiciste una tirada de ataque contra un enemigo, obligaste a un enemigo a hacer una tirada de salvación o usaste una Acción Bonus para prolongarla. Dura como máximo 10 minutos.\nTermina antes si te ponés armadura pesada o quedás Incapacitado.\nRecuperás 1 uso gastado al terminar un Descanso Corto y todos al terminar un Descanso Largo.",
+      "toggleBonoDano": {
+        "porNivel": {
+          "1": 2,
+          "9": 3,
+          "16": 4
+        },
+        "aplicaA": {
+          "tipo": "melee"
+        }
+      },
+      "disparadoresSiActivo": {
+        "arma": {
+          "tipo": "melee"
+        }
+      },
+      "recuperaCortoCantidad": 1
+    },
+    {
+      "nombre": "Stone's Endurance",
+      "usos": "1/1",
+      "recupera": "corto",
+      "accion": "Reacción",
+      "distancia": "Propio",
+      "desc": "Cuando recibís daño, podés usar tu reacción para tirar un d12.\nSumás tu modificador de Constitución al resultado y reducís el daño en ese total.",
+      "efectos": [
+        {
+          "tipo": "notificacionYAbreVida",
+          "descripcion": "Stone's Endurance",
+          "mensaje": "Tirá 1d12 + {CON} y reducí el daño recibido en ese total."
+        }
+      ]
+    },
+    {
+      "nombre": "Animal Speaker: Speak with Animals",
       "accion": "Ritual (10 min)",
       "distancia": "Propio",
       "duracion": "10 minutos",
       "desc": "Podés entender y comunicarte verbalmente con bestias. Se lanza solo como ritual, sin gastar ranura de hechizo."
     },
     {
-      "nombre": "Spirit Seeker: Beast Sense",
+      "nombre": "Animal Speaker: Beast Sense",
       "accion": "Ritual (10 min)",
       "distancia": "Toque",
       "duracion": "Concentración, hasta 1 hora",
-      "desc": "Tocás a una bestia dispuesta y percibís a través de sus sentidos mientras dure la concentración. Se lanza solo como ritual, sin gastar ranura de hechizo."
+      "desc": "Tocás a una bestia dispuesta y percibís a través de sus sentidos mientras dure la concentración.\nSe lanza solo como ritual, sin gastar ranura de hechizo."
     }
   ],
   "equipo": [
@@ -185,10 +270,11 @@
       "valor": 30,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Hacha grande a dos manos."
+      "desc": "Hacha grande a dos manos.",
+      "maestriaArma": "Cleave"
     },
     {
-      "nombre": "Hachuela (Handaxe)",
+      "nombre": "Hacha (Handaxe)",
       "dano": "1d6",
       "tipoDano": "cortante",
       "tipo": "melee",
@@ -197,7 +283,8 @@
       "valor": 5,
       "accion": "Acción",
       "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
-      "desc": "Arma liviana y arrojadiza."
+      "desc": "Arma cuerpo a cuerpo simple, liviana y arrojadiza.\nMelee: 1d6 cortante, alcance 5 ft. Arrojadiza: 1d6 cortante, alcance 20/60 ft.\nPropiedad de maestría: Hostigar (Vex).",
+      "maestriaArma": "Vex"
     },
     {
       "nombre": "Jabalina (Javelin)",
@@ -209,12 +296,31 @@
       "valor": 5,
       "accion": "Acción",
       "distancia": "Melee 5 ft / Arrojadiza 30/120 ft",
-      "desc": "Arma arrojadiza."
+      "desc": "Arma cuerpo a cuerpo simple y arrojadiza.\nMelee: 1d6 perforante, alcance 5 ft. Arrojadiza: 1d6 perforante, alcance 30/120 ft.\nPropiedad de maestría: Ralentizar (Slow)."
+    },
+    {
+      "nombre": "Cabilla de amarre (Belaying Pin / Club)",
+      "dano": "1d4",
+      "tipoDano": "contundente",
+      "tipo": "melee",
+      "manos": 1,
+      "peso": 2,
+      "valor": 0.1,
+      "accion": "Acción",
+      "distancia": "Melee 5 ft",
+      "desc": "Garrote. Arma liviana."
     }
   ],
   "hechizos": {
     "ranuras": [],
     "lista": []
   },
-  "inventario": []
+  "inventario": [
+    {
+      "nombre": "Amuleto de la suerte",
+      "peso": 0,
+      "cantidad": 1,
+      "desc": "Un amuleto de la suerte, como una pata de conejo o una piedrita con un agujero en el centro."
+    }
+  ]
 }

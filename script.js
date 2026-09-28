@@ -199,15 +199,44 @@ function guardarTogglesDuracion() {
 // Suma el daño extra de cualquier habilidad tipo "interruptor" (toggleBonoDano) que esté
 // activa (ej: Radiant Soul: +nivel de daño radiante mientras esté prendida). Devuelve una
 // lista de {nombre, valor} para mezclar con los demás bonos de daño de un arma.
-function bonoDanoDeTogglesActivos() {
+// Valor del bono de un toggle: fórmula matemática, notación de dado (ej: "1d6", se pasa tal
+// cual para mostrarse como "+1d6"), o escalones por nivel de personaje ("porNivel": {"1": 2,
+// "9": 3, "16": 4} — ej: el daño de Rage), tomando el umbral más alto <= nivel actual.
+function valorBonoToggle(h) {
+    const tb = h.toggleBonoDano || {};
+    if (tb.porNivel && typeof tb.porNivel === 'object') {
+        let valor = 0;
+        Object.keys(tb.porNivel).map(k => parseInt(k)).sort((a, b) => a - b).forEach(umbral => {
+            if (nivelPersonajeGlobal >= umbral) valor = tb.porNivel[String(umbral)];
+        });
+        return valor;
+    }
+    const formula = tb.formula;
+    const esDado = /^\d+d\d+$/i.test(String(formula).trim());
+    return esDado ? String(formula).trim() : evaluarFormula(formula, { nivelPersonaje: nivelPersonajeGlobal });
+}
+
+// ¿El item cumple la condición? Misma sintaxis que los disparadores: true, string (nombre
+// exacto), objeto {a:b} (todas las claves), o array de objetos/strings (alcanza con uno).
+function itemCumpleCondicion(cond, item) {
+    if (cond === undefined || cond === null) return true;
+    if (cond === true) return true;
+    if (!item) return false;
+    if (Array.isArray(cond)) return cond.some(c => itemCumpleCondicion(c, item));
+    if (typeof cond === 'string') return item.nombre === cond;
+    if (typeof cond === 'object') return Object.keys(cond).every(k => item[k] === cond[k]);
+    return false;
+}
+
+// Suma el daño extra de cualquier habilidad tipo "interruptor" (toggleBonoDano) que esté
+// activa (ej: Radiant Soul, Rage). Si el toggle declara "aplicaA" (ej: {tipo: "melee"}), solo
+// se suma a los items que cumplan esa condición. Devuelve una lista de {nombre, valor}.
+function bonoDanoDeTogglesActivos(item) {
     const detalles = [];
     (window._habilidadesUsoData || []).forEach(h => {
         if (h.toggleBonoDano && togglesActivos[h.nombre]) {
-            const formula = h.toggleBonoDano.formula;
-            // Si la fórmula es notación de dado (ej: "1d6"), no se evalúa como matemática:
-            // se pasa tal cual para mostrarse como "+1d6" en el badge de daño (violeta).
-            const esDado = /^\d+d\d+$/i.test(String(formula).trim());
-            const valor = esDado ? String(formula).trim() : evaluarFormula(formula, { nivelPersonaje: nivelPersonajeGlobal });
+            if (h.toggleBonoDano.aplicaA && !itemCumpleCondicion(h.toggleBonoDano.aplicaA, item)) return;
+            const valor = valorBonoToggle(h);
             if (valor) detalles.push({ nombre: h.nombre, valor });
         }
     });
@@ -301,15 +330,13 @@ const TIPOS_EFECTO_PASIVO_EQUIPO = ['CA', 'salvaciones', 'bonoAtaqueHechizo', 'b
 // - true            → aplica siempre que ese tipo de contexto esté activo
 // - string          → aplica solo si item.nombre coincide exactamente (ej: una habilidad puntual)
 // - objeto {a:b}    → aplica solo si item[a] === b para TODAS las claves (ej: {manos:2, tipo:'melee'})
+// - array [..]      → aplica si el item cumple AL MENOS UNA de las condiciones (ej: [{tipo:'finesse'},{tipo:'ranged'}])
 function rasgoAplicaAContexto(rasgo, tiposContexto, item) {
     if (!rasgo.disparadores) return false;
     return tiposContexto.some(tipo => {
         const cond = rasgo.disparadores[tipo];
         if (!cond) return false;
-        if (cond === true) return true;
-        if (typeof cond === 'string') return !!item && item.nombre === cond;
-        if (typeof cond === 'object') return !!item && Object.keys(cond).every(k => item[k] === cond[k]);
-        return false;
+        return itemCumpleCondicion(cond, item);
     });
 }
 
@@ -371,12 +398,13 @@ function procesarEfectos(item, contexto) {
     (window._habilidadesUsoData || []).forEach(hab => {
         const yaEstaba = () => listaEfectos.some(e => e.descripcion === hab.nombre);
         if (hab.disparadores && rasgoAplicaAContexto(hab, tiposContexto, item) && !yaEstaba()) {
-            listaEfectos.push({ tipo: 'notificacion', descripcion: hab.nombre, mensaje: hab.desc });
+            // "mensajeDisparo" (opcional): texto corto propio para este recordatorio, en vez de la
+            // descripción completa de la habilidad (ej: Sneak Attack al golpear con un arma).
+            const textoDisparo = resolverDescDinamicaHabilidad(hab.mensajeDisparo || hab.desc);
+            listaEfectos.push({ tipo: 'notificacion', descripcion: hab.nombre, mensaje: textoDisparo, colorCard: hab.colorCard, colorCardFondo: hab.colorCardFondo });
         } else if (hab.toggleBonoDano && togglesActivos[hab.nombre] && hab.disparadoresSiActivo
             && rasgoAplicaAContexto({ disparadores: hab.disparadoresSiActivo }, tiposContexto, item) && !yaEstaba()) {
-            const formula = hab.toggleBonoDano.formula;
-            const esDado = /^\d+d\d+$/i.test(String(formula).trim());
-            const valor = esDado ? String(formula).trim() : evaluarFormula(formula, { nivelPersonaje: nivelPersonajeGlobal });
+            const valor = valorBonoToggle(hab);
             const notaExtraTxt = hab.toggleBonoDano.notaExtra ? ` ${hab.toggleBonoDano.notaExtra}` : '';
             listaEfectos.push({
                 tipo: 'notificacion',
@@ -1496,6 +1524,7 @@ function resetearTurno() {
     if (huboToggleExpirado) {
         guardarToggles();
         guardarTogglesDuracion();
+        if (window._refrescarDanoCardsEquipo) window._refrescarDanoCardsEquipo();
         mostrarNotificacionGenerica(notificacionesExpirados);
     } else {
         guardarTogglesDuracion();
@@ -1948,7 +1977,10 @@ function tomarDescanso(tipo) {
             actualizarBadgeDuracionDOM(nombre);
         }
     });
-    if (huboToggleApagado) guardarToggles();
+    if (huboToggleApagado) {
+        guardarToggles();
+        if (window._refrescarDanoCardsEquipo) window._refrescarDanoCardsEquipo();
+    }
     // Limpiar también los contadores de duración por turno (ver "toggleDuracionTurnos"):
     // si se reactiva más adelante, arranca de 0 de nuevo, no desde donde había quedado.
     if (Object.keys(togglesDuracionContador).length > 0) {
@@ -2051,7 +2083,7 @@ async function init() {
                 img.src = 'img/personajes/placeholder.png';
             };
             // Nombre del archivo de imagen: por default es el mismo que personajeId (ej.
-            // "gabi_DM/selene" -> "img/personajes/gabi_DM/selene.png"), pero el JSON puede pisarlo
+            // "gabi_DM/sele" -> "img/personajes/gabi_DM/sele.png"), pero el JSON puede pisarlo
             // con "personaje.imagen" si el archivo de la foto se llama distinto (ej. un apodo:
             // "imagen": "gabi_DM/sele" -> "img/personajes/gabi_DM/sele.png").
             const nombreImagen = (data.personaje && data.personaje.imagen) ? data.personaje.imagen : personajeId;
@@ -2588,6 +2620,48 @@ async function init() {
         }
     };
 
+    // Daño que se muestra en la card de un arma (dados + mod STR/DEX + bonos de rasgos, arma
+    // mágica y toggles activos como Rage) y el texto de dónde sale cada "+N".
+    function calcularDanoCardArma(i) {
+        let danoFinal = i.dano || '';
+        let detalleStr = '';
+        if (i.dano && i.tipo) {
+            const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
+            const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
+            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
+            const { base: danoBaseLimpio, bonus: bonusHorneado } = extraerBonusHorneado(i.dano);
+            const detallesConMagico = [...bonosInfo.detalles];
+            if (i.bonoDano) detallesConMagico.push({ nombre: 'Arma mágica', valor: i.bonoDano });
+            if (bonusHorneado) detallesConMagico.push({ nombre: 'Arma mágica', valor: bonusHorneado });
+            detallesConMagico.push(...bonoDanoDeTogglesActivos(i));
+            danoFinal = formatearDanoConBonos(danoBaseLimpio, modUsado, detallesConMagico);
+            // De dónde sale cada "+N" (STR/DEX, Fighting Style, arma mágica, etc.)
+            detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, detallesConMagico) || '';
+        }
+        if (i.ataques && i.ataques > 1 && danoFinal) {
+            danoFinal = `${danoFinal} ×${i.ataques}`;
+        }
+        return { danoFinal, detalleStr };
+    }
+
+    // Recalcula el daño mostrado en todas las cards de armas sin re-renderizarlas. Se llama al
+    // prender/apagar un toggle de daño (activación, botón de apagar, fin de duración, descanso).
+    window._refrescarDanoCardsEquipo = () => {
+        data.equipo.forEach(i => {
+            if (i.oculto || !i.dano || !i.tipo) return;
+            const card = document.querySelector(`#equipo-grid .skill-btn[data-item-nombre="${CSS.escape(i.nombre)}"]`);
+            if (!card) return;
+            const { danoFinal, detalleStr } = calcularDanoCardArma(i);
+            const badge = card.querySelector('.dano-card-arma');
+            if (badge) badge.textContent = danoFinal;
+            const det = card.querySelector('.detalle-dano-card');
+            if (det) {
+                det.textContent = detalleStr;
+                det.style.display = detalleStr ? 'block' : 'none';
+            }
+        });
+    };
+
     data.equipo.forEach(i => {
         if (i.oculto) return;
 
@@ -2598,31 +2672,14 @@ async function init() {
         btn.style.alignItems = 'flex-start';
         btn.style.height = 'auto';
 
-        let danoFinal = i.dano || '';
-        let detalleDanoHTML = '';
-        if (i.dano && i.tipo) {
-            const modUsado = (i.tipo === 'finesse') ? modDexNum : modStr;
-            const nombreModUsado = (i.tipo === 'finesse') ? 'DEX' : 'STR';
-            const bonosInfo = calcularBonosDano(i, false, rasgosGlobal, statsGlobal, nombresQueOcupanMano());
-            const { base: danoBaseLimpio, bonus: bonusHorneado } = extraerBonusHorneado(i.dano);
-            const detallesConMagico = [...bonosInfo.detalles];
-            if (i.bonoDano) detallesConMagico.push({ nombre: 'Arma mágica', valor: i.bonoDano });
-            if (bonusHorneado) detallesConMagico.push({ nombre: 'Arma mágica', valor: bonusHorneado });
-            detallesConMagico.push(...bonoDanoDeTogglesActivos());
-            danoFinal = formatearDanoConBonos(danoBaseLimpio, modUsado, detallesConMagico);
+        const { danoFinal, detalleStr } = calcularDanoCardArma(i);
+        // El detalle se renderiza siempre (vacío si no hay bonos) para poder refrescarlo en
+        // vivo cuando se prende/apaga un toggle de daño (ej: Rage), ver refrescarDanoCardsEquipo.
+        const detalleDanoHTML = (i.dano && i.tipo)
+            ? `<span class="detalle-dano-card" style="font-size: 0.8rem; color: var(--text-muted); display: ${detalleStr ? 'block' : 'none'}; margin-top: 2px;">${detalleStr}</span>`
+            : '';
 
-            // Mostrar de dónde sale cada "+N" (STR/DEX, Fighting Style, arma mágica, etc.)
-            // para que no quede como una suma rara sin explicación (ej: "1d6+2+2+1").
-            const detalleStr = formatearDetalleBonos(modUsado, nombreModUsado, detallesConMagico);
-            if (detalleStr) {
-                detalleDanoHTML = `<span style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px;">${detalleStr}</span>`;
-            }
-        }
-        if (i.ataques && i.ataques > 1 && danoFinal) {
-            danoFinal = `${danoFinal} ×${i.ataques}`;
-        }
-
-        const danoHTML = danoFinal ? `<span class="skill-mod" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
+        const danoHTML = danoFinal ? `<span class="skill-mod dano-card-arma" style="background-color: #6a1b9a; color: white;">${danoFinal}</span>` : '';
         const bonoAtqCard = (i.dano && i.tipo) ? calcularBonoAtaqueArma(i, modStr, modDexNum, proficienciaActual) : null;
         const atqHTML = (bonoAtqCard !== null)
             ? `<span class="skill-mod" style="background-color: var(--gris-fill, #757575); color: white;" title="${i.proficiente === false ? 'Sin proficiencia' : 'Con proficiencia'}">Atq: ${formatMod(bonoAtqCard)}</span>`
@@ -2724,7 +2781,7 @@ async function init() {
                 }
             }
             // Toggles activos (ej: Radiant Soul) suman daño extra tanto a armas como a hechizos
-            detallesModalConMagico.push(...bonoDanoDeTogglesActivos());
+            detallesModalConMagico.push(...bonoDanoDeTogglesActivos(item));
             danoTexto = formatearDanoConBonos(danoBaseFinal, modUsado, detallesModalConMagico);
             if (ataquesItem > 1) danoTexto = `${danoTexto} ×${ataquesItem}`;
             ultimoDanoMostrado = item.tipoDano ? `${danoTexto} ${item.tipoDano}` : danoTexto;
@@ -2839,7 +2896,7 @@ async function init() {
         // compartido (ej: Channel Divinity 2/2, Puntos de Ki N/N). Las opciones concretas que la
         // gastan (con "consumeUsoDe" apuntando a ella) SÍ son accionables cada una por separado;
         // la habilidad base nunca se usa "directo" sin elegir una opción, así que no muestra botón.
-        const esHabilidad = !item.esPoolCompartido && (!!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe || !!item.otorgaGolpes || !!item.soloPostGolpe);
+        const esHabilidad = !item.esPoolCompartido && (!!item.usos || item.tipo === 'smite' || !!item.consumeUsoDe || !!item.otorgaGolpes || !!item.soloPostGolpe || item.usable === true);
         const esHechizoConRanura = (tipo === 'hechizo');
         const esCantrip = (tipo === 'cantrip');
         const esArma = (tipo === 'arma') && tieneDano;
@@ -2899,7 +2956,10 @@ async function init() {
                     // Ya está activa: el botón pasa a ser "Desactivar", no gasta usos
                     useSpellBtn.disabled = false;
                     useSpellBtn.textContent = `Desactivar ${item.nombre}`;
-                } else if (item.otorgaGolpes && !item.consumeUsoDe) {
+                } else if ((item.otorgaGolpes && !item.consumeUsoDe) || (item.usable === true && !item.usos && !item.consumeUsoDe)) {
+                    // Sin contador propio: otorga golpes gratis (ej: Martial Arts bonus attack) o es
+                    // una habilidad "usable" sin límite de usos (ej: Cunning Action), que solo
+                    // gasta el recurso de turno de su campo "accion".
                     // Otorga golpes gratis (ej: Martial Arts bonus attack): no tiene contador
                     // propio, solo depende de que tengas la Acción Bonus disponible.
                     useSpellBtn.disabled = false;
@@ -2963,7 +3023,7 @@ async function init() {
                 const archivoImagen = item.imagen || `${slugificarNombreItem(item.nombre)}.png`;
                 imgEquipoEl.onerror = () => {
                     imgEquipoEl.onerror = null;
-                    imgEquipoEl.src = 'img/equipamiento/placeholder.png';
+                    imgEquipoEl.src = 'img/personajes/placeholder.png';
                 };
                 imgEquipoEl.src = `img/equipamiento/${archivoImagen}`;
                 imgEquipoEl.alt = item.nombre;
@@ -3800,6 +3860,7 @@ async function init() {
                             actualizarBadgeDuracionDOM(habObj.nombre);
                         }
                         guardarToggles();
+                        if (window._refrescarDanoCardsEquipo) window._refrescarDanoCardsEquipo();
                         mostrarToast(`${habObj.nombre} desactivado`);
                     } else {
                         const partesTog = (habilidadesUsoState[habObj.nombre] || '0/0').split('/');
@@ -3823,6 +3884,7 @@ async function init() {
                             actualizarBadgeDuracionDOM(habObj.nombre);
                         }
                         guardarToggles();
+                        if (window._refrescarDanoCardsEquipo) window._refrescarDanoCardsEquipo();
                         const rTog = consumirAccion(tipoAccion);
                         mostrarToast(`✨ ¡${habObj.nombre} activado! ${rTog.mensaje}`.trim());
                     }
@@ -3965,6 +4027,13 @@ async function init() {
                     useSpellBtn.dataset.habilidad = '';
                     const rCD = consumirAccion(tipoAccion);
                     mostrarToast(`¡${habilidad} usada! (${nombreControlFallback}: ${habilidadesUsoState[nombreControlFallback]}) ${rCD.mensaje}`.trim());
+                } else if (habilidadesUsoState[habilidad] === undefined) {
+                    // Habilidad "usable" sin contador de usos (ej: Cunning Action): solo gasta
+                    // el recurso de turno declarado en su campo "accion".
+                    modal.style.display = 'none';
+                    useSpellBtn.dataset.habilidad = '';
+                    const rSinUsos = consumirAccion(tipoAccion);
+                    mostrarToast(`¡${habilidad} usada! ${rSinUsos.mensaje}`.trim());
                 } else {
                     usarHabilidad(habilidad);
                     useSpellBtn.dataset.habilidad = '';

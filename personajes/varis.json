@@ -247,6 +247,10 @@
       "disparadores": {
         "arma": "Oathbow"
       }
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Podés usar las propiedades de maestría de dos tipos de armas simples o marciales a tu elección.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
     }
   ],
   "habilidadesUso": [
@@ -287,7 +291,8 @@
       "magico": true,
       "bonoAtaque": 2,
       "bonoDano": 2,
-      "desc": "Arco largo mágico raro (requiere sintonía). Su habilidad especial (Enemigo Jurado) está en Rasgos."
+      "desc": "Arco largo mágico raro (requiere sintonía). Su habilidad especial (Enemigo Jurado) está en Rasgos.",
+      "maestriaArma": "Slow"
     },
     {
       "nombre": "Bracers of Archery",

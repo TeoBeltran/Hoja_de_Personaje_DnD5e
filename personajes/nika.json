@@ -466,7 +466,13 @@
         "tipoDano": "curación",
         "accion": "Acción",
         "distancia": "Toque",
-        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra."
+        "desc": "Tocás a una criatura y la curás 1d8 + tu modificador de CHA. Cada slot superior al 1 suma 1d8 extra.",
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "1d8+3",
+            "2": "2d8+3"
+          }
+        }
       },
       {
         "nivel": "NIVEL 1",

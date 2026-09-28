@@ -1,9 +1,10 @@
 {
   "personaje": {
-    "nombre": "Sele",
+    "nombre": "Selene",
     "clase": "Clérigo",
     "raza": "Tiefling",
     "tamano": "mediano",
+    "imagen": "gabi_DM/sele",
     "stats": {
       "STR": 8,
       "DEX": 10,
@@ -148,7 +149,7 @@
     "habilidades": [
       {
         "nombre": "Shelter of the Faithful",
-        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
+        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio.\nLos sacerdotes te tratan como un igual."
       }
     ]
   },
@@ -163,7 +164,7 @@
     },
     {
       "nombre": "Legado de Flegetos",
-      "desc": "Conocés el cantrip friends gracias a este rasgo (ya incluido en tus cantrips). Carisma es tu habilidad de conjuración para los hechizos de este rasgo."
+      "desc": "Conocés el cantrip friends gracias a este rasgo (ya incluido en tus cantrips).\nCarisma es tu habilidad de conjuración para los hechizos de este rasgo."
     },
     {
       "nombre": "Disciple of Life",
@@ -202,21 +203,21 @@
         "18": 3
       },
       "recupera": "corto",
-      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18). Cada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Preserve Life o Turn Undead)."
+      "desc": "Tenés usos por descanso corto (1 a nivel 1, 2 desde nivel 6, 3 desde nivel 18).\nCada vez que uses Channel Divinity, gastá 1 uso de este contador y elegí una de las opciones de abajo (Preserve Life o Turn Undead)."
     },
     {
       "nombre": "Channel Divinity: Preserve Life",
       "consumeUsoDe": "Channel Divinity",
       "accion": "Acción",
       "distancia": "30 ft",
-      "desc": "Repartís 15 HP de curación entre las criaturas que elijas dentro de 30 ft (podés incluirte). Ninguna criatura puede superar la mitad de su HP máximo con esta curación. No tiene efecto sobre no-muertos ni constructos. Consume 1 uso de Channel Divinity."
+      "desc": "Repartís 15 HP de curación entre las criaturas que elijas dentro de 30 ft (podés incluirte).\nNinguna criatura puede superar la mitad de su HP máximo con esta curación.\nNo tiene efecto sobre no-muertos ni constructos.\nConsume 1 uso de Channel Divinity."
     },
     {
       "nombre": "Channel Divinity: Turn Undead",
       "consumeUsoDe": "Channel Divinity",
       "accion": "Acción",
       "distancia": "30 ft",
-      "desc": "Cada no-muerto que pueda verte u oírte dentro de 30 ft hace tirada de salvación de WIS. Si falla, queda Turned durante 1 minuto o hasta que reciba daño. Consume 1 uso de Channel Divinity."
+      "desc": "Cada no-muerto que pueda verte u oírte dentro de 30 ft hace tirada de salvación de WIS.\nSi falla, queda Turned durante 1 minuto o hasta que reciba daño.\nConsume 1 uso de Channel Divinity."
     },
     {
       "nombre": "Legado de Flegetos: Charm Person",
@@ -225,7 +226,7 @@
       "accion": "Acción",
       "distancia": "30 ft",
       "duracion": "Concentración, 1 hora",
-      "desc": "Podés lanzar charm person como un hechizo de Nivel 2 usando este rasgo, sin gastar espacio de conjuro. Recuperás la habilidad de usarlo al completar un descanso largo."
+      "desc": "Podés lanzar charm person como un hechizo de Nivel 2 usando este rasgo, sin gastar espacio de conjuro.\nRecuperás la habilidad de usarlo al completar un descanso largo."
     }
   ],
   "equipo": [
@@ -295,7 +296,7 @@
         "accion": "Acción",
         "distancia": "Toque",
         "duracion": "Concentración, 1 minuto",
-        "desc": "Tocás a una criatura dispuesta. Antes de que termine el hechizo, esa criatura puede tirar 1d4 y sumarlo a una prueba de habilidad a elección."
+        "desc": "Tocás a una criatura dispuesta.\nAntes de que termine el hechizo, esa criatura puede tirar 1d4 y sumarlo a una prueba de habilidad a elección."
       },
       {
         "nivel": "CANTRIPS",
@@ -311,7 +312,7 @@
         "accion": "Acción",
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
-        "desc": "Ganás Ventaja en todas las pruebas de Carisma dirigidas a una criatura a elección dentro del rango mientras dure el hechizo. Al terminar, el objetivo se da cuenta de que usaste magia para influenciar su humor y puede quedar hostil hacia vos."
+        "desc": "Ganás Ventaja en todas las pruebas de Carisma dirigidas a una criatura a elección dentro del rango mientras dure el hechizo.\nAl terminar, el objetivo se da cuenta de que usaste magia para influenciar su humor y puede quedar hostil hacia vos."
       },
       {
         "nivel": "NIVEL 1",
@@ -319,7 +320,7 @@
         "accion": "Acción",
         "distancia": "30 ft",
         "duracion": "Concentración, 1 minuto",
-        "desc": "Bendecís a 3 criaturas a elección dentro del rango. Cada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
+        "desc": "Bendecís a 3 criaturas a elección dentro del rango.\nCada vez que una bendecida hace una tirada de ataque o salvación, tira 1d4 y lo suma al resultado."
       },
       {
         "nivel": "NIVEL 1",
@@ -336,7 +337,13 @@
             "rasgoRequerido": "Disciple of Life",
             "descripcion": "Disciple of Life (curación extra al objetivo)"
           }
-        ]
+        ],
+        "escalaSlot": {
+          "danoPorNivel": {
+            "1": "1d8",
+            "2": "2d8"
+          }
+        }
       },
       {
         "nivel": "NIVEL 1",
@@ -345,7 +352,7 @@
         "tipoDano": "curación",
         "accion": "Acción Bonus",
         "distancia": "60 ft",
-        "desc": "Una criatura a elección dentro del rango recupera 1d4 + tu modificador de WIS de HP. No tiene efecto sobre no-muertos ni constructos. Cada slot superior al 1 suma 1d4 extra.",
+        "desc": "Una criatura a elección dentro del rango recupera 1d4 + tu modificador de WIS de HP.\nNo tiene efecto sobre no-muertos ni constructos.\nCada slot superior al 1 suma 1d4 extra.",
         "efectos": [
           {
             "tipo": "autoCuracion",
@@ -370,7 +377,7 @@
         "accion": "Acción Bonus",
         "distancia": "60 ft",
         "duracion": "1 minuto",
-        "desc": "Creás un arma espectral flotante dentro del rango que dura 1 minuto o hasta que volvés a lanzar este hechizo. Como Acción Bonus en turnos posteriores podés mover el arma hasta 20 ft y atacar con ella a una criatura dentro de 5 ft: en un golpe hace 1d8 + tu modificador de WIS de daño de fuerza. Cada dos slots superiores al 2 suma 1d8 extra."
+        "desc": "Creás un arma espectral flotante dentro del rango que dura 1 minuto o hasta que volvés a lanzar este hechizo.\nComo Acción Bonus en turnos posteriores podés mover el arma hasta 20 ft y atacar con ella a una criatura dentro de 5 ft: en un golpe hace 1d8 + tu modificador de WIS de daño de fuerza.\nCada dos slots superiores al 2 suma 1d8 extra."
       },
       {
         "nivel": "NIVEL 2",
@@ -378,7 +385,7 @@
         "accion": "Acción",
         "distancia": "30 ft",
         "duracion": "8 horas",
-        "desc": "Elegís 3 criaturas en rango. Cada una gana 5 HP máximos y actuales mientras dure el hechizo. Si se lanza con slot Nivel 3, son 10 HP."
+        "desc": "Elegís 3 criaturas en rango.\nCada una gana 5 HP máximos y actuales mientras dure el hechizo.\nSi se lanza con slot Nivel 3, son 10 HP."
       }
     ]
   },

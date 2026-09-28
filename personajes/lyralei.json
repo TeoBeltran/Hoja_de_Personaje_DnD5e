@@ -239,6 +239,10 @@
     {
       "nombre": "Competencia: Herramientas de Ladrón",
       "desc": "Tenés competencia con las Herramientas de Ladrón (Thieves' Tools): podés usarlas para forzar cerraduras y desarmar trampas."
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Podés usar las propiedades de maestría de dos tipos de armas a tu elección: armas simples, o armas marciales con la propiedad Finesse o Liviana.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
     }
   ],
   "habilidadesUso": [
@@ -297,14 +301,15 @@
       "magico": true,
       "bonoAtaque": 1,
       "bonoDano": 1,
-      "desc": "Estoque mágico. Finesse, a una mano. +1 a las tiradas de ataque y al daño. Cuenta como arma mágica para superar resistencias e inmunidades. Válido para Sneak Attack."
+      "desc": "Estoque mágico. Finesse, a una mano. +1 a las tiradas de ataque y al daño. Cuenta como arma mágica para superar resistencias e inmunidades. Válido para Sneak Attack.",
+      "maestriaArma": "Vex"
     },
     {
       "nombre": "Ballesta de Mano +1 (Hand Crossbow)",
       "imagen": "Crossbow.png",
       "dano": "1d6",
       "tipoDano": "perforante",
-      "tipo": "rango",
+      "tipo": "finesse",
       "manos": 1,
       "peso": 3,
       "valor": 1000,
@@ -313,7 +318,8 @@
       "magico": true,
       "bonoAtaque": 1,
       "bonoDano": 1,
-      "desc": "Ballesta de mano mágica. Ligera, a una mano. Propiedades: Recarga, Munición. +1 a las tiradas de ataque y al daño. Cuenta como arma mágica para superar resistencias e inmunidades. Válido para Sneak Attack."
+      "desc": "Ballesta de mano mágica. Ligera, a una mano. Propiedades: Recarga, Munición. +1 a las tiradas de ataque y al daño. Cuenta como arma mágica para superar resistencias e inmunidades. Válido para Sneak Attack.",
+      "maestriaArma": "Vex"
     },
     {
       "nombre": "Capa de protección (Cloak of Protection)",

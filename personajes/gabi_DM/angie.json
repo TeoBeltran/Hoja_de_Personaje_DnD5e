@@ -2,7 +2,7 @@
   "personaje": {
     "nombre": "Angie",
     "clase": "Pícaro",
-    "raza": "Humana",
+    "raza": "Semielfa (Half-Elf)",
     "tamano": "mediano",
     "stats": {
       "STR": 8,
@@ -16,19 +16,19 @@
   "improvements": {
     "race": [
       {
+        "atributo": "CHA",
+        "valor": 2,
+        "motivo": "Half-Elf"
+      },
+      {
         "atributo": "DEX",
         "valor": 1,
-        "motivo": "Humana"
+        "motivo": "Half-Elf"
       },
       {
         "atributo": "CON",
         "valor": 1,
-        "motivo": "Humana"
-      },
-      {
-        "atributo": "CHA",
-        "valor": 1,
-        "motivo": "Humana"
+        "motivo": "Half-Elf"
       }
     ],
     "feats": [],
@@ -154,7 +154,7 @@
     "habilidades": [
       {
         "nombre": "Shelter of the Faithful",
-        "desc": "Vos y tus compañeros pueden recibir hospitalidad gratuita en templos de tu fe: curación, descanso, comida y refugio. Los sacerdotes te tratan como un igual."
+        "desc": "Vos y tus compañeros pueden esperar curación gratuita en un establecimiento de tu fe."
       }
     ]
   },
@@ -165,19 +165,11 @@
     },
     {
       "nombre": "Fey Ancestry",
-      "desc": "Tenés Ventaja en tiradas de salvación contra quedar Encantada (Charmed), y la magia no puede dormirte."
+      "desc": "Ventaja en tiradas de salvación contra quedar encantada, e inmune a la magia que duerme."
     },
     {
       "nombre": "Thieves' Cant",
-      "desc": "Conocés la Jerga de Ladrones: una mezcla secreta de dialecto, jerga y señas que te permite ocultar mensajes en una conversación normal. Solo otra criatura que también la conozca nota el mensaje oculto; para cualquier otro oyente, suena a charla común."
-    },
-    {
-      "nombre": "Sneak Attack",
-      "desc": "Revisar la sección de Características Activas."
-    },
-    {
-      "nombre": "Cunning Action",
-      "desc": "Revisar la sección de Características Activas."
+      "desc": "Transmitís mensajes secretos ocultos dentro de una conversación normal."
     },
     {
       "nombre": "Roguish Archetype: Swashbuckler",
@@ -185,11 +177,15 @@
     },
     {
       "nombre": "Fancy Footwork",
-      "desc": "Durante tu turno, si atacás cuerpo a cuerpo a una criatura, esa criatura no puede hacerte ataques de oportunidad por el resto de tu turno."
+      "desc": "Cuando elegís este arquetipo a nivel 3, aprendés a asestar un golpe y escabullirte sin represalias.\nDurante tu turno, si hacés un ataque cuerpo a cuerpo contra una criatura, esa criatura no puede hacerte ataques de oportunidad por el resto de tu turno."
     },
     {
       "nombre": "Rakish Audacity",
-      "desc": "Sumás tu modificador de CHA a tus tiradas de Iniciativa (esto NO está calculado en el campo de Iniciativa automático de la ficha — sumalo manualmente al tirar). Además, no necesitás Ventaja en la tirada de ataque para usar Sneak Attack si ningún otro enemigo está a 5 ft de vos y no tenés Desventaja en el ataque. El resto de las reglas de Sneak Attack siguen aplicando igual."
+      "desc": "A partir del nivel 3, tu confianza inconfundible te impulsa a la batalla.\nPodés sumar tu modificador de Carisma a tus tiradas de iniciativa.\nAdemás, no necesitás ventaja en tu tirada de ataque para usar tu Sneak Attack si ninguna criatura aparte de tu objetivo está a 5 ft de vos y no tenés desventaja.\nTodas las demás reglas del rasgo de clase Sneak Attack siguen aplicando."
+    },
+    {
+      "nombre": "Weapon Mastery",
+      "desc": "Podés usar las propiedades de maestría de dos tipos de armas a tu elección: armas simples, o armas marciales con la propiedad Finesse o Liviana.\nAl terminar un Descanso Largo, podés cambiar uno de esos tipos de arma por otro que cumpla los requisitos."
     }
   ],
   "habilidadesUso": [
@@ -197,7 +193,16 @@
       "nombre": "Cunning Action",
       "accion": "Acción Bonus",
       "distancia": "Propio",
-      "desc": "Como Acción Bonus en cada uno de tus turnos, podés Correr (Dash), Desengancharte (Disengage) o Esconderte (Hide)."
+      "desc": "Como acción bonus podés Correr (Dash), Destrabarte (Disengage) o Esconderte (Hide). Una vez por turno.",
+      "usable": true
+    },
+    {
+      "nombre": "Steady Aim",
+      "usable": true,
+      "accion": "Acción Bonus",
+      "distancia": "Propio",
+      "duracion": "Turno actual",
+      "desc": "Te das Ventaja en tu próxima tirada de ataque de este turno.\nSolo podés usarlo si no te moviste durante este turno, y después de usarlo tu Velocidad es 0 hasta el final del turno."
     },
     {
       "nombre": "Sneak Attack",
@@ -214,7 +219,20 @@
         "19": "10d6"
       },
       "accion": "Sin acción (parte de un ataque)",
-      "desc": "Una vez por turno, sumás {sneakAttackDados}d6 de daño extra a UN ataque que hagas con un arma finesse o a distancia, si tenés Ventaja en la tirada de ataque, o si un aliado está a 5 ft del objetivo (y vos no tenés Desventaja en el ataque). Con Rakish Audacity, tampoco necesitás Ventaja si ningún otro enemigo está a 5 ft de vos y no tenés Desventaja. No se puede usar más de una vez por turno."
+      "desc": "{sneakAttackDados}d6 de daño extra en un ataque en el que tengas ventaja, o si otro enemigo de la criatura está a 5 ft de ella.\nUna vez por turno.",
+      "disparadores": {
+        "arma": [
+          {
+            "tipo": "finesse"
+          },
+          {
+            "tipo": "ranged"
+          }
+        ]
+      },
+      "mensajeDisparo": "+{sneakAttackDados}d6 si tenés ventaja, si otro enemigo del objetivo está a 5 ft de él, o si no hay otra criatura a 5 ft tuyo y no tenés desventaja.\nUna vez por turno.",
+      "colorCard": "#e65100",
+      "colorCardFondo": "#fff3e0"
     }
   ],
   "equipo": [
@@ -229,16 +247,18 @@
       "desc": "Armadura ligera. CA: 11 + Modificador de Destreza."
     },
     {
-      "nombre": "Espada Corta (Shortsword)",
+      "nombre": "Ballesta de Mano (Hand Crossbow)",
+      "imagen": "Crossbow.png",
       "dano": "1d6",
       "tipoDano": "perforante",
       "tipo": "finesse",
       "manos": 1,
-      "peso": 2,
-      "valor": 10,
+      "peso": 3,
+      "valor": 75,
       "accion": "Acción",
-      "distancia": "Melee 5 ft",
-      "desc": "Espada corta. Finesse, a una mano."
+      "distancia": "30/120 ft",
+      "maestriaArma": "Vex",
+      "desc": "Arma marcial a distancia, liviana, a una mano.\nPropiedades: Munición (30/120 ft), Recarga.\nPropiedad de maestría: Hostigar (Vex)."
     },
     {
       "nombre": "Estoque (Rapier)",
@@ -250,7 +270,8 @@
       "valor": 25,
       "accion": "Acción",
       "distancia": "Melee 5 ft",
-      "desc": "Estoque. Finesse, a una mano."
+      "desc": "Estoque. Finesse, a una mano.\nPropiedad de maestría: Hostigar (Vex).",
+      "maestriaArma": "Vex"
     },
     {
       "nombre": "Daga",
@@ -262,12 +283,19 @@
       "valor": 2,
       "accion": "Acción",
       "distancia": "Melee 5 ft / Arrojadiza 20/60 ft",
-      "desc": "Arma finesse, liviana y arrojadiza."
+      "desc": "Arma finesse, liviana y arrojadiza.\nPropiedad de maestría: Golpe Doble (Nick)."
     }
   ],
   "hechizos": {
     "ranuras": [],
     "lista": []
   },
-  "inventario": []
+  "inventario": [
+    {
+      "nombre": "Virotes",
+      "peso": 0.075,
+      "cantidad": 20,
+      "desc": "Munición para ballesta."
+    }
+  ]
 }
